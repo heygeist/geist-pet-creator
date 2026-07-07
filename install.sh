@@ -6,9 +6,8 @@ INSTALLER="$CODEX_HOME/skills/.system/skill-installer/scripts/install-skill-from
 
 if [[ ! -f "$INSTALLER" ]]; then
   echo "Could not find the Codex skill installer at: $INSTALLER" >&2
-  echo "Install from Codex instead: Install the geist-pet-creator skill from https://github.com/sseerrnn/motherclaw/tree/main/geist-pet-creator" >&2
+  echo "Install from Codex instead: Install the geist-pet-creator skill from https://github.com/motherclaw/geist-pet-creator/tree/main/geist-pet-creator" >&2
   exit 1
 fi
 
-python "$INSTALLER" --repo sseerrnn/motherclaw --path geist-pet-creator "$@"
-
+python "$INSTALLER" --repo motherclaw/geist-pet-creator --path geist-pet-creator "$@"
