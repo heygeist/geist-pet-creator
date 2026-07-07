@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geist Pet Creator"
+  short_description: "Create approved Geist Pet bundles"
+  default_prompt: "Use $geist-pet-creator to create a Geist Pet from this brief with pre-screened candidates for my approval, then validate and export it."
