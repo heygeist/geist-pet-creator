@@ -7,14 +7,14 @@ Installable Codex skill bundle for creating, validating, repairing, exporting, a
 From Codex, ask:
 
 ```text
-Install the geist-pet-creator skill from https://github.com/motherclaw/geist-pet-creator/tree/main/geist-pet-creator
+Install the geist-pet-creator skill from https://github.com/heygeist/geist-pet-creator/tree/main/geist-pet-creator
 ```
 
 Or run the bundled helper directly:
 
 ```bash
 python "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/install-skill-from-github.py" \
-  --repo motherclaw/geist-pet-creator \
+  --repo heygeist/geist-pet-creator \
   --path geist-pet-creator
 ```
 
