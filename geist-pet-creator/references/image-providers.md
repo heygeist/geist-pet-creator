@@ -28,10 +28,11 @@ Turn it on by writing `imagegen.json` into the Pet source bundle:
 {
   "provider": "openrouter",
   "model": "openai/gpt-image-2",
-  "output_format": "png",
-  "background": "transparent"
+  "output_format": "png"
 }
 ```
+
+No `background` key: how a frame gets its alpha is a fact about the model, so `ALPHA_PATHS` in `generate_candidates.py` decides it. The template used to ship `"background": "transparent"`, which answered HTTP 400 on the default model and then paid for an opaque draw nobody could use — see § Transparency below.
 
 The presence of that file switches the mode. A human asking for a different model in a single run overrides `model` for that run only.
 
@@ -125,6 +126,8 @@ creativity with no character reference. Cost is a projection from measured per-f
 | Model | 57-frame cost | 57-frame time | Alpha | Verdict |
 | --- | ---: | ---: | --- | --- |
 | **`openai/gpt-image-2`** (default) | **$1.33** | 68 min | params-dropped + chroma | best on cost *and* character completeness |
+
+Every figure in that column is `57 x` a median that billed **two** calls per frame, because that is what the pipeline did when the eval ran. `ALPHA_PATHS` now bills one call for the seven models with a known alpha path, so halve the column to project a pass today — `openai/gpt-image-2` lands near **$0.67**. Re-run `eval_providers.py` to replace the projection with a measurement.
 | `openai/gpt-5-image-mini` | $2.89 | 51 min | **native** | cheapest true-alpha path |
 | `google/gemini-3.1-flash-lite-image` | $3.88 | **11 min** | chroma-key | by far the fastest; quality drops |
 | `google/gemini-3.1-flash-image` | $7.74 | 22 min | chroma-key | |
@@ -148,35 +151,42 @@ Measured 2026-08-12 over 42 sheets, six cases per model. Full record in
 `comparable` counts sheets whose cells came out usable together — right count, contained, matched
 scale and baseline, row-major order intact.
 
-| Model | Comparable | Sheet cost | Median time |
-| --- | ---: | ---: | ---: |
-| **`google/gemini-3.1-flash-image`** | **6/6** | $0.0687 | 25.2s |
-| `google/gemini-3.1-flash-lite-image` | 5/6 | **$0.0343** | **5.5s** |
-| `google/gemini-3-pro-image` | 4/6 | $0.1386 | 36.2s |
-| `x-ai/grok-imagine-image-2.0` | 4/6 | $0.0750 | 14.2s |
-| `openai/gpt-5-image-mini` | 2/6 | $0.0520 | 51.8s |
-| `openai/gpt-5-image` | 2/6 | $0.2578 | 51.6s |
-| `openai/gpt-image-2` (default) | **1/6** | $0.0252 | 33.9s |
+**A sheet has two scores, and they disagree.** `comparable` is mechanical and measures *layout* only.
+The human ranking measures *style and identity*, which is the thing a concept sheet exists to let
+someone choose between.
 
-**`openai/gpt-image-2` wins the frame eval and comes last here.** These are different jobs: a frame
-redraws one approved creature, a sheet places many on a grid at matched scale and baseline. Layout
-skill is not something the frame eval ever tested.
+| Model | Layout | Human rank | Sheet cost | Median time |
+| --- | ---: | ---: | ---: | ---: |
+| `google/gemini-3.1-flash-image` | **6/6** | 3rd | $0.0687 | 25.2s |
+| `google/gemini-3.1-flash-lite-image` | 5/6 | — | **$0.0343** | **5.5s** |
+| `google/gemini-3-pro-image` | 5/6 | — | $0.1386 | 36.2s |
+| `openai/gpt-5-image-mini` | 4/6 | — | $0.0520 | 51.8s |
+| `x-ai/grok-imagine-image-2.0` | 3/6 | **2nd** | $0.0750 | 14.2s |
+| `openai/gpt-5-image` | 2/6 | — | $0.2578 | 51.6s |
+| **`openai/gpt-image-2`** (default) | 2/6 | **1st** | **$0.0252** | 33.9s |
 
-`DEFAULT_MODEL` stays as it is, because 56 of a Pet's 57 frames are frames and that is where the cost
-lives. **Name a Gemini model for the one sheet call instead**, with `--model`, which overrides for a
-single run without touching the bundle:
+**Keep `openai/gpt-image-2` for sheets as well as frames.** It is ranked first by a human for style
+and identity, and it is also the cheapest sheet drawer measured. Do not repin it off the mechanical
+column: the two failure kinds are not equally serious.
+
+- **Layout faults are recoverable.** A crossing cell is caught at pre-screen and struck out on its
+  own, the cropper snaps to the drawn gutters rather than an even grid, and a whole redraw costs
+  $0.10.
+- **Style faults are not.** A tidy grid of characterless mascots has failed the only job a concept
+  sheet has, and nothing downstream fixes it.
+
+Read the mechanical column as *how much pre-screening to expect*, not as quality. `gpt-image-2` at
+2/6 will more often need a cell rejected — which is cheap, and which the per-cell policy already
+handles.
+
+**The exception is a sheet that must be layout-perfect** — twelve cells, or a sheet going to someone
+without a pre-screen pass. `google/gemini-3.1-flash-image` is the only model that passed every case
+including the 12-cell stress. Name it for that one run, and expect weaker style in exchange:
 
 ```
 scripts/with_openrouter_key.sh python3 scripts/generate_candidates.py PetName.pet \
-  --action concept-sheet --cells 6 --model google/gemini-3.1-flash-image
+  --action concept-sheet --cells 12 --model google/gemini-3.1-flash-image
 ```
-
-The split is by vendor, not by tier. All three Gemini models place mascots on the implied grid; no
-OpenAI model reliably does, and on the 3-cell sheet all three OpenAI models had every cell cross its
-rect. The cheapest Gemini beats the most expensive OpenAI model 5 to 2. Use
-`gemini-3.1-flash-lite-image` at six cells or fewer — it matches the winner there, costs half as
-much, and is four times faster. Reserve `gemini-3.1-flash-image` for a 12-cell sheet, which nothing
-else passed.
 
 ### The API
 
@@ -317,21 +327,30 @@ python "$SKILL_DIR/scripts/generate_candidates.py" /absolute/path/PetName.pet \
 
 `--variants` defaults to 1 when `--cell-image` names an approved sheet cell, because the sheet already showed the human their options. It defaults to 3 without one, which is the normal per-action minimum for a gate nothing has previewed.
 
-## Transparency: request, verify, fall back
+## Transparency: the model's capability decides the request
 
-Providers vary in whether they honour `background: transparent`, and a provider that ignores it returns an opaque image with no error. So the script checks the result instead of trusting the request:
+Providers vary in whether they honour `background: transparent`, and only two of the nine measured models return real alpha. `ALPHA_PATHS` in `generate_candidates.py` records which is which, so a frame is asked for the way it can actually be delivered:
 
-1. Ask for `background: transparent` with `output_format: png`.
-2. Verify the returned image: a real share of the canvas is transparent, and the border is clear.
-3. When that fails, ask again for a flat green chroma-key background and key it out locally.
+| Entry | What the first call asks for | Paid calls per frame |
+| --- | --- | ---: |
+| `native` | `background: transparent`, verified on the way back | 1 |
+| `chroma` | a flat green field, keyed out locally | 1 |
+| `chroma-bare` | the same, with `output_format`/`background` omitted because the model rejects them | 1 |
+| absent from the table | transparent first, then chroma when the result comes back opaque | 1-2 |
 
-`candidate-context.json` records which path produced each frame under `provenance[].alpha_path`, so a Pet built through the fallback is visible as such later.
+**This is where the largest single cost leak was.** The script used to ask every model for transparency and check the answer, which is right when the capability is unknown and pure waste when it is known. `openai/gpt-image-2` is the default and can never return alpha: the first request 400'd, the second drew an opaque image that was discarded every time, and the third drew the frame. Measured 2026-08-12 on the Karate Crown Guardian build — 2 frames cost 4 calls / $0.101 before the table, and 2 calls / $0.059 after.
+
+Gate on the model id rather than a config flag. The fact belongs to the model, and a flag lets a bundle quietly ask for something the provider cannot do and pay a full draw to find out.
+
+A model absent from the table keeps the ask-verify-fall-back path, which is what an unknown capability deserves. Measure it with `eval_providers.py`, then add the entry.
+
+`candidate-context.json` records which path produced each frame under `provenance[].alpha_path`, alongside `alpha_path_source` — `table` or `probed` — so a frame drawn through a stale entry is visible as such later.
 
 None of this applies to `--action concept-sheet`. A sheet asks for opaque warm off-white paper on purpose — the negative space between cells is what keeps the mascots readable — so there is nothing to verify and nothing to fall back to. Cells become reference images, and a reference image does not need alpha.
 
 ## Spend guards
 
-Three variants across nine states at one call per frame is 171 calls. Nothing else in the pipeline notices that, so every run carries a ceiling:
+A ceiling is a runaway-loop guardrail, not a spend control. Every run carries one:
 
 - `--max-images` caps the number of provider calls.
 - `--max-cost-usd` caps spend, summed from `usage.cost` on each response.
@@ -345,6 +364,20 @@ The defaults are sized per action, because an 8-frame state and a one-call sheet
 | the nine animation states | 24 | $3.00 | possible |
 
 A one-call sheet under a $3.00 ceiling has no real guard, so a mistyped flag would keep drawing until something else noticed. Under $0.10 it stops immediately.
+
+### Pre-flight stops a bad state at two frames
+
+A ceiling only catches a runaway. What actually cost money was a state that ran to completion carrying a defect that was already in frame 0.
+
+So the mechanical checks get a veto. After each of the first `PREFLIGHT_FRAMES` (2) frames, the run stops if the cell fails any of:
+
+- **edge contact** — the body reaches outside safe padding
+- **opaque fraction** — the background did not key out, so a panel or backdrop came back as art
+- **area delta** — the body's bbox is more than 35% off frame 0's, so it is not the same character moving
+
+The run still writes its packet, so the frames drawn are evidence rather than a loss, and `ok` comes back `false` with the failing check named. That is a prompt or a canonical-base problem: drawing the state again unchanged spends the same money for the same result.
+
+What pre-flight cannot see is anatomy. A state that draws legs fits, keys out, and holds its area perfectly. Legs are the prompt's job — `LEGLESS_MOTION` in `geist_house.py`.
 
 A run that reaches either ceiling stops and reports what it spent. The chroma-key fallback costs a second call and counts against both ceilings, so any action that can fall back is capped with room for it. A concept sheet never falls back: it asks for paper, and paper is what it wants.
 

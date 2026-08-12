@@ -206,14 +206,21 @@
     },
     {
       "model": "google/gemini-3-pro-image",
-      "sheets_comparable": "4/6",
+      "sheets_comparable": "5/6",
       "median_sheet_usd": 0.1386,
       "median_s": 39.92,
       "run_cost_usd": 0.8324
     },
     {
-      "model": "x-ai/grok-imagine-image-2.0",
+      "model": "openai/gpt-5-image-mini",
       "sheets_comparable": "4/6",
+      "median_sheet_usd": 0.052,
+      "median_s": 53.38,
+      "run_cost_usd": 0.2814
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "sheets_comparable": "3/6",
       "median_sheet_usd": 0.08,
       "median_s": 15.64,
       "run_cost_usd": 0.46
@@ -226,15 +233,8 @@
       "run_cost_usd": 1.391
     },
     {
-      "model": "openai/gpt-5-image-mini",
-      "sheets_comparable": "2/6",
-      "median_sheet_usd": 0.052,
-      "median_s": 53.38,
-      "run_cost_usd": 0.2814
-    },
-    {
       "model": "openai/gpt-image-2",
-      "sheets_comparable": "1/6",
+      "sheets_comparable": "2/6",
       "median_sheet_usd": 0.0298,
       "median_s": 35.67,
       "run_cost_usd": 0.1702
@@ -256,12 +256,12 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-09, cell-10"
+        "crosses its cell: cell-01, cell-02, cell-03, cell-04"
       ],
       "sheet": {
         "paper": [
           246,
-          246,
+          247,
           236
         ],
         "cells_drawn": 12,
@@ -270,115 +270,111 @@
           "cell-01",
           "cell-02",
           "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06",
-          "cell-07",
-          "cell-08",
-          "cell-09",
-          "cell-10"
+          "cell-04"
         ],
-        "scale_cv": 0.1064,
-        "baseline_spread": 0.1037,
+        "scale_cv": 0.0889,
+        "baseline_spread": 0.0978,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6756,
+            "coverage": 0.5954,
             "height_fraction": 0.9298,
-            "baseline_fraction": 1.0
+            "baseline_fraction": 0.9956
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6768,
-            "height_fraction": 0.8495,
-            "baseline_fraction": 1.0
+            "coverage": 0.7433,
+            "height_fraction": 0.8465,
+            "baseline_fraction": 0.9956
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5078,
-            "height_fraction": 0.6957,
-            "baseline_fraction": 1.0
+            "coverage": 0.5571,
+            "height_fraction": 0.693,
+            "baseline_fraction": 0.9956
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6222,
-            "height_fraction": 0.8562,
-            "baseline_fraction": 1.0
+            "coverage": 0.5893,
+            "height_fraction": 0.8553,
+            "baseline_fraction": 0.9956
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7454,
-            "height_fraction": 0.9597,
-            "baseline_fraction": 0.9597
+            "contained": true,
+            "coverage": 0.6474,
+            "height_fraction": 0.8356,
+            "baseline_fraction": 0.9635
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.8542,
-            "height_fraction": 0.9597,
-            "baseline_fraction": 0.9597
+            "contained": true,
+            "coverage": 0.6795,
+            "height_fraction": 0.8493,
+            "baseline_fraction": 0.9635
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6966,
-            "height_fraction": 0.9631,
-            "baseline_fraction": 0.9631
+            "contained": true,
+            "coverage": 0.7662,
+            "height_fraction": 0.9589,
+            "baseline_fraction": 0.968
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7673,
-            "height_fraction": 0.9631,
-            "baseline_fraction": 0.9631
+            "contained": true,
+            "coverage": 0.6594,
+            "height_fraction": 0.8767,
+            "baseline_fraction": 0.9635
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.626,
-            "height_fraction": 0.806,
-            "baseline_fraction": 0.8963
+            "contained": true,
+            "coverage": 0.6232,
+            "height_fraction": 0.8044,
+            "baseline_fraction": 0.8978
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7354,
-            "height_fraction": 0.8294,
-            "baseline_fraction": 0.8963
+            "contained": true,
+            "coverage": 0.6573,
+            "height_fraction": 0.8267,
+            "baseline_fraction": 0.8978
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": true,
-            "coverage": 0.508,
-            "height_fraction": 0.7023,
-            "baseline_fraction": 0.8963
+            "coverage": 0.5611,
+            "height_fraction": 0.7022,
+            "baseline_fraction": 0.8978
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6295,
-            "height_fraction": 0.8662,
-            "baseline_fraction": 0.8963
+            "coverage": 0.5905,
+            "height_fraction": 0.8622,
+            "baseline_fraction": 0.8978
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3-pro-image",
@@ -404,35 +400,37 @@
         "cells_drawn": 3,
         "cells_expected": 3,
         "cells_crossing": [],
-        "scale_cv": 0.0962,
-        "baseline_spread": 0.0703,
+        "scale_cv": 0.0679,
+        "baseline_spread": 0.0439,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5653,
-            "height_fraction": 0.8691,
-            "baseline_fraction": 0.916
+            "coverage": 0.5421,
+            "height_fraction": 0.8373,
+            "baseline_fraction": 0.8822
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5674,
-            "height_fraction": 0.7852,
-            "baseline_fraction": 0.9043
+            "coverage": 0.5488,
+            "height_fraction": 0.7559,
+            "baseline_fraction": 0.8715
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4499,
-            "height_fraction": 0.6855,
-            "baseline_fraction": 0.8457
+            "coverage": 0.4653,
+            "height_fraction": 0.7113,
+            "baseline_fraction": 0.8383
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3-pro-image",
@@ -458,59 +456,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.102,
-        "baseline_spread": 0.1085,
+        "scale_cv": 0.0991,
+        "baseline_spread": 0.1076,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5284,
-            "height_fraction": 0.8491,
-            "baseline_fraction": 0.9316
+            "coverage": 0.5554,
+            "height_fraction": 0.8421,
+            "baseline_fraction": 0.9243
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5333,
-            "height_fraction": 0.7476,
-            "baseline_fraction": 0.9316
+            "coverage": 0.5058,
+            "height_fraction": 0.7434,
+            "baseline_fraction": 0.9276
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3816,
-            "height_fraction": 0.6132,
-            "baseline_fraction": 0.9316
+            "coverage": 0.3768,
+            "height_fraction": 0.6118,
+            "baseline_fraction": 0.9276
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4623,
-            "height_fraction": 0.7429,
-            "baseline_fraction": 0.8231
+            "coverage": 0.4903,
+            "height_fraction": 0.7433,
+            "baseline_fraction": 0.82
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.575,
-            "height_fraction": 0.6816,
-            "baseline_fraction": 0.8231
+            "coverage": 0.5471,
+            "height_fraction": 0.6833,
+            "baseline_fraction": 0.82
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4242,
-            "height_fraction": 0.6816,
-            "baseline_fraction": 0.8231
+            "coverage": 0.4209,
+            "height_fraction": 0.6833,
+            "baseline_fraction": 0.82
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3-pro-image",
@@ -525,10 +525,8 @@
         1264,
         848
       ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-03, cell-04, cell-06"
-      ],
+      "mechanical_pass": true,
+      "reasons": [],
       "sheet": {
         "paper": [
           248,
@@ -537,64 +535,62 @@
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
-        "cells_crossing": [
-          "cell-03",
-          "cell-04",
-          "cell-06"
-        ],
-        "scale_cv": 0.0633,
-        "baseline_spread": 0.1439,
+        "cells_crossing": [],
+        "scale_cv": 0.0713,
+        "baseline_spread": 0.044,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.54,
-            "height_fraction": 0.8208,
-            "baseline_fraction": 0.8939
+            "coverage": 0.5539,
+            "height_fraction": 0.8294,
+            "baseline_fraction": 0.903
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5885,
-            "height_fraction": 0.7618,
-            "baseline_fraction": 0.8939
+            "coverage": 0.5441,
+            "height_fraction": 0.7692,
+            "baseline_fraction": 0.903
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.631,
-            "height_fraction": 0.7547,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.4662,
+            "height_fraction": 0.6555,
+            "baseline_fraction": 0.903
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7056,
-            "height_fraction": 0.8561,
-            "baseline_fraction": 0.8561
+            "contained": true,
+            "coverage": 0.4972,
+            "height_fraction": 0.7639,
+            "baseline_fraction": 0.859
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6044,
-            "height_fraction": 0.7288,
-            "baseline_fraction": 0.8561
+            "coverage": 0.5501,
+            "height_fraction": 0.7246,
+            "baseline_fraction": 0.859
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7077,
-            "height_fraction": 0.8561,
-            "baseline_fraction": 0.8561
+            "contained": true,
+            "coverage": 0.4996,
+            "height_fraction": 0.7246,
+            "baseline_fraction": 0.859
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3-pro-image",
@@ -620,56 +616,56 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0019,
-        "baseline_spread": 0.0094,
+        "scale_cv": 0.0125,
+        "baseline_spread": 0.0035,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3933,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
+            "coverage": 0.3896,
+            "height_fraction": 0.6262,
+            "baseline_fraction": 0.8262
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3909,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
+            "coverage": 0.3857,
+            "height_fraction": 0.6262,
+            "baseline_fraction": 0.8262
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3918,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
+            "coverage": 0.3896,
+            "height_fraction": 0.6262,
+            "baseline_fraction": 0.8262
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3948,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
+            "coverage": 0.3995,
+            "height_fraction": 0.6421,
+            "baseline_fraction": 0.8227
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3923,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
+            "coverage": 0.3955,
+            "height_fraction": 0.6421,
+            "baseline_fraction": 0.8227
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3933,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
+            "coverage": 0.3995,
+            "height_fraction": 0.6421,
+            "baseline_fraction": 0.8227
           }
         ],
         "order": {
@@ -709,7 +705,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3-pro-image",
@@ -735,43 +733,45 @@
         "cells_drawn": 4,
         "cells_expected": 4,
         "cells_crossing": [],
-        "scale_cv": 0.0651,
-        "baseline_spread": 0.1152,
+        "scale_cv": 0.0687,
+        "baseline_spread": 0.1189,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.468,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9355
+            "coverage": 0.4465,
+            "height_fraction": 0.7701,
+            "baseline_fraction": 0.9397
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4217,
-            "height_fraction": 0.8086,
-            "baseline_fraction": 0.9238
+            "coverage": 0.4503,
+            "height_fraction": 0.8125,
+            "baseline_fraction": 0.9286
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4975,
-            "height_fraction": 0.6738,
-            "baseline_fraction": 0.8203
+            "coverage": 0.4676,
+            "height_fraction": 0.6704,
+            "baseline_fraction": 0.8208
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4136,
-            "height_fraction": 0.7617,
-            "baseline_fraction": 0.8203
+            "coverage": 0.4367,
+            "height_fraction": 0.7588,
+            "baseline_fraction": 0.8208
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
@@ -923,35 +923,37 @@
         "cells_drawn": 3,
         "cells_expected": 3,
         "cells_crossing": [],
-        "scale_cv": 0.1034,
-        "baseline_spread": 0.086,
+        "scale_cv": 0.0684,
+        "baseline_spread": 0.0517,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.494,
-            "height_fraction": 0.8574,
-            "baseline_fraction": 0.9258
+            "coverage": 0.4664,
+            "height_fraction": 0.8157,
+            "baseline_fraction": 0.8814
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4937,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.9258
+            "coverage": 0.4742,
+            "height_fraction": 0.7161,
+            "baseline_fraction": 0.8835
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3837,
-            "height_fraction": 0.666,
-            "baseline_fraction": 0.8398
+            "coverage": 0.4023,
+            "height_fraction": 0.7009,
+            "baseline_fraction": 0.8318
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
@@ -977,59 +979,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0738,
-        "baseline_spread": 0.059,
+        "scale_cv": 0.0745,
+        "baseline_spread": 0.0621,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4914,
-            "height_fraction": 0.8019,
-            "baseline_fraction": 0.9057
+            "coverage": 0.4998,
+            "height_fraction": 0.804,
+            "baseline_fraction": 0.907
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5434,
-            "height_fraction": 0.7618,
-            "baseline_fraction": 0.9104
+            "coverage": 0.4993,
+            "height_fraction": 0.7641,
+            "baseline_fraction": 0.9136
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3902,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.9057
+            "coverage": 0.4268,
+            "height_fraction": 0.6379,
+            "baseline_fraction": 0.907
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4683,
-            "height_fraction": 0.7642,
-            "baseline_fraction": 0.8514
+            "coverage": 0.4739,
+            "height_fraction": 0.7624,
+            "baseline_fraction": 0.8515
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5754,
-            "height_fraction": 0.6958,
-            "baseline_fraction": 0.8514
+            "coverage": 0.5245,
+            "height_fraction": 0.6931,
+            "baseline_fraction": 0.8515
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4394,
-            "height_fraction": 0.717,
-            "baseline_fraction": 0.8514
+            "coverage": 0.4792,
+            "height_fraction": 0.7162,
+            "baseline_fraction": 0.8515
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
@@ -1055,59 +1059,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0801,
-        "baseline_spread": 0.0731,
+        "scale_cv": 0.0775,
+        "baseline_spread": 0.0626,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4667,
-            "height_fraction": 0.8325,
-            "baseline_fraction": 0.9316
+            "coverage": 0.4703,
+            "height_fraction": 0.8203,
+            "baseline_fraction": 0.9183
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5201,
-            "height_fraction": 0.7783,
-            "baseline_fraction": 0.9292
+            "coverage": 0.4602,
+            "height_fraction": 0.7647,
+            "baseline_fraction": 0.915
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3653,
-            "height_fraction": 0.6462,
-            "baseline_fraction": 0.9269
+            "coverage": 0.3945,
+            "height_fraction": 0.6373,
+            "baseline_fraction": 0.915
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4275,
-            "height_fraction": 0.7594,
-            "baseline_fraction": 0.8608
+            "coverage": 0.4452,
+            "height_fraction": 0.7718,
+            "baseline_fraction": 0.8591
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5644,
-            "height_fraction": 0.7005,
-            "baseline_fraction": 0.8585
+            "coverage": 0.5151,
+            "height_fraction": 0.7081,
+            "baseline_fraction": 0.8557
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.408,
-            "height_fraction": 0.7217,
-            "baseline_fraction": 0.8608
+            "coverage": 0.4529,
+            "height_fraction": 0.7315,
+            "baseline_fraction": 0.8591
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
@@ -1133,56 +1139,56 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0016,
-        "baseline_spread": 0.0802,
+        "scale_cv": 0.003,
+        "baseline_spread": 0.0795,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
+            "coverage": 0.3459,
+            "height_fraction": 0.5728,
             "baseline_fraction": 0.8278
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3613,
-            "height_fraction": 0.5731,
+            "coverage": 0.3972,
+            "height_fraction": 0.5728,
             "baseline_fraction": 0.8278
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3607,
-            "height_fraction": 0.5731,
+            "coverage": 0.3459,
+            "height_fraction": 0.5728,
             "baseline_fraction": 0.8278
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.7476
+            "coverage": 0.3479,
+            "height_fraction": 0.5762,
+            "baseline_fraction": 0.7483
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3627,
-            "height_fraction": 0.5755,
-            "baseline_fraction": 0.7476
+            "coverage": 0.3995,
+            "height_fraction": 0.5762,
+            "baseline_fraction": 0.7483
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.7476
+            "coverage": 0.3479,
+            "height_fraction": 0.5762,
+            "baseline_fraction": 0.7483
           }
         ],
         "order": {
@@ -1222,7 +1228,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
@@ -1248,43 +1256,45 @@
         "cells_drawn": 4,
         "cells_expected": 4,
         "cells_crossing": [],
-        "scale_cv": 0.053,
-        "baseline_spread": 0.0351,
+        "scale_cv": 0.0562,
+        "baseline_spread": 0.0396,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3184,
-            "height_fraction": 0.5801,
-            "baseline_fraction": 0.8008
+            "coverage": 0.3128,
+            "height_fraction": 0.5839,
+            "baseline_fraction": 0.8054
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3094,
-            "height_fraction": 0.6602,
-            "baseline_fraction": 0.8105
+            "coverage": 0.3209,
+            "height_fraction": 0.6644,
+            "baseline_fraction": 0.8166
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3673,
-            "height_fraction": 0.584,
-            "baseline_fraction": 0.7793
+            "coverage": 0.3564,
+            "height_fraction": 0.5806,
+            "baseline_fraction": 0.7815
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3115,
-            "height_fraction": 0.5996,
-            "baseline_fraction": 0.7754
+            "coverage": 0.3177,
+            "height_fraction": 0.596,
+            "baseline_fraction": 0.777
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1301,122 +1311,120 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-05, cell-06",
-        "baselines spread over 26% of cell height"
+        "baselines spread over 21% of cell height"
       ],
       "sheet": {
         "paper": [
-          249,
+          248,
           244,
           233
         ],
         "cells_drawn": 12,
         "cells_expected": 12,
-        "cells_crossing": [
-          "cell-05",
-          "cell-06"
-        ],
-        "scale_cv": 0.0815,
-        "baseline_spread": 0.2642,
+        "cells_crossing": [],
+        "scale_cv": 0.1332,
+        "baseline_spread": 0.2074,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4126,
-            "height_fraction": 0.7324,
-            "baseline_fraction": 0.9498
+            "coverage": 0.3507,
+            "height_fraction": 0.7069,
+            "baseline_fraction": 0.9181
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.452,
-            "height_fraction": 0.699,
-            "baseline_fraction": 0.9498
+            "coverage": 0.4965,
+            "height_fraction": 0.6767,
+            "baseline_fraction": 0.9181
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3221,
-            "height_fraction": 0.5753,
-            "baseline_fraction": 0.9498
+            "coverage": 0.3451,
+            "height_fraction": 0.556,
+            "baseline_fraction": 0.9181
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4003,
-            "height_fraction": 0.7023,
-            "baseline_fraction": 0.9498
+            "coverage": 0.3551,
+            "height_fraction": 0.6767,
+            "baseline_fraction": 0.9181
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4532,
-            "height_fraction": 0.6443,
-            "baseline_fraction": 0.8221
+            "contained": true,
+            "coverage": 0.4659,
+            "height_fraction": 0.7273,
+            "baseline_fraction": 0.8889
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5454,
-            "height_fraction": 0.6678,
-            "baseline_fraction": 0.8221
+            "contained": true,
+            "coverage": 0.4835,
+            "height_fraction": 0.7576,
+            "baseline_fraction": 0.8889
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3834,
-            "height_fraction": 0.7013,
-            "baseline_fraction": 0.8221
+            "coverage": 0.4804,
+            "height_fraction": 0.7929,
+            "baseline_fraction": 0.8889
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3699,
-            "height_fraction": 0.6644,
-            "baseline_fraction": 0.8221
+            "coverage": 0.3887,
+            "height_fraction": 0.7525,
+            "baseline_fraction": 0.8889
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3708,
-            "height_fraction": 0.6622,
-            "baseline_fraction": 0.6856
+            "coverage": 0.303,
+            "height_fraction": 0.6157,
+            "baseline_fraction": 0.7107
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3033,
-            "height_fraction": 0.5385,
-            "baseline_fraction": 0.6856
+            "coverage": 0.3191,
+            "height_fraction": 0.5,
+            "baseline_fraction": 0.7107
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3754,
-            "height_fraction": 0.6187,
-            "baseline_fraction": 0.6856
+            "coverage": 0.3876,
+            "height_fraction": 0.5744,
+            "baseline_fraction": 0.7107
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3596,
-            "height_fraction": 0.6421,
-            "baseline_fraction": 0.6856
+            "coverage": 0.3074,
+            "height_fraction": 0.595,
+            "baseline_fraction": 0.7107
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1435,42 +1443,44 @@
       "reasons": [],
       "sheet": {
         "paper": [
-          247,
+          246,
           242,
           231
         ],
         "cells_drawn": 3,
         "cells_expected": 3,
         "cells_crossing": [],
-        "scale_cv": 0.0841,
-        "baseline_spread": 0.1407,
+        "scale_cv": 0.0594,
+        "baseline_spread": 0.1178,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4323,
-            "height_fraction": 0.7793,
-            "baseline_fraction": 0.9219
+            "coverage": 0.4277,
+            "height_fraction": 0.7527,
+            "baseline_fraction": 0.8925
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4154,
-            "height_fraction": 0.6973,
-            "baseline_fraction": 0.9219
+            "coverage": 0.3919,
+            "height_fraction": 0.6753,
+            "baseline_fraction": 0.8925
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3521,
-            "height_fraction": 0.6348,
-            "baseline_fraction": 0.7812
+            "coverage": 0.3721,
+            "height_fraction": 0.6575,
+            "baseline_fraction": 0.7747
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1496,59 +1506,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.072,
-        "baseline_spread": 0.1109,
+        "scale_cv": 0.0724,
+        "baseline_spread": 0.1093,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4795,
-            "height_fraction": 0.7948,
-            "baseline_fraction": 0.9175
+            "coverage": 0.4816,
+            "height_fraction": 0.7947,
+            "baseline_fraction": 0.9172
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.477,
-            "height_fraction": 0.7241,
-            "baseline_fraction": 0.9175
+            "coverage": 0.4509,
+            "height_fraction": 0.7219,
+            "baseline_fraction": 0.9172
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3742,
-            "height_fraction": 0.6203,
-            "baseline_fraction": 0.9175
+            "coverage": 0.3919,
+            "height_fraction": 0.6192,
+            "baseline_fraction": 0.9172
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4351,
-            "height_fraction": 0.7241,
-            "baseline_fraction": 0.8066
+            "coverage": 0.4395,
+            "height_fraction": 0.7252,
+            "baseline_fraction": 0.8079
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5417,
-            "height_fraction": 0.7099,
-            "baseline_fraction": 0.8066
+            "coverage": 0.5141,
+            "height_fraction": 0.7086,
+            "baseline_fraction": 0.8079
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4195,
-            "height_fraction": 0.6981,
-            "baseline_fraction": 0.8066
+            "coverage": 0.4397,
+            "height_fraction": 0.6987,
+            "baseline_fraction": 0.8079
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1574,59 +1586,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0742,
-        "baseline_spread": 0.125,
+        "scale_cv": 0.0763,
+        "baseline_spread": 0.1322,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3896,
-            "height_fraction": 0.7193,
-            "baseline_fraction": 0.8774
+            "coverage": 0.3866,
+            "height_fraction": 0.7258,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
             "coverage": 0.4224,
-            "height_fraction": 0.6651,
-            "baseline_fraction": 0.8774
+            "height_fraction": 0.6722,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.304,
-            "height_fraction": 0.5613,
-            "baseline_fraction": 0.8774
+            "coverage": 0.3176,
+            "height_fraction": 0.5686,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3543,
-            "height_fraction": 0.6486,
-            "baseline_fraction": 0.7524
+            "coverage": 0.3427,
+            "height_fraction": 0.6393,
+            "baseline_fraction": 0.7541
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.446,
-            "height_fraction": 0.6274,
-            "baseline_fraction": 0.7524
+            "coverage": 0.4385,
+            "height_fraction": 0.623,
+            "baseline_fraction": 0.7574
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3429,
-            "height_fraction": 0.625,
-            "baseline_fraction": 0.7524
+            "coverage": 0.3507,
+            "height_fraction": 0.6164,
+            "baseline_fraction": 0.7541
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1646,62 +1660,62 @@
       "sheet": {
         "paper": [
           247,
-          241,
-          229
+          242,
+          230
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0168,
-        "baseline_spread": 0.0401,
+        "scale_cv": 0.018,
+        "baseline_spread": 0.0384,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3387,
-            "height_fraction": 0.5991,
-            "baseline_fraction": 0.7995
+            "coverage": 0.3385,
+            "height_fraction": 0.6013,
+            "baseline_fraction": 0.804
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3431,
-            "height_fraction": 0.6108,
-            "baseline_fraction": 0.8113
+            "coverage": 0.3493,
+            "height_fraction": 0.6113,
+            "baseline_fraction": 0.814
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3452,
-            "height_fraction": 0.6132,
-            "baseline_fraction": 0.8137
+            "coverage": 0.3398,
+            "height_fraction": 0.6113,
+            "baseline_fraction": 0.814
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3347,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
+            "coverage": 0.3326,
+            "height_fraction": 0.5875,
+            "baseline_fraction": 0.7756
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3353,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
+            "coverage": 0.3397,
+            "height_fraction": 0.5875,
+            "baseline_fraction": 0.7756
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3347,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
+            "coverage": 0.3285,
+            "height_fraction": 0.5875,
+            "baseline_fraction": 0.7756
           }
         ],
         "order": {
@@ -1741,7 +1755,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
@@ -1767,43 +1783,45 @@
         "cells_drawn": 4,
         "cells_expected": 4,
         "cells_crossing": [],
-        "scale_cv": 0.0972,
-        "baseline_spread": 0.125,
+        "scale_cv": 0.0919,
+        "baseline_spread": 0.1193,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3182,
-            "height_fraction": 0.5449,
-            "baseline_fraction": 0.8184
+            "coverage": 0.2988,
+            "height_fraction": 0.5396,
+            "baseline_fraction": 0.8106
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.2847,
-            "height_fraction": 0.6875,
-            "baseline_fraction": 0.8555
+            "coverage": 0.2995,
+            "height_fraction": 0.6806,
+            "baseline_fraction": 0.848
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3686,
-            "height_fraction": 0.5566,
-            "baseline_fraction": 0.7344
+            "coverage": 0.3519,
+            "height_fraction": 0.5628,
+            "baseline_fraction": 0.7332
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.2742,
-            "height_fraction": 0.5684,
-            "baseline_fraction": 0.7305
+            "coverage": 0.2944,
+            "height_fraction": 0.574,
+            "baseline_fraction": 0.7287
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -1820,7 +1838,7 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-09, cell-10, cell-11, cell-12"
+        "crosses its cell: cell-09, cell-10, cell-11, cell-12"
       ],
       "sheet": {
         "paper": [
@@ -1831,120 +1849,114 @@
         "cells_drawn": 12,
         "cells_expected": 12,
         "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06",
-          "cell-07",
-          "cell-08",
           "cell-09",
           "cell-10",
           "cell-11",
           "cell-12"
         ],
-        "scale_cv": 0.0903,
-        "baseline_spread": 0.0,
+        "scale_cv": 0.0586,
+        "baseline_spread": 0.0332,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6825,
-            "height_fraction": 0.8592,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6693,
+            "height_fraction": 0.8789,
+            "baseline_fraction": 0.9883
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7904,
-            "height_fraction": 0.827,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7889,
+            "height_fraction": 0.8516,
+            "baseline_fraction": 0.9844
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7751,
-            "height_fraction": 0.7771,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6546,
+            "height_fraction": 0.8047,
+            "baseline_fraction": 0.9805
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5187,
-            "height_fraction": 0.8299,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.4903,
+            "height_fraction": 0.8516,
+            "baseline_fraction": 0.9844
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.75,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6342,
+            "height_fraction": 0.9242,
+            "baseline_fraction": 0.9668
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.8724,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6967,
+            "height_fraction": 0.9289,
+            "baseline_fraction": 0.9716
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
-            "contained": false,
-            "coverage": 1.0,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.8202,
+            "height_fraction": 0.9479,
+            "baseline_fraction": 0.9858
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7552,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6745,
+            "height_fraction": 0.9573,
+            "baseline_fraction": 0.9763
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6875,
-            "height_fraction": 1.0,
+            "coverage": 0.6339,
+            "height_fraction": 0.9774,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
             "contained": false,
-            "coverage": 0.8568,
-            "height_fraction": 1.0,
+            "coverage": 0.6982,
+            "height_fraction": 0.9624,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": false,
-            "coverage": 1.0,
-            "height_fraction": 1.0,
+            "coverage": 0.8065,
+            "height_fraction": 0.9549,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6875,
-            "height_fraction": 1.0,
+            "coverage": 0.5614,
+            "height_fraction": 0.9624,
             "baseline_fraction": 1.0
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -1977,35 +1989,37 @@
           "cell-02",
           "cell-03"
         ],
-        "scale_cv": 0.0554,
-        "baseline_spread": 0.6113,
+        "scale_cv": 0.0564,
+        "baseline_spread": 0.6111,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": false,
-            "coverage": 0.4427,
-            "height_fraction": 0.4453,
+            "coverage": 0.4447,
+            "height_fraction": 0.4467,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": false,
-            "coverage": 0.4199,
-            "height_fraction": 0.4199,
+            "coverage": 0.42,
+            "height_fraction": 0.42,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": false,
-            "coverage": 0.3887,
-            "height_fraction": 0.3887,
-            "baseline_fraction": 0.3887
+            "coverage": 0.3889,
+            "height_fraction": 0.3889,
+            "baseline_fraction": 0.3889
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -2022,73 +2036,72 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-01",
-        "baselines spread over 18% of cell height"
+        "baselines spread over 16% of cell height"
       ],
       "sheet": {
         "paper": [
-          255,
+          254,
           252,
           243
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01"
-        ],
-        "scale_cv": 0.0536,
-        "baseline_spread": 0.1777,
+        "cells_crossing": [],
+        "scale_cv": 0.0369,
+        "baseline_spread": 0.1615,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5845,
-            "height_fraction": 0.8574,
-            "baseline_fraction": 0.998
+            "contained": true,
+            "coverage": 0.6024,
+            "height_fraction": 0.8404,
+            "baseline_fraction": 0.9772
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6497,
-            "height_fraction": 0.8379,
-            "baseline_fraction": 0.9746
+            "coverage": 0.6354,
+            "height_fraction": 0.8208,
+            "baseline_fraction": 0.9544
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4795,
-            "height_fraction": 0.7793,
-            "baseline_fraction": 0.9727
+            "coverage": 0.4481,
+            "height_fraction": 0.7622,
+            "baseline_fraction": 0.9511
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4761,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.8223
+            "coverage": 0.5155,
+            "height_fraction": 0.7679,
+            "baseline_fraction": 0.8191
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.52,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.8242
+            "coverage": 0.5356,
+            "height_fraction": 0.7713,
+            "baseline_fraction": 0.8225
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5054,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.8203
+            "coverage": 0.4966,
+            "height_fraction": 0.785,
+            "baseline_fraction": 0.8157
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -2114,59 +2127,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0227,
-        "baseline_spread": 0.0976,
+        "scale_cv": 0.0229,
+        "baseline_spread": 0.102,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4585,
-            "height_fraction": 0.8066,
-            "baseline_fraction": 0.9453
+            "coverage": 0.4633,
+            "height_fraction": 0.8154,
+            "baseline_fraction": 0.953
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4892,
-            "height_fraction": 0.7852,
-            "baseline_fraction": 0.9434
+            "coverage": 0.5072,
+            "height_fraction": 0.7919,
+            "baseline_fraction": 0.9497
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4579,
-            "height_fraction": 0.7539,
-            "baseline_fraction": 0.9336
+            "coverage": 0.4496,
+            "height_fraction": 0.7584,
+            "baseline_fraction": 0.9396
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4547,
-            "height_fraction": 0.7812,
-            "baseline_fraction": 0.8516
+            "coverage": 0.4524,
+            "height_fraction": 0.7781,
+            "baseline_fraction": 0.8543
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5675,
-            "height_fraction": 0.7832,
-            "baseline_fraction": 0.8477
+            "coverage": 0.5834,
+            "height_fraction": 0.7815,
+            "baseline_fraction": 0.851
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4616,
-            "height_fraction": 0.8066,
-            "baseline_fraction": 0.8496
+            "coverage": 0.4516,
+            "height_fraction": 0.8013,
+            "baseline_fraction": 0.851
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -2187,63 +2202,63 @@
       ],
       "sheet": {
         "paper": [
-          255,
+          254,
           251,
           243
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0011,
-        "baseline_spread": 0.0957,
+        "scale_cv": 0.0132,
+        "baseline_spread": 0.1088,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.8711
+            "coverage": 0.399,
+            "height_fraction": 0.6824,
+            "baseline_fraction": 0.8851
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.8711
+            "coverage": 0.4513,
+            "height_fraction": 0.6757,
+            "baseline_fraction": 0.8818
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4057,
-            "height_fraction": 0.668,
-            "baseline_fraction": 0.8711
+            "coverage": 0.3929,
+            "height_fraction": 0.6757,
+            "baseline_fraction": 0.8818
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
+            "coverage": 0.3845,
+            "height_fraction": 0.6612,
+            "baseline_fraction": 0.7796
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
+            "coverage": 0.4394,
+            "height_fraction": 0.6579,
+            "baseline_fraction": 0.7763
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4069,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
+            "coverage": 0.3864,
+            "height_fraction": 0.6645,
+            "baseline_fraction": 0.7796
           }
         ],
         "order": {
@@ -2285,7 +2300,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image",
@@ -2312,42 +2329,44 @@
         "cells_expected": 4,
         "cells_crossing": [],
         "scale_cv": 0.0753,
-        "baseline_spread": 0.1113,
+        "baseline_spread": 0.1094,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4561,
-            "height_fraction": 0.6523,
-            "baseline_fraction": 0.8965
+            "coverage": 0.4553,
+            "height_fraction": 0.6519,
+            "baseline_fraction": 0.8958
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5268,
-            "height_fraction": 0.8027,
-            "baseline_fraction": 0.9355
+            "coverage": 0.5277,
+            "height_fraction": 0.8004,
+            "baseline_fraction": 0.9335
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5508,
-            "height_fraction": 0.748,
-            "baseline_fraction": 0.8242
+            "coverage": 0.5525,
+            "height_fraction": 0.7506,
+            "baseline_fraction": 0.8241
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4855,
-            "height_fraction": 0.7695,
-            "baseline_fraction": 0.8418
+            "coverage": 0.4888,
+            "height_fraction": 0.7728,
+            "baseline_fraction": 0.8419
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2362,10 +2381,8 @@
         1536,
         1024
       ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-09, cell-10, cell-11, cell-12"
-      ],
+      "mechanical_pass": true,
+      "reasons": [],
       "sheet": {
         "paper": [
           255,
@@ -2374,121 +2391,110 @@
         ],
         "cells_drawn": 12,
         "cells_expected": 12,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06",
-          "cell-07",
-          "cell-08",
-          "cell-09",
-          "cell-10",
-          "cell-11",
-          "cell-12"
-        ],
-        "scale_cv": 0.0635,
-        "baseline_spread": 0.044,
+        "cells_crossing": [],
+        "scale_cv": 0.0338,
+        "baseline_spread": 0.0323,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6124,
-            "height_fraction": 0.915,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6094,
+            "height_fraction": 0.8879,
+            "baseline_fraction": 0.9612
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7169,
-            "height_fraction": 0.8739,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7065,
+            "height_fraction": 0.8707,
+            "baseline_fraction": 0.9784
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5331,
-            "height_fraction": 0.8123,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6482,
+            "height_fraction": 0.819,
+            "baseline_fraction": 0.9784
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5632,
-            "height_fraction": 0.8651,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.4782,
+            "height_fraction": 0.8621,
+            "baseline_fraction": 0.9784
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.638,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5699,
+            "height_fraction": 0.8706,
+            "baseline_fraction": 0.9602
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6797,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5942,
+            "height_fraction": 0.9154,
+            "baseline_fraction": 0.9652
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.9089,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7643,
+            "height_fraction": 0.9403,
+            "baseline_fraction": 0.9652
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6641,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5848,
+            "height_fraction": 0.8806,
+            "baseline_fraction": 0.9552
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5119,
-            "height_fraction": 0.9589,
-            "baseline_fraction": 0.9589
+            "contained": true,
+            "coverage": 0.5006,
+            "height_fraction": 0.9102,
+            "baseline_fraction": 0.9521
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5669,
-            "height_fraction": 0.9589,
-            "baseline_fraction": 0.9589
+            "contained": true,
+            "coverage": 0.487,
+            "height_fraction": 0.9102,
+            "baseline_fraction": 0.9521
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5452,
-            "height_fraction": 0.956,
-            "baseline_fraction": 0.956
+            "contained": true,
+            "coverage": 0.5971,
+            "height_fraction": 0.8862,
+            "baseline_fraction": 0.9461
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5948,
-            "height_fraction": 0.9677,
-            "baseline_fraction": 0.9677
+            "contained": true,
+            "coverage": 0.4572,
+            "height_fraction": 0.9042,
+            "baseline_fraction": 0.9641
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2521,35 +2527,37 @@
           "cell-02",
           "cell-03"
         ],
-        "scale_cv": 0.0674,
-        "baseline_spread": 0.4395,
+        "scale_cv": 0.0671,
+        "baseline_spread": 0.44,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": false,
-            "coverage": 0.627,
-            "height_fraction": 0.627,
+            "coverage": 0.6267,
+            "height_fraction": 0.6267,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5352,
-            "height_fraction": 0.5352,
+            "coverage": 0.5356,
+            "height_fraction": 0.5356,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5605,
-            "height_fraction": 0.5605,
-            "baseline_fraction": 0.5605
+            "coverage": 0.56,
+            "height_fraction": 0.56,
+            "baseline_fraction": 0.56
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2564,11 +2572,8 @@
         1536,
         1024
       ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-04, cell-05, cell-06",
-        "baselines spread over 16% of cell height"
-      ],
+      "mechanical_pass": true,
+      "reasons": [],
       "sheet": {
         "paper": [
           255,
@@ -2577,66 +2582,62 @@
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-04",
-          "cell-05",
-          "cell-06"
-        ],
-        "scale_cv": 0.0509,
-        "baseline_spread": 0.1641,
+        "cells_crossing": [],
+        "scale_cv": 0.0468,
+        "baseline_spread": 0.1464,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5574,
-            "height_fraction": 0.8809,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5351,
+            "height_fraction": 0.8645,
+            "baseline_fraction": 0.9774
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.74,
-            "height_fraction": 0.873,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7211,
+            "height_fraction": 0.8516,
+            "baseline_fraction": 0.9742
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4743,
-            "height_fraction": 0.7734,
-            "baseline_fraction": 0.9922
+            "coverage": 0.4268,
+            "height_fraction": 0.7516,
+            "baseline_fraction": 0.9613
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.497,
-            "height_fraction": 0.8398,
-            "baseline_fraction": 0.8398
+            "contained": true,
+            "coverage": 0.439,
+            "height_fraction": 0.8,
+            "baseline_fraction": 0.8345
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.8457,
-            "height_fraction": 0.8457,
-            "baseline_fraction": 0.8457
+            "contained": true,
+            "coverage": 0.64,
+            "height_fraction": 0.7897,
+            "baseline_fraction": 0.8414
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4813,
-            "height_fraction": 0.7773,
-            "baseline_fraction": 0.8359
+            "contained": true,
+            "coverage": 0.4657,
+            "height_fraction": 0.8069,
+            "baseline_fraction": 0.831
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2662,59 +2663,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0347,
-        "baseline_spread": 0.1074,
+        "scale_cv": 0.0348,
+        "baseline_spread": 0.0964,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5656,
-            "height_fraction": 0.8418,
-            "baseline_fraction": 0.9688
+            "coverage": 0.5494,
+            "height_fraction": 0.8295,
+            "baseline_fraction": 0.9541
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6069,
-            "height_fraction": 0.8242,
-            "baseline_fraction": 0.9707
+            "coverage": 0.624,
+            "height_fraction": 0.8131,
+            "baseline_fraction": 0.9574
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4798,
-            "height_fraction": 0.7559,
-            "baseline_fraction": 0.9688
+            "coverage": 0.4606,
+            "height_fraction": 0.7443,
+            "baseline_fraction": 0.9541
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4892,
-            "height_fraction": 0.8027,
-            "baseline_fraction": 0.8633
+            "coverage": 0.4902,
+            "height_fraction": 0.8169,
+            "baseline_fraction": 0.861
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5427,
-            "height_fraction": 0.8008,
-            "baseline_fraction": 0.8691
+            "coverage": 0.5758,
+            "height_fraction": 0.8169,
+            "baseline_fraction": 0.8678
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4791,
-            "height_fraction": 0.7812,
-            "baseline_fraction": 0.8691
+            "coverage": 0.48,
+            "height_fraction": 0.7966,
+            "baseline_fraction": 0.8678
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2737,61 +2740,61 @@
         "paper": [
           255,
           253,
-          239
+          240
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0351,
-        "baseline_spread": 0.043,
+        "scale_cv": 0.0197,
+        "baseline_spread": 0.057,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5638,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9219
+            "coverage": 0.5519,
+            "height_fraction": 0.7831,
+            "baseline_fraction": 0.939
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5667,
-            "height_fraction": 0.7676,
-            "baseline_fraction": 0.9219
+            "coverage": 0.6433,
+            "height_fraction": 0.7831,
+            "baseline_fraction": 0.939
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5638,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9219
+            "coverage": 0.5476,
+            "height_fraction": 0.7831,
+            "baseline_fraction": 0.939
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5836,
-            "height_fraction": 0.7969,
-            "baseline_fraction": 0.8789
+            "coverage": 0.5473,
+            "height_fraction": 0.7836,
+            "baseline_fraction": 0.882
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5946,
-            "height_fraction": 0.8184,
-            "baseline_fraction": 0.8789
+            "coverage": 0.6566,
+            "height_fraction": 0.8066,
+            "baseline_fraction": 0.882
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6041,
-            "height_fraction": 0.8359,
-            "baseline_fraction": 0.8789
+            "coverage": 0.5651,
+            "height_fraction": 0.823,
+            "baseline_fraction": 0.882
           }
         ],
         "order": {
@@ -2834,7 +2837,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-5-image-mini",
@@ -2860,43 +2865,45 @@
         "cells_drawn": 4,
         "cells_expected": 4,
         "cells_crossing": [],
-        "scale_cv": 0.0435,
-        "baseline_spread": 0.0859,
+        "scale_cv": 0.042,
+        "baseline_spread": 0.0849,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.635,
-            "height_fraction": 0.7578,
-            "baseline_fraction": 0.9238
+            "coverage": 0.6224,
+            "height_fraction": 0.7561,
+            "baseline_fraction": 0.9224
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6463,
-            "height_fraction": 0.8398,
-            "baseline_fraction": 0.9316
+            "coverage": 0.658,
+            "height_fraction": 0.8381,
+            "baseline_fraction": 0.929
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6216,
-            "height_fraction": 0.7578,
-            "baseline_fraction": 0.8457
+            "coverage": 0.6153,
+            "height_fraction": 0.7617,
+            "baseline_fraction": 0.8463
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5922,
-            "height_fraction": 0.7715,
-            "baseline_fraction": 0.8457
+            "coverage": 0.605,
+            "height_fraction": 0.7728,
+            "baseline_fraction": 0.8441
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -2913,129 +2920,120 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-10",
-        "baselines spread over 24% of cell height"
+        "baselines spread over 21% of cell height"
       ],
       "sheet": {
         "paper": [
           251,
-          249,
+          250,
           245
         ],
         "cells_drawn": 12,
         "cells_expected": 12,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06",
-          "cell-07",
-          "cell-08",
-          "cell-10"
-        ],
-        "scale_cv": 0.1249,
-        "baseline_spread": 0.237,
+        "cells_crossing": [],
+        "scale_cv": 0.1101,
+        "baseline_spread": 0.2139,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5931,
-            "height_fraction": 0.8594,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5392,
+            "height_fraction": 0.8571,
+            "baseline_fraction": 0.9874
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5528,
-            "height_fraction": 0.7422,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6278,
+            "height_fraction": 0.7437,
+            "baseline_fraction": 0.9874
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4578,
-            "height_fraction": 0.651,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.4825,
+            "height_fraction": 0.6555,
+            "baseline_fraction": 0.9832
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5392,
-            "height_fraction": 0.7995,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.512,
+            "height_fraction": 0.7983,
+            "baseline_fraction": 0.9874
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7211,
-            "height_fraction": 0.9323,
-            "baseline_fraction": 0.9323
+            "contained": true,
+            "coverage": 0.6495,
+            "height_fraction": 0.8522,
+            "baseline_fraction": 0.9704
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.8568,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6893,
+            "height_fraction": 0.8966,
+            "baseline_fraction": 0.9655
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.8298,
-            "height_fraction": 0.9427,
-            "baseline_fraction": 0.9427
+            "contained": true,
+            "coverage": 0.6884,
+            "height_fraction": 0.9655,
+            "baseline_fraction": 0.9803
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.683,
-            "height_fraction": 0.9401,
-            "baseline_fraction": 0.9401
+            "contained": true,
+            "coverage": 0.629,
+            "height_fraction": 0.8768,
+            "baseline_fraction": 0.9803
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4871,
-            "height_fraction": 0.6953,
-            "baseline_fraction": 0.763
+            "coverage": 0.4275,
+            "height_fraction": 0.6709,
+            "baseline_fraction": 0.7735
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5515,
-            "height_fraction": 0.8177,
-            "baseline_fraction": 0.8177
+            "contained": true,
+            "coverage": 0.6137,
+            "height_fraction": 0.8034,
+            "baseline_fraction": 0.8248
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6359,
-            "height_fraction": 0.763,
-            "baseline_fraction": 0.8177
+            "coverage": 0.6398,
+            "height_fraction": 0.735,
+            "baseline_fraction": 0.8248
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5522,
-            "height_fraction": 0.8125,
-            "baseline_fraction": 0.8177
+            "coverage": 0.5049,
+            "height_fraction": 0.7821,
+            "baseline_fraction": 0.8248
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -3059,7 +3057,7 @@
         "paper": [
           254,
           252,
-          247
+          246
         ],
         "cells_drawn": 3,
         "cells_expected": 3,
@@ -3068,35 +3066,37 @@
           "cell-02",
           "cell-03"
         ],
-        "scale_cv": 0.0484,
-        "baseline_spread": 0.1602,
+        "scale_cv": 0.0486,
+        "baseline_spread": 0.16,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6419,
-            "height_fraction": 0.8906,
+            "coverage": 0.6416,
+            "height_fraction": 0.8911,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5778,
-            "height_fraction": 0.791,
+            "coverage": 0.5784,
+            "height_fraction": 0.7911,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": false,
-            "coverage": 0.579,
-            "height_fraction": 0.8398,
-            "baseline_fraction": 0.8398
+            "coverage": 0.5787,
+            "height_fraction": 0.84,
+            "baseline_fraction": 0.84
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -3111,10 +3111,8 @@
         1536,
         1024
       ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06"
-      ],
+      "mechanical_pass": true,
+      "reasons": [],
       "sheet": {
         "paper": [
           251,
@@ -3123,67 +3121,62 @@
         ],
         "cells_drawn": 6,
         "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06"
-        ],
+        "cells_crossing": [],
         "scale_cv": 0.0769,
-        "baseline_spread": 0.1172,
+        "baseline_spread": 0.0944,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7127,
-            "height_fraction": 0.9238,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6821,
+            "height_fraction": 0.8997,
+            "baseline_fraction": 0.9741
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7585,
-            "height_fraction": 0.8887,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7501,
+            "height_fraction": 0.8673,
+            "baseline_fraction": 0.9741
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5391,
-            "height_fraction": 0.7188,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5302,
+            "height_fraction": 0.7023,
+            "baseline_fraction": 0.9741
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6518,
-            "height_fraction": 0.8828,
-            "baseline_fraction": 0.8828
+            "contained": true,
+            "coverage": 0.6155,
+            "height_fraction": 0.8522,
+            "baseline_fraction": 0.8797
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7603,
-            "height_fraction": 0.8848,
-            "baseline_fraction": 0.8848
+            "contained": true,
+            "coverage": 0.6982,
+            "height_fraction": 0.8041,
+            "baseline_fraction": 0.8832
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6342,
-            "height_fraction": 0.8848,
-            "baseline_fraction": 0.8848
+            "contained": true,
+            "coverage": 0.5829,
+            "height_fraction": 0.8041,
+            "baseline_fraction": 0.8832
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -3209,59 +3202,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0675,
-        "baseline_spread": 0.1329,
+        "scale_cv": 0.0722,
+        "baseline_spread": 0.1476,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4532,
-            "height_fraction": 0.7461,
-            "baseline_fraction": 0.9102
+            "coverage": 0.4473,
+            "height_fraction": 0.7619,
+            "baseline_fraction": 0.9286
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5309,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9102
+            "coverage": 0.575,
+            "height_fraction": 0.7823,
+            "baseline_fraction": 0.9286
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3773,
-            "height_fraction": 0.6172,
-            "baseline_fraction": 0.9102
+            "coverage": 0.3771,
+            "height_fraction": 0.6293,
+            "baseline_fraction": 0.9286
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4331,
-            "height_fraction": 0.7246,
-            "baseline_fraction": 0.7773
+            "coverage": 0.4114,
+            "height_fraction": 0.7124,
+            "baseline_fraction": 0.781
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5103,
-            "height_fraction": 0.6875,
-            "baseline_fraction": 0.7871
+            "coverage": 0.5305,
+            "height_fraction": 0.6732,
+            "baseline_fraction": 0.7908
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4382,
-            "height_fraction": 0.7168,
-            "baseline_fraction": 0.7871
+            "coverage": 0.4208,
+            "height_fraction": 0.7059,
+            "baseline_fraction": 0.7941
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -3278,7 +3273,7 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "baselines spread over 20% of cell height"
+        "baselines spread over 21% of cell height"
       ],
       "sheet": {
         "paper": [
@@ -3289,56 +3284,56 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0,
-        "baseline_spread": 0.205,
+        "scale_cv": 0.0067,
+        "baseline_spread": 0.2106,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
+            "coverage": 0.3314,
+            "height_fraction": 0.6107,
+            "baseline_fraction": 0.906
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3418,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
+            "coverage": 0.3903,
+            "height_fraction": 0.6107,
+            "baseline_fraction": 0.906
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
+            "coverage": 0.3295,
+            "height_fraction": 0.6107,
+            "baseline_fraction": 0.906
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
+            "coverage": 0.3232,
+            "height_fraction": 0.6026,
+            "baseline_fraction": 0.6954
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3418,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
+            "coverage": 0.3852,
+            "height_fraction": 0.6026,
+            "baseline_fraction": 0.6954
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3429,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
+            "coverage": 0.3232,
+            "height_fraction": 0.6026,
+            "baseline_fraction": 0.6954
           }
         ],
         "order": {
@@ -3378,7 +3373,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "openai/gpt-image-2",
@@ -3395,8 +3392,7 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-03, cell-04",
-        "baselines spread over 22% of cell height"
+        "baselines spread over 19% of cell height"
       ],
       "sheet": {
         "paper": [
@@ -3406,47 +3402,46 @@
         ],
         "cells_drawn": 4,
         "cells_expected": 4,
-        "cells_crossing": [
-          "cell-03",
-          "cell-04"
-        ],
-        "scale_cv": 0.1246,
-        "baseline_spread": 0.2168,
+        "cells_crossing": [],
+        "scale_cv": 0.1059,
+        "baseline_spread": 0.1897,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.48,
-            "height_fraction": 0.6113,
-            "baseline_fraction": 0.9648
+            "coverage": 0.4236,
+            "height_fraction": 0.5864,
+            "baseline_fraction": 0.9254
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4894,
-            "height_fraction": 0.793,
-            "baseline_fraction": 0.9668
+            "coverage": 0.5161,
+            "height_fraction": 0.7612,
+            "baseline_fraction": 0.9275
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4709,
-            "height_fraction": 0.5781,
-            "baseline_fraction": 0.75
+            "contained": true,
+            "coverage": 0.4623,
+            "height_fraction": 0.6009,
+            "baseline_fraction": 0.7378
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4927,
-            "height_fraction": 0.6484,
-            "baseline_fraction": 0.7656
+            "contained": true,
+            "coverage": 0.4413,
+            "height_fraction": 0.6752,
+            "baseline_fraction": 0.7541
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3463,8 +3458,7 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "crosses its cell: cell-05, cell-06, cell-10",
-        "baselines spread over 28% of cell height"
+        "baselines spread over 20% of cell height"
       ],
       "sheet": {
         "paper": [
@@ -3474,112 +3468,110 @@
         ],
         "cells_drawn": 12,
         "cells_expected": 12,
-        "cells_crossing": [
-          "cell-05",
-          "cell-06",
-          "cell-10"
-        ],
-        "scale_cv": 0.0721,
-        "baseline_spread": 0.2812,
+        "cells_crossing": [],
+        "scale_cv": 0.1025,
+        "baseline_spread": 0.2049,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.488,
-            "height_fraction": 0.7639,
-            "baseline_fraction": 0.9653
+            "coverage": 0.4278,
+            "height_fraction": 0.7478,
+            "baseline_fraction": 0.9435
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5017,
-            "height_fraction": 0.7014,
-            "baseline_fraction": 0.9618
+            "coverage": 0.5284,
+            "height_fraction": 0.687,
+            "baseline_fraction": 0.9435
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4352,
-            "height_fraction": 0.6562,
-            "baseline_fraction": 0.9688
+            "coverage": 0.4738,
+            "height_fraction": 0.6391,
+            "baseline_fraction": 0.9478
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4922,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.9688
+            "coverage": 0.4512,
+            "height_fraction": 0.7348,
+            "baseline_fraction": 0.9478
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4702,
-            "height_fraction": 0.6944,
-            "baseline_fraction": 0.8264
+            "contained": true,
+            "coverage": 0.4867,
+            "height_fraction": 0.785,
+            "baseline_fraction": 0.905
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7325,
-            "height_fraction": 0.8507,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5296,
+            "height_fraction": 0.765,
+            "baseline_fraction": 0.905
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4726,
-            "height_fraction": 0.7604,
-            "baseline_fraction": 0.8403
+            "coverage": 0.5955,
+            "height_fraction": 0.855,
+            "baseline_fraction": 0.92
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4895,
-            "height_fraction": 0.6944,
-            "baseline_fraction": 0.8299
+            "coverage": 0.5179,
+            "height_fraction": 0.785,
+            "baseline_fraction": 0.91
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4398,
-            "height_fraction": 0.6597,
-            "baseline_fraction": 0.7188
+            "coverage": 0.3673,
+            "height_fraction": 0.6082,
+            "baseline_fraction": 0.7429
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.4636,
-            "height_fraction": 0.7257,
-            "baseline_fraction": 0.7257
+            "contained": true,
+            "coverage": 0.4719,
+            "height_fraction": 0.6816,
+            "baseline_fraction": 0.7469
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4796,
-            "height_fraction": 0.7083,
-            "baseline_fraction": 0.7292
+            "coverage": 0.494,
+            "height_fraction": 0.649,
+            "baseline_fraction": 0.751
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4394,
-            "height_fraction": 0.684,
-            "baseline_fraction": 0.7292
+            "coverage": 0.3782,
+            "height_fraction": 0.6286,
+            "baseline_fraction": 0.751
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3596,7 +3588,7 @@
       ],
       "mechanical_pass": false,
       "reasons": [
-        "baselines spread over 20% of cell height"
+        "baselines spread over 19% of cell height"
       ],
       "sheet": {
         "paper": [
@@ -3607,35 +3599,37 @@
         "cells_drawn": 3,
         "cells_expected": 3,
         "cells_crossing": [],
-        "scale_cv": 0.0793,
-        "baseline_spread": 0.2031,
+        "scale_cv": 0.0615,
+        "baseline_spread": 0.1903,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4597,
-            "height_fraction": 0.752,
-            "baseline_fraction": 0.9336
+            "coverage": 0.45,
+            "height_fraction": 0.7348,
+            "baseline_fraction": 0.913
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4684,
-            "height_fraction": 0.7012,
-            "baseline_fraction": 0.9336
+            "coverage": 0.4555,
+            "height_fraction": 0.6848,
+            "baseline_fraction": 0.913
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.387,
-            "height_fraction": 0.6191,
-            "baseline_fraction": 0.7305
+            "coverage": 0.3954,
+            "height_fraction": 0.6318,
+            "baseline_fraction": 0.7227
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": false,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3661,59 +3655,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0439,
-        "baseline_spread": 0.1081,
+        "scale_cv": 0.0471,
+        "baseline_spread": 0.1256,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4254,
-            "height_fraction": 0.7404,
-            "baseline_fraction": 0.8942
+            "coverage": 0.4191,
+            "height_fraction": 0.7603,
+            "baseline_fraction": 0.9178
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4941,
-            "height_fraction": 0.7212,
-            "baseline_fraction": 0.8942
+            "coverage": 0.5347,
+            "height_fraction": 0.7397,
+            "baseline_fraction": 0.9178
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3962,
-            "height_fraction": 0.6514,
-            "baseline_fraction": 0.8942
+            "coverage": 0.4011,
+            "height_fraction": 0.6678,
+            "baseline_fraction": 0.9178
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4244,
-            "height_fraction": 0.7236,
-            "baseline_fraction": 0.7861
+            "coverage": 0.3974,
+            "height_fraction": 0.7045,
+            "baseline_fraction": 0.7922
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4577,
-            "height_fraction": 0.6899,
-            "baseline_fraction": 0.7861
+            "coverage": 0.4693,
+            "height_fraction": 0.6721,
+            "baseline_fraction": 0.7922
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4524,
-            "height_fraction": 0.738,
-            "baseline_fraction": 0.7909
+            "coverage": 0.4381,
+            "height_fraction": 0.7175,
+            "baseline_fraction": 0.7955
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3739,59 +3735,61 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0502,
-        "baseline_spread": 0.125,
+        "scale_cv": 0.0516,
+        "baseline_spread": 0.145,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4036,
-            "height_fraction": 0.6995,
-            "baseline_fraction": 0.8678
+            "coverage": 0.3958,
+            "height_fraction": 0.7207,
+            "baseline_fraction": 0.8966
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4148,
-            "height_fraction": 0.6611,
-            "baseline_fraction": 0.8678
+            "coverage": 0.4642,
+            "height_fraction": 0.6828,
+            "baseline_fraction": 0.8966
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3412,
-            "height_fraction": 0.5913,
-            "baseline_fraction": 0.8678
+            "coverage": 0.3459,
+            "height_fraction": 0.6103,
+            "baseline_fraction": 0.8966
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3918,
-            "height_fraction": 0.6707,
-            "baseline_fraction": 0.7428
+            "coverage": 0.362,
+            "height_fraction": 0.6516,
+            "baseline_fraction": 0.7516
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4147,
-            "height_fraction": 0.6635,
-            "baseline_fraction": 0.7452
+            "coverage": 0.434,
+            "height_fraction": 0.6452,
+            "baseline_fraction": 0.7548
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3932,
-            "height_fraction": 0.6731,
-            "baseline_fraction": 0.7476
+            "coverage": 0.3733,
+            "height_fraction": 0.6548,
+            "baseline_fraction": 0.7581
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3806,8 +3804,10 @@
         1248,
         832
       ],
-      "mechanical_pass": true,
-      "reasons": [],
+      "mechanical_pass": false,
+      "reasons": [
+        "baselines spread over 17% of cell height"
+      ],
       "sheet": {
         "paper": [
           254,
@@ -3817,56 +3817,56 @@
         "cells_drawn": 6,
         "cells_expected": 6,
         "cells_crossing": [],
-        "scale_cv": 0.0057,
-        "baseline_spread": 0.1395,
+        "scale_cv": 0.0331,
+        "baseline_spread": 0.1677,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3419,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
+            "coverage": 0.3382,
+            "height_fraction": 0.6597,
+            "baseline_fraction": 0.8854
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3374,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
+            "coverage": 0.3875,
+            "height_fraction": 0.6562,
+            "baseline_fraction": 0.8854
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3389,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
+            "coverage": 0.3393,
+            "height_fraction": 0.6597,
+            "baseline_fraction": 0.8889
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
+            "coverage": 0.3135,
+            "height_fraction": 0.6154,
+            "baseline_fraction": 0.7212
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
+            "coverage": 0.3675,
+            "height_fraction": 0.6186,
+            "baseline_fraction": 0.7244
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
+            "coverage": 0.3165,
+            "height_fraction": 0.6154,
+            "baseline_fraction": 0.7244
           }
         ],
         "order": {
@@ -3906,7 +3906,9 @@
           "unreadable": [],
           "method": "monotonic hue rank"
         }
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "x-ai/grok-imagine-image-2.0",
@@ -3932,43 +3934,63 @@
         "cells_drawn": 4,
         "cells_expected": 4,
         "cells_crossing": [],
-        "scale_cv": 0.0343,
-        "baseline_spread": 0.1074,
+        "scale_cv": 0.0511,
+        "baseline_spread": 0.1306,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3902,
-            "height_fraction": 0.6465,
-            "baseline_fraction": 0.8594
+            "coverage": 0.3828,
+            "height_fraction": 0.6713,
+            "baseline_fraction": 0.8897
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3707,
-            "height_fraction": 0.7109,
-            "baseline_fraction": 0.8574
+            "coverage": 0.4087,
+            "height_fraction": 0.7356,
+            "baseline_fraction": 0.8874
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4712,
-            "height_fraction": 0.6777,
-            "baseline_fraction": 0.752
+            "coverage": 0.4318,
+            "height_fraction": 0.6559,
+            "baseline_fraction": 0.7591
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.3496,
-            "height_fraction": 0.668,
-            "baseline_fraction": 0.7539
+            "coverage": 0.3627,
+            "height_fraction": 0.6473,
+            "baseline_fraction": 0.7634
           }
         ]
-      }
+      },
+      "mechanical_pass_even_grid": true,
+      "scored_against": "snapped-to-gutters"
+    }
+  ],
+  "scoring_note": "Containment, scale, baseline and order are measured against the rects crop_gallery_cells.py cuts on (gutter-snapped), not an even grid. mechanical_pass_even_grid preserves the original over-strict verdict.",
+  "human_verdict": [
+    {
+      "rank": 1,
+      "model": "openai/gpt-image-2",
+      "note": "best style and identity"
+    },
+    {
+      "rank": 2,
+      "model": "x-ai/grok-imagine-image-2.0",
+      "note": "nearly as good as first, but expensive"
+    },
+    {
+      "rank": 3,
+      "model": "google/gemini-3.1-flash-image",
+      "note": "style drops; identity held acceptably"
     }
   ]
 }

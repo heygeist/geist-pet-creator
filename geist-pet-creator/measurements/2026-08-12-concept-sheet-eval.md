@@ -20,56 +20,84 @@ scripts/with_openrouter_key.sh python3 scripts/eval_providers.py \
 `comparable` counts sheets whose cells came out usable together: right count, each contained in its
 cell, matched scale and baseline, row-major order intact.
 
+**This measures layout only.** It says nothing about whether a cell is nameable or well drawn. The
+human verdict below is the other axis, and it disagrees.
+
 | Model | Comparable | Sheet cost | Median time |
 | --- | ---: | ---: | ---: |
 | **`google/gemini-3.1-flash-image`** | **6/6** | $0.0687 | 25.2s |
 | `google/gemini-3.1-flash-lite-image` | 5/6 | **$0.0343** | **5.5s** |
-| `google/gemini-3-pro-image` | 4/6 | $0.1386 | 36.2s |
-| `x-ai/grok-imagine-image-2.0` | 4/6 | $0.0750 | 14.2s |
-| `openai/gpt-5-image-mini` | 2/6 | $0.0520 | 51.8s |
+| `google/gemini-3-pro-image` | 5/6 | $0.1386 | 36.2s |
+| `openai/gpt-5-image-mini` | 4/6 | $0.0520 | 51.8s |
+| `x-ai/grok-imagine-image-2.0` | 3/6 | $0.0750 | 14.2s |
 | `openai/gpt-5-image` | 2/6 | $0.2578 | 51.6s |
-| `openai/gpt-image-2` (skill default) | **1/6** | $0.0252 | 33.9s |
+| `openai/gpt-image-2` (skill default) | 2/6 | $0.0252 | 33.9s |
 
-Per case, where `d6`/`o6` are the derived and original six-cell casts:
+Every Gemini model places mascots on the implied grid more consistently than any OpenAI model. Twelve
+cells is the ceiling: only `gemini-3.1-flash-image` passed it, so the 12-cell cap stands but only one
+measured model reaches it.
 
-| Model | d6 | o6 | variants-4 | order-6 | d3 | d12 |
-| --- | --- | --- | --- | --- | --- | --- |
-| `gemini-3.1-flash-image` | pass | pass | pass | pass | pass | **pass** |
-| `gemini-3.1-flash-lite-image` | pass | pass | pass | pass | pass | fail |
-| `gemini-3-pro-image` | pass | fail | pass | pass | pass | fail |
-| `grok-imagine-image-2.0` | pass | pass | pass | pass | fail | fail |
-| `gpt-5-image-mini` | fail | pass | pass | fail | fail | fail |
-| `gpt-5-image` | fail | pass | pass | fail | fail | fail |
-| `gpt-image-2` | fail | pass | fail | fail | fail | fail |
+### The first version of this table was wrong
 
-**The vendor split is the clearest signal in the table.** Every Gemini model places mascots on the
-implied grid; no OpenAI model reliably does. On the 3-cell sheet all three OpenAI models had *every*
-cell cross its rect — they ignore the grid and compose the three freely — while all three Gemini
-models kept baselines inside 14%. `cast-original-6` is the one case OpenAI models pass consistently,
-and it is the case with no identity reference attached.
+Containment was scored against an **even grid**. `crop_gallery_cells.py` does not cut on an even
+grid — it snaps to the drawn gutters, because models put their rows where they like.
 
-**Twelve cells is the real ceiling.** Only `gemini-3.1-flash-image` passed it, out of seven. The
-12-cell cap in the grid table stands, but it is a cap only one measured model can actually reach.
+So the metric reported disagreement with an assumption as though it were damage. Checked directly:
+17 of `openai/gpt-image-2`'s cells were called "crossing" across five sheets, and **all 17 crop clean
+once snapped**. Not one was clipped. Correcting it moved five verdicts — `gpt-5-image-mini` 2→4,
+`gemini-3-pro` 4→5, `grok` 4→3 — and flattened the table from `6,5,4,4,2,2,1` to `6,5,5,4,3,2,2`.
+
+A fault only counts if it survives the thing that repairs it. `mechanical_pass_even_grid` in the JSON
+preserves the original verdicts.
+
+## Human grading
+
+The ranking below is the human's, from the review page. It is the naming and blend judgement the
+mechanical score deliberately does not attempt.
+
+1. **`openai/gpt-image-2`** — best style and identity.
+2. `x-ai/grok-imagine-image-2.0` — nearly as good, but expensive.
+3. `google/gemini-3.1-flash-image` — style drops; identity held acceptably.
+
+**The two axes disagree, and that is the most useful result in this eval.** The model a human ranks
+first for style comes second-to-last on layout. The model that tops the layout table is third on
+looks.
+
+They do not contradict each other, because they measure different things — and only one of them is
+recoverable:
+
+- **Layout faults are cheap.** A crossing cell is caught at pre-screen and rejected on its own; the
+  cropper snaps to gutters; a sheet redraw costs $0.10. The per-cell failure policy exists precisely
+  so one weak cell does not cost the sheet.
+- **Style faults are not.** A concept sheet exists so a human can choose a concept by looking at it.
+  A well-aligned grid of characterless mascots has failed at the only job it had, and no downstream
+  step recovers it.
+
+So the human axis decides which model draws concepts, and the mechanical axis decides how much
+pre-screening to expect from it.
 
 ## What it decided
 
-**The default model is the worst sheet drawer measured, and should not be repinned.**
-`openai/gpt-image-2` won the frame eval on cost and character completeness, and it comes last here at
-1 of 6. These are different jobs. A frame redraws one approved creature; a sheet places many
-creatures on a grid at matched scale and baseline, and that is a layout skill the frame eval never
-tested. **Leave `DEFAULT_MODEL` alone** — it is still the right default for the 56 frames that make up
-almost all of a Pet's cost. Consider naming a different model for the one sheet call instead, which
-the per-run `--model` override already allows without touching the bundle.
+**`openai/gpt-image-2` stays the default, for sheets as well as frames.** It won the frame eval on
+cost and character completeness, and the human ranked it first for sheet style and identity too. It
+is also the cheapest sheet drawer measured, at $0.0252. Nothing here justifies a change.
 
-**If a sheet model is named, `google/gemini-3.1-flash-image` is the one.** It is the only model that
-passed every case, 6 of 6, at mid price and mid speed. `gemini-3.1-flash-lite-image` is the value
-option: 5 of 6, losing only the 12-cell stress case, cheapest of the credible models, and **more than
-four times faster than the winner** — 5.5s against 25.2s. At six cells or fewer they are equivalent
-on comparability, and the lite model costs half as much.
+An earlier draft of this record recommended naming a Gemini model for the sheet call. **That
+recommendation was wrong and is withdrawn.** It rested on the mechanical table alone, at a point when
+that table was also over-strict, and it would have traded the thing a concept sheet is for — a human
+looking at concepts and picking one — for grid tidiness that the cropper already handles.
 
-**Prefer a Gemini model for sheets regardless of which.** All three place mascots on the implied
-grid; no OpenAI model reliably does. That is a vendor-level difference, not a tier one — the cheapest
-Gemini beats the most expensive OpenAI model 5 to 2.
+**What the mechanical axis is actually good for: knowing what to expect at pre-screen.**
+`gpt-image-2` sits at 2 of 6, so its sheets are the likeliest to need a cell rejected. Budget for
+that, and note it is cheap: one cell struck out costs nothing, and a full redraw costs $0.10.
+
+**If a sheet ever needs to be layout-perfect** — twelve cells, or a sheet going straight to someone
+without pre-screening — `google/gemini-3.1-flash-image` is the only model that passed every case,
+including the 12-cell stress. Treat that as the exception, not the default, and expect weaker style
+in exchange.
+
+**Price still does not track quality on either axis.** `openai/gpt-5-image` costs ten times
+`gpt-image-2` per sheet, scores 2 of 6 mechanically, and did not place in the human ranking.
 
 **Price still does not track quality.** `openai/gpt-5-image` is the most expensive sheet drawer at
 $0.2578 — ten times `gpt-image-2` — and manages 2 of 6. The cheapest credible model beats it twice
