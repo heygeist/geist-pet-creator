@@ -1,0 +1,740 @@
+{
+  "cases": [
+    {
+      "id": "doraemon",
+      "kind": "identity-hold",
+      "reference": "/Users/samithiwat/Desktop/work/geist/pet-design/DoraemonGeist.pet/frames/idle/00.png",
+      "prompt": "Redraw the exact creature in the attached reference image, unchanged in colour, shape, outline, markings and proportion, now raising one arm nub in a friendly wave. One compact rounded legless floating body with a single thick sky-blue outline, a cream body area, two small ink dot eyes, one tiny mouth, exactly one centred orange heart on the chest, tiny attached arm nubs, flat fills, no legs, no feet, no floor and no shadow. Centre the character with clear empty space on all four sides.",
+      "cues": "round blue head, cream face, collar and bell, whiskers, red nose",
+      "difficulty": "medium"
+    },
+    {
+      "id": "gon-hxh",
+      "kind": "identity-hold",
+      "reference": "/Users/samithiwat/Desktop/work/geist/pet-design/HunterXHunterGeistConcepts.pet/sources/canonical-base.png",
+      "prompt": "Redraw the exact creature in the attached reference image, unchanged in colour, shape, outline, markings and proportion, now raising one arm nub in a friendly wave, still holding its prop. One compact rounded legless floating body with a single thick sky-blue outline, a cream body area, two small ink dot eyes, one tiny mouth, exactly one centred orange heart on the chest, tiny attached arm nubs, flat fills, no legs, no feet, no floor and no shadow. Centre the character with clear empty space on all four sides.",
+      "cues": "green spiky hair, green and red jacket blocks, fishing rod",
+      "difficulty": "hard -- one attached prop"
+    },
+    {
+      "id": "vegeta-dbz",
+      "kind": "identity-hold",
+      "reference": "/Users/samithiwat/Desktop/work/geist/pet-design/DragonBallConcepts.pet/sources/canonical-base.png",
+      "prompt": "Redraw the exact creature in the attached reference image, unchanged in colour, shape, outline, markings and proportion, now raising one arm nub in a friendly wave. One compact rounded legless floating body with a single thick sky-blue outline, a cream body area, two small ink dot eyes, one tiny mouth, exactly one centred orange heart on the chest, tiny attached arm nubs, flat fills, no legs, no feet, no floor and no shadow. Centre the character with clear empty space on all four sides.",
+      "cues": "black widow's-peak spiky hair, blue and white armour, gold trim, angry brows",
+      "difficulty": "hardest -- spiky hair silhouette"
+    },
+    {
+      "id": "invent-slayer",
+      "kind": "creativity",
+      "reference": "/Users/samithiwat/Desktop/work/geist/geist-pet-creator/geist-pet-creator/assets/geist-house-style.jpg",
+      "prompt": "Draw a new mascot creature in exactly the house style of the attached reference sheet. Give it: dark brown hair, slightly wavy, falling to just below the ears, with clearly red-brown tips at the ends; a jagged burn scar on the upper left forehead; a green and black checkered pattern across the lower body; small rectangular earrings, white with a red sun disc. Calm determined expression. One compact rounded legless floating body with a single thick sky-blue outline, a cream body area, two small ink dot eyes, one tiny mouth, exactly one centred orange heart on the chest, tiny attached arm nubs, flat fills, no legs, no feet, no floor and no shadow. Centre the character with clear empty space on all four sides.",
+      "cues": "red-tipped dark hair, forehead scar, green/black check, sun-disc earrings",
+      "difficulty": "creativity -- no character reference"
+    }
+  ],
+  "calls": 60,
+  "cost_usd": 4.091291,
+  "stopped_early": null,
+  "summary": [
+    {
+      "model": "openai/gpt-image-2",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 72.08,
+      "total_cost_usd": 0.08854,
+      "median_cost_usd": 0.023349,
+      "projected_pass_usd": 1.3309,
+      "alpha_paths": [
+        "params-dropped+chroma"
+      ],
+      "errors": []
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 54.22,
+      "total_cost_usd": 0.186385,
+      "median_cost_usd": 0.050722,
+      "projected_pass_usd": 2.8912,
+      "alpha_paths": [
+        "native"
+      ],
+      "errors": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 11.43,
+      "total_cost_usd": 0.27266,
+      "median_cost_usd": 0.068091,
+      "projected_pass_usd": 3.8812,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 23.57,
+      "total_cost_usd": 0.544358,
+      "median_cost_usd": 0.135819,
+      "projected_pass_usd": 7.7417,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": []
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 21.5,
+      "total_cost_usd": 0.56,
+      "median_cost_usd": 0.14,
+      "projected_pass_usd": 7.98,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": []
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 36.52,
+      "total_cost_usd": 0.67898,
+      "median_cost_usd": 0.169635,
+      "projected_pass_usd": 9.6692,
+      "alpha_paths": [
+        "native"
+      ],
+      "errors": []
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "returned": "4/4",
+      "mechanical_pass": "4/4",
+      "median_s": 44.25,
+      "total_cost_usd": 1.094368,
+      "median_cost_usd": 0.273293,
+      "projected_pass_usd": 15.5777,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": []
+    },
+    {
+      "model": "qwen/qwen-image-3",
+      "returned": "3/4",
+      "mechanical_pass": "3/4",
+      "median_s": 128.74,
+      "total_cost_usd": 0.198,
+      "median_cost_usd": 0.066,
+      "projected_pass_usd": 3.762,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": [
+        "image request failed: HTTP 400: {\"error\":{\"message\":\"Input data is suspected of being involved in IP infringement\",\"code\":400,\"metadata\":{\"provider_name\":\"Alibaba\"}}}"
+      ]
+    },
+    {
+      "model": "qwen/qwen-image-3-pro",
+      "returned": "3/4",
+      "mechanical_pass": "3/4",
+      "median_s": 294.45,
+      "total_cost_usd": 0.468,
+      "median_cost_usd": 0.156,
+      "projected_pass_usd": 8.892,
+      "alpha_paths": [
+        "chroma-key"
+      ],
+      "errors": [
+        "image request failed: HTTP 400: {\"error\":{\"message\":\"Input data is suspected of being involved in IP infringement\",\"code\":400,\"metadata\":{\"provider_name\":\"Alibaba\"}}}"
+      ]
+    }
+  ],
+  "attempts": [
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 26.37,
+      "cost_usd": 0.067823,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        992,
+        1075
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 23.25,
+      "cost_usd": 0.135989,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        992,
+        1075
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 44.55,
+      "cost_usd": 0.272582,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        992,
+        1072
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 49.88,
+      "cost_usd": 0.050722,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1536
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 37.44,
+      "cost_usd": 0.16961,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 50.98,
+      "cost_usd": 0.017536,
+      "calls": 2,
+      "alpha_path": "params-dropped+chroma",
+      "size": [
+        1254,
+        1254
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3",
+      "case": "doraemon",
+      "ok": false,
+      "error": "image request failed: HTTP 400: {\"error\":{\"message\":\"Input data is suspected of being involved in IP infringement\",\"code\":400,\"metadata\":{\"provider_name\":\"Alibaba\"}}}",
+      "duration_s": 33.57,
+      "cost_usd": 0.0,
+      "calls": 0,
+      "alpha_path": "-",
+      "size": [
+        0,
+        0
+      ],
+      "mechanical_pass": false,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3-pro",
+      "case": "doraemon",
+      "ok": false,
+      "error": "image request failed: HTTP 400: {\"error\":{\"message\":\"Input data is suspected of being involved in IP infringement\",\"code\":400,\"metadata\":{\"provider_name\":\"Alibaba\"}}}",
+      "duration_s": 72.87,
+      "cost_usd": 0.0,
+      "calls": 0,
+      "alpha_path": "-",
+      "size": [
+        0,
+        0
+      ],
+      "mechanical_pass": false,
+      "reasons": []
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "doraemon",
+      "ok": true,
+      "error": null,
+      "duration_s": 19.2,
+      "cost_usd": 0.14,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 8.01,
+      "cost_usd": 0.068656,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 23.89,
+      "cost_usd": 0.13565,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 43.95,
+      "cost_usd": 0.273932,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 41.65,
+      "cost_usd": 0.034095,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 40.91,
+      "cost_usd": 0.16966,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 66.07,
+      "cost_usd": 0.024306,
+      "calls": 2,
+      "alpha_path": "params-dropped+chroma",
+      "size": [
+        1254,
+        1254
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 149.18,
+      "cost_usd": 0.066,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2048,
+        2048
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3-pro",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 327.31,
+      "cost_usd": 0.156,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2048,
+        2048
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "gon-hxh",
+      "ok": true,
+      "error": null,
+      "duration_s": 22.04,
+      "cost_usd": 0.14,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 11.57,
+      "cost_usd": 0.068336,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 27.74,
+      "cost_usd": 0.135645,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 124.93,
+      "cost_usd": 0.272654,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 59.84,
+      "cost_usd": 0.050722,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1536
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 34.75,
+      "cost_usd": 0.16961,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 78.39,
+      "cost_usd": 0.024256,
+      "calls": 2,
+      "alpha_path": "params-dropped+chroma",
+      "size": [
+        1254,
+        1254
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 124.77,
+      "cost_usd": 0.066,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2048,
+        2048
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3-pro",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 237.68,
+      "cost_usd": 0.156,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2048,
+        2048
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "vegeta-dbz",
+      "ok": true,
+      "error": null,
+      "duration_s": 20.97,
+      "cost_usd": 0.14,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 11.29,
+      "cost_usd": 0.067846,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1195,
+        896
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 20.62,
+      "cost_usd": 0.137074,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1195,
+        896
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 41.03,
+      "cost_usd": 0.2752,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1195,
+        896
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 58.55,
+      "cost_usd": 0.050845,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1536
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 35.6,
+      "cost_usd": 0.1701,
+      "calls": 1,
+      "alpha_path": "native",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 78.08,
+      "cost_usd": 0.022442,
+      "calls": 2,
+      "alpha_path": "params-dropped+chroma",
+      "size": [
+        1254,
+        1254
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 128.74,
+      "cost_usd": 0.066,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2048,
+        2048
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "qwen/qwen-image-3-pro",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 294.45,
+      "cost_usd": 0.156,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        2352,
+        1760
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "invent-slayer",
+      "ok": true,
+      "error": null,
+      "duration_s": 29.96,
+      "cost_usd": 0.14,
+      "calls": 2,
+      "alpha_path": "chroma-key",
+      "size": [
+        1152,
+        864
+      ],
+      "mechanical_pass": true,
+      "reasons": []
+    }
+  ]
+}

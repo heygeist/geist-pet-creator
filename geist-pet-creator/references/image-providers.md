@@ -13,7 +13,7 @@ The bundle draws through OpenRouter over HTTP. Turn it on by writing `imagegen.j
 ```json
 {
   "provider": "openrouter",
-  "model": "google/gemini-3.1-flash-image",
+  "model": "openai/gpt-image-2",
   "output_format": "png",
   "background": "transparent"
 }
@@ -64,11 +64,19 @@ fresher table.
 scripts/eval_providers.py --out provider-eval --max-cost-usd 5
 ```
 
-That runs each contender over three diagnostic frames — a front idle, a side profile, and one
-mid-stride — and reports measured cost, measured duration, and a mechanical QA verdict, then writes
-a review sheet for the identity judgement that stays human. Three frames rather than one because
-identity drift shows up across a pose change, not within a single pose. Duration is reported
-because a full Pet is 57 frames, so a model that is lovely at 20s a frame costs 19 minutes a pass.
+That runs each contender over four cases, every one of them sending a reference image, because the
+skill does: 56 of a Pet's 57 frames are drawn with an approved identity lock attached. Three cases
+are identity-hold — an approved Pet's own art goes in and the model redraws that creature in a new
+pose — and one is creativity, sending only the house-style sheet plus a physical description of a
+source the model must invent a Pet for.
+
+It reports measured cost, measured duration, a mechanical QA verdict and a rendered silhouette test,
+then writes a review page for the naming test and blend verdict that stay human. Duration is
+reported because a full Pet is 57 frames, so a model that is lovely at 30s a frame costs half an
+hour a pass.
+
+The full record, including per-case numbers, the human grading, the raw JSON and the method's
+known limitations, is in [measurements/2026-08-12-provider-eval.md](../measurements/2026-08-12-provider-eval.md).
 
 Measured 2026-08-12 across four cases — three identity-hold against approved Pet art, one
 creativity with no character reference. Cost is a projection from measured per-frame cost across

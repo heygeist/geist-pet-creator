@@ -244,6 +244,7 @@ Share the HTML file path with the human. The page must render sprite-action cand
 - Read [references/generation-workflow.md](references/generation-workflow.md) before writing a character bible, generating new art, or building candidate packets.
 - Read [references/qa-rubric.md](references/qa-rubric.md) before accepting, repairing, or visually reviewing frames.
 - Read [references/image-providers.md](references/image-providers.md) before configuring or using the External Image Provider.
+- Read [measurements/2026-08-12-provider-eval.md](measurements/2026-08-12-provider-eval.md) before changing the default model, raising a spend cap, or arguing a model is better than the pinned one. It records what was measured, what it cost, and what it does not prove.
 
 ## Assets
 
