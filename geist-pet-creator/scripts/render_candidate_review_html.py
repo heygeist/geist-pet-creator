@@ -184,6 +184,36 @@ def discover_candidates(bundle: Path, action: str) -> list[dict[str, Any]]:
     return candidates
 
 
+def growth_allowance_row(context: dict[str, Any]) -> str:
+    """Motion headroom, on the page where changing the base is still cheap.
+
+    `generate_candidates.py` measures how far a silhouette can grow inside the
+    cell before it touches the line, and writes it into the packet. Until it is
+    on the review page it changes no decision: the base for the 2026-08-12 build
+    was chosen for the strongest identity read, and its lack of room then caused
+    five of the six clipping failures across `jumping`, both directional states
+    and `review`. That risk was recorded in the character bible as prose. It is
+    a number, and this is the last moment it is free to act on.
+    """
+    for record in context.get("provenance", []) or []:
+        allowance = record.get("growth_allowance") if isinstance(record, dict) else None
+        if not isinstance(allowance, dict):
+            continue
+        width = allowance.get("width_pct")
+        height = allowance.get("height_pct")
+        limited = allowance.get("limited_by", "")
+        if width is None or height is None:
+            continue
+        tight = min(width, height) < 5
+        note = " — tight; every motion state will fight the cell" if tight else ""
+        text = f"grow {width}% wider, {height}% taller (limited by {limited}){note}"
+        return (
+            f'<div><dt>Motion headroom</dt>'
+            f'<dd class="{"warn" if tight else ""}">{html.escape(text)}</dd></div>'
+        )
+    return ""
+
+
 def render_card(candidate: dict[str, Any], bundle: Path, output: Path, action: str) -> str:
     context = candidate["context"]
     candidate_id = candidate["id"]
@@ -209,6 +239,7 @@ def render_card(candidate: dict[str, Any], bundle: Path, output: Path, action: s
     )
     destination = target.get("destination", "")
     variant_intent = context.get("variant_intent", "")
+    headroom_row = growth_allowance_row(context)
     pre_status = pre_screen.get("status", "unknown") if isinstance(pre_screen, dict) else "unknown"
     prompt_id = f"prompt-{candidate_id}"
     choice_text = f"I choose {candidate_id} for {action}."
@@ -227,6 +258,7 @@ def render_card(candidate: dict[str, Any], bundle: Path, output: Path, action: s
         <dl>
           <div><dt>Target</dt><dd>{html.escape(str(destination))}</dd></div>
           <div><dt>Prompt File</dt><dd>{html.escape(prompt_file)}</dd></div>
+          {headroom_row}
         </dl>
         <div class="checks">{check_items}</div>
         <section>
@@ -344,6 +376,7 @@ def render_html(bundle: Path, action: str, candidates: list[dict[str, Any]], out
     dl div {{ display: grid; grid-template-columns: 88px 1fr; gap: 8px; margin: 4px 0; }}
     dt {{ color: var(--muted); }}
     dd {{ margin: 0; overflow-wrap: anywhere; }}
+    dd.warn {{ color: var(--bad); font-weight: 700; }}
     .checks {{ display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px; border-bottom: 1px solid var(--line); }}
     .check {{ padding: 4px 8px; border: 1px solid var(--line); border-radius: 999px; background: #fafafa; }}
     section {{ padding: 14px; border-bottom: 1px solid var(--line); }}

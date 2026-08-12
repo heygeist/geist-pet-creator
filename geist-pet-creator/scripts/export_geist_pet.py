@@ -60,22 +60,42 @@ def atlas_digest(atlas: Image.Image) -> str:
     return hashlib.sha256(atlas.convert("RGBA").tobytes()).hexdigest()
 
 
-def audit_approval(bundle: Path, digest: str) -> dict[str, Any] | None:
+def audit_approval(bundle: Path, digest: str) -> tuple[dict[str, Any] | None, str | None]:
+    """The final-audit approval for these exact pixels, and why not when absent.
+
+    Returns `(entry, problem)`. `problem` is None when the file was read fine and
+    simply holds no matching approval — the ordinary case. It is a sentence when
+    the file could not be read at all.
+
+    Four different states used to collapse into one `None`: file absent, file
+    unparseable, file parseable but not a top-level list, and file correct with
+    no matching digest. The caller then reported the fourth for all four, which
+    sends a reader hunting for a missing approval that is sitting right there in
+    a file whose shape is wrong.
+    """
     approvals_path = bundle / "qa" / "approvals.json"
     if not approvals_path.is_file():
-        return None
+        return None, f"{approvals_path} does not exist"
     try:
         approvals = json.loads(approvals_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return None
-    for entry in approvals if isinstance(approvals, list) else []:
+    except json.JSONDecodeError as error:
+        return None, f"{approvals_path} is not valid JSON: {error}"
+    if not isinstance(approvals, list):
+        return None, (
+            f"{approvals_path} holds a {type(approvals).__name__}, and this reader wants a "
+            f"top-level JSON array of decision records. The approval may well be in there; "
+            f"nothing can find it in this shape."
+        )
+    for entry in approvals:
+        if not isinstance(entry, dict):
+            continue
         if (
             entry.get("approved_action") == "final-audit"
             and entry.get("decision") == "approved"
             and entry.get("atlas_digest") == digest
         ):
-            return entry
-    return None
+            return entry, None
+    return None, None
 
 
 def save_contact_sheet(atlas: Image.Image, output: Path) -> None:
@@ -148,8 +168,10 @@ def main() -> None:
     atlas = compose_atlas(bundle)
     digest = atlas_digest(atlas)
 
-    approval = audit_approval(bundle, digest)
+    approval, unreadable = audit_approval(bundle, digest)
     if approval is None and not args.skip_audit_gate:
+        if unreadable:
+            raise SystemExit(f"cannot read the approvals file, so the audit gate cannot open.\n  {unreadable}")
         raise SystemExit(
             "no approved final anatomy audit for these exact frames.\n"
             f"  atlas digest: {digest[:12]}\n"

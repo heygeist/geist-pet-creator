@@ -83,6 +83,40 @@ def fringe_counts(rgba: Image.Image, alpha_threshold: int, detect_cyan: bool = F
     return fringe, edge
 
 
+def desaturate_fringe(rgba: Image.Image, alpha_threshold: int, detect_cyan: bool = False) -> int:
+    """Neutralise chroma spill on boundary pixels. Returns how many were changed.
+
+    Deterministic, and it preserves every visible shape: only the hue of a
+    semi-transparent edge pixel moves, pulled to that pixel's own luminance so
+    the outline keeps its softness and its position.
+
+    It reuses `is_green_fringe`, `boundary_mask` and the two thresholds the gate
+    reads, rather than re-deriving them. A hand-rolled version of this cleanup
+    written against `alpha > 16` silently cleaned nothing on a real bundle,
+    because the spill sat at alpha 9-16 — inside `ALPHA_THRESHOLD = 8`'s visible
+    band and below `OPAQUE_THRESHOLD`, which is exactly the population the gate
+    counts. A cleanup and its gate that read different constants cannot agree.
+    """
+    boundary = boundary_mask(rgba, alpha_threshold).tobytes()
+    pixels = bytearray(rgba.tobytes())
+    cleaned = 0
+    for index, on_boundary in enumerate(boundary):
+        if not on_boundary:
+            continue
+        base = index * 4
+        if pixels[base + 3] >= OPAQUE_THRESHOLD:
+            continue
+        red, green, blue = pixels[base], pixels[base + 1], pixels[base + 2]
+        if not (is_green_fringe(red, green, blue) or (detect_cyan and is_cyan_fringe(red, green, blue))):
+            continue
+        grey = (red * 299 + green * 587 + blue * 114) // 1000
+        pixels[base] = pixels[base + 1] = pixels[base + 2] = grey
+        cleaned += 1
+    if cleaned:
+        rgba.frombytes(bytes(pixels))
+    return cleaned
+
+
 def validate_frame(
     frame_path: Path,
     grid: FrameGrid,
@@ -91,6 +125,7 @@ def validate_frame(
     safe_padding: int,
     alpha_threshold: int,
     fix_transparent_rgb: bool,
+    fix_fringe: bool,
     detect_cyan: bool,
 ) -> dict[str, Any]:
     label = grid.rel(frame_path)
@@ -169,15 +204,29 @@ def validate_frame(
     frame_result["edge_fringe_pixels"] = fringe
     frame_result["edge_pixels"] = edge
     if fringe >= FRINGE_MIN_PIXELS and edge and fringe / edge >= FRINGE_MIN_RATIO:
-        findings.append(
-            Finding(
-                "error",
-                "green_cyan_fringe",
-                label,
-                f"{fringe}/{edge} boundary pixels look like chroma fringe",
+        if fix_fringe:
+            cleaned = desaturate_fringe(rgba, alpha_threshold, detect_cyan)
+            rgba.save(frame_path)
+            frame_result["fringe_pixels_cleaned"] = cleaned
+            findings.append(
+                Finding(
+                    "warning",
+                    "green_cyan_fringe",
+                    label,
+                    f"{fringe}/{edge} boundary pixels looked like chroma fringe; "
+                    f"desaturated {cleaned}",
+                )
             )
-        )
-        frame_result["ok"] = False
+        else:
+            findings.append(
+                Finding(
+                    "error",
+                    "green_cyan_fringe",
+                    label,
+                    f"{fringe}/{edge} boundary pixels look like chroma fringe",
+                )
+            )
+            frame_result["ok"] = False
 
     return frame_result
 
@@ -188,6 +237,7 @@ def validate_bundle(
     safe_padding: int,
     alpha_threshold: int = ALPHA_THRESHOLD,
     fix_transparent_rgb: bool = False,
+    fix_fringe: bool = False,
     detect_cyan: bool = False,
 ) -> dict[str, Any]:
     findings: list[Finding] = []
@@ -235,6 +285,7 @@ def validate_bundle(
                     safe_padding=safe_padding,
                     alpha_threshold=alpha_threshold,
                     fix_transparent_rgb=fix_transparent_rgb,
+                    fix_fringe=fix_fringe,
                     detect_cyan=detect_cyan,
                 )
                 for frame in grid.frame_paths(state)
@@ -271,6 +322,14 @@ def main() -> None:
         help="Zero RGB channels for fully transparent pixels in-place",
     )
     parser.add_argument(
+        "--fix-green-fringe",
+        action="store_true",
+        help="Desaturate chroma spill on boundary pixels in-place. Deterministic and "
+             "shape-preserving: it moves the hue of semi-transparent edge pixels to their own "
+             "luminance and touches nothing else, so it needs no approval. Every chroma-path "
+             "frame carries this spill, and without the fix the only cure was a redraw.",
+    )
+    parser.add_argument(
         "--detect-cyan-fringe",
         action="store_true",
         help="Also flag near-pure cyan matte residue; off by default because Pet outlines are often blue or teal",
@@ -283,6 +342,7 @@ def main() -> None:
         safe_padding=args.safe_padding,
         alpha_threshold=args.alpha_threshold,
         fix_transparent_rgb=args.fix_transparent_rgb,
+        fix_fringe=args.fix_green_fringe,
         detect_cyan=args.detect_cyan_fringe,
     )
     output = json.dumps(result, indent=2)

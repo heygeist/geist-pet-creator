@@ -47,8 +47,13 @@ from PIL import Image
 
 from geist_grid import CELL_HEIGHT, CELL_WIDTH, FRAME_COUNTS
 from geist_house import (
+    FLAT_FIELD,
+    FRAMING,
     HOUSE_FORM,
+    LEGLESS_BODY,
+    LEGLESS_MOTION,
     MIN_PASSING_CELLS,
+    MOTION_STATES,
     NEVER_TRANSFERS,
     cell_id,
     house_style_path,
@@ -146,8 +151,69 @@ KNOWN_MODELS = (
     "x-ai/grok-imagine-image-2.0",
 )
 
+# How each model delivers a transparent frame. Keyed on the model id, because
+# that is what the fact belongs to: a config flag would let a bundle quietly ask
+# for something the provider cannot do and pay a full draw to find out.
+#
+#   "native"      returns real alpha when asked. One paid call per frame.
+#   "chroma"      has no alpha path. Ask for a flat green field on the FIRST
+#                 call and key it out here. Still one paid call per frame.
+#   "chroma-bare" chroma, and the model answers HTTP 400 for
+#                 output_format/background rather than ignoring them, so neither
+#                 field is sent.
+#
+# Measured 2026-08-12; the table is measurements/2026-08-12-provider-eval.md.
+#
+# Optimism is not free here. openai/gpt-image-2 is the default and is
+# "chroma-bare", so asking it for transparency first bought a rejected
+# round-trip AND a paid opaque draw that was discarded every time -- every frame
+# drawn twice. On the Karate Crown Guardian build, 2 frames cost 4 calls /
+# $0.101 before this table and 2 calls / $0.059 after.
+#
+# A model absent from this table keeps the optimistic path -- ask, verify, fall
+# back -- which is the right behaviour while the capability is genuinely
+# unknown. Add the entry once eval_providers.py has measured it.
+ALPHA_PATHS: dict[str, str] = {
+    "google/gemini-3.1-flash-lite-image": "chroma",
+    "google/gemini-3.1-flash-image": "chroma",
+    "google/gemini-3-pro-image": "chroma",
+    "openai/gpt-5-image-mini": "native",
+    "openai/gpt-5-image": "native",
+    "openai/gpt-image-2": "chroma-bare",
+    "x-ai/grok-imagine-image-2.0": "chroma",
+}
+
+# A model earns a place in KNOWN_MODELS by being measured, and the measurement
+# that matters most for cost is the alpha path. Catch the omission here rather
+# than paying a doubled call per frame to discover it.
+_unmeasured = [model for model in KNOWN_MODELS if model not in ALPHA_PATHS]
+if _unmeasured:
+    raise SystemExit(
+        f"KNOWN_MODELS entries with no ALPHA_PATHS entry: {', '.join(_unmeasured)}. "
+        f"Measure the alpha path with eval_providers.py and add it, or the model draws "
+        f"every frame twice."
+    )
+
 # Lanczos resampling spreads an edge by roughly one pixel.
 RESAMPLE_BLEED = 1
+
+# How much of the safe box the first frame deliberately leaves empty.
+#
+# The transform is built from frame 0 and applied unchanged to every later
+# frame, so whatever margin frame 0 has is exactly the margin the whole state
+# has. Fitting frame 0 tight to the safe box therefore puts it flush against the
+# edge, and any later frame that grows -- a jump, a stretch, hair swinging wide
+# -- crosses the cell line. Measured: a body scaled tight to a 192x208 cell
+# clips on 2% growth.
+#
+# That is why asking the model for a generous margin cannot fix clipping on its
+# own. The margin is on the provider canvas and the transform normalises it
+# away. The headroom has to be reserved here, where the scale is decided, and it
+# costs no provider calls at all.
+#
+# 8% buys roughly 15 pixels of vertical growth, which covers the motion range of
+# the nine states. Raise it for a Pet whose silhouette swings a long way.
+MOTION_HEADROOM = 0.08
 
 # A returned image counts as alpha-capable only when the border is genuinely
 # clear and a real share of the canvas is transparent. An opaque image with one
@@ -155,10 +221,16 @@ RESAMPLE_BLEED = 1
 MIN_TRANSPARENT_FRACTION = 0.10
 MIN_CLEAR_BORDER_FRACTION = 0.90
 
+# How each alpha path asks for its background. Exactly one of these is appended
+# to every frame prompt, by generate_frame, so the prompt can never ask for a
+# transparent background and a green one in the same breath. Both carry
+# FLAT_FIELD: an unkeyed panel behind the character reads as art to the keyer
+# and cost a redraw on 2026-08-12.
 CHROMA_SUFFIX = (
-    " Place the character on a flat, uniform chroma-key background of pure green (#00FF00). "
+    f" Place the character on a background of pure green (#00FF00). {FLAT_FIELD} "
     "Keep the green clear of the character and use no green in the character itself."
 )
+TRANSPARENT_SUFFIX = f" Use a fully transparent background. {FLAT_FIELD}"
 CHROMA_KEY = (0, 255, 0)
 KEY_TOLERANCE = 72
 
@@ -168,6 +240,10 @@ CONCEPT_SHEET = "concept-sheet"
 CANONICAL_BASE = "canonical-base"
 PRE_FRAME_ACTIONS = (CONCEPT_SHEET, CANONICAL_BASE)
 ACTIONS = (*PRE_FRAME_ACTIONS, *sorted(FRAME_COUNTS))
+
+# The one state that is drawn by moving pixels rather than by asking a provider.
+MIRROR_OF = "running-left"
+MIRROR_SOURCE = "running-right"
 
 # Ceilings sized per action, because an eight-frame state and a one-call sheet
 # are not the same accident. A sheet run under the state ceiling has no real
@@ -425,9 +501,12 @@ class CellTransform:
     offset_x: int
     offset_y: int
     source_size: tuple[int, int]
+    headroom: float = MOTION_HEADROOM
 
     @classmethod
-    def from_reference(cls, image: Image.Image, safe_padding: int) -> "CellTransform":
+    def from_reference(
+        cls, image: Image.Image, safe_padding: int, headroom: float = MOTION_HEADROOM
+    ) -> "CellTransform":
         bbox = alpha_bbox(image)
         if not bbox:
             raise SystemExit("reference frame has no visible pixels; cannot derive a cell transform")
@@ -438,7 +517,10 @@ class CellTransform:
         # as visible. Reserve that pixel so the reference frame clears its own
         # padding check rather than reporting itself as a misfit.
         margin = (safe_padding + RESAMPLE_BLEED) * 2
-        scale = min((CELL_WIDTH - margin) / body_width, (CELL_HEIGHT - margin) / body_height)
+        fitted = min((CELL_WIDTH - margin) / body_width, (CELL_HEIGHT - margin) / body_height)
+        # Frame 0 sits back from the safe box by `headroom` so the frames that
+        # follow it -- drawn under this same transform -- have somewhere to grow.
+        scale = fitted * (1.0 - headroom)
         centre_x = (left + right) / 2
         centre_y = (top + bottom) / 2
         return cls(
@@ -446,7 +528,29 @@ class CellTransform:
             offset_x=round(CELL_WIDTH / 2 - centre_x * scale),
             offset_y=round(CELL_HEIGHT / 2 - centre_y * scale),
             source_size=image.size,
+            headroom=headroom,
         )
+
+    def growth_allowance(self, cell: Image.Image, safe_padding: int) -> dict[str, Any]:
+        """How much this body can still grow before it touches the cell line.
+
+        The number the character bible could only describe in prose. A base
+        whose allowance is near zero will fight every motion state, and the one
+        moment when swapping it is free is the canonical-base review.
+        """
+        bbox = alpha_bbox(cell)
+        if not bbox:
+            return {"width_pct": 0.0, "height_pct": 0.0, "limited_by": "no visible pixels"}
+        left, top, right, bottom = bbox
+        body_width = max(1, right - left)
+        body_height = max(1, bottom - top)
+        width_pct = (CELL_WIDTH - 2 * safe_padding) / body_width - 1.0
+        height_pct = (CELL_HEIGHT - 2 * safe_padding) / body_height - 1.0
+        return {
+            "width_pct": round(width_pct * 100, 1),
+            "height_pct": round(height_pct * 100, 1),
+            "limited_by": "height" if height_pct <= width_pct else "width",
+        }
 
     def apply(self, image: Image.Image) -> Image.Image:
         scaled = image.resize(
@@ -481,6 +585,7 @@ class CellTransform:
             "offset_x": self.offset_x,
             "offset_y": self.offset_y,
             "source_size": list(self.source_size),
+            "motion_headroom": round(self.headroom, 4),
         }
 
 
@@ -601,6 +706,26 @@ def opaque(config: ProviderConfig, aspect_ratio: str | None = None) -> ProviderC
     )
 
 
+def drop_transparency_params(config: ProviderConfig, keep_output_format: bool) -> ProviderConfig:
+    """The same config without the fields a chroma run has no use for.
+
+    `background` always goes: a chroma run is asking for a flat green field, not
+    for alpha. `output_format` stays wherever the model tolerates it, because a
+    lossy default puts compression noise around the green edge and the key-out
+    leaves a halo where that noise was.
+    """
+    return ProviderConfig(
+        provider=config.provider,
+        model=config.model,
+        output_format=config.output_format if keep_output_format else None,
+        background=None,
+        resolution=config.resolution,
+        aspect_ratio=config.aspect_ratio,
+        quality=config.quality,
+        extra=config.extra,
+    )
+
+
 def generate_frame(
     config: ProviderConfig,
     prompt: str,
@@ -609,6 +734,11 @@ def generate_frame(
     require_alpha: bool = True,
 ) -> tuple[Image.Image, dict[str, Any]]:
     """Draw one image on the provider canvas. Placement happens later, once.
+
+    The model's entry in ALPHA_PATHS decides how transparency is asked for, so a
+    model with no alpha path spends one call rather than two. A model absent
+    from the table is asked optimistically and checked, which is what an unknown
+    capability deserves.
 
     `require_alpha` is False only for a concept sheet, which asked for paper.
     Running the transparency check on it would see an opaque image, conclude the
@@ -623,47 +753,63 @@ def generate_frame(
         guard.record(cost)
         return image, cost
 
-    alpha_path = "native"
+    declared = ALPHA_PATHS.get(config.model)
+    bare = declared == "chroma-bare"
+    chroma_first = require_alpha and declared in {"chroma", "chroma-bare"}
+
+    if chroma_first:
+        active = drop_transparency_params(config, keep_output_format=not bare)
+        text = prompt + CHROMA_SUFFIX
+        alpha_path = "params-dropped+chroma-key" if bare else "chroma-key"
+    elif not require_alpha:
+        # The caller already asked for paper, so only the fields this model
+        # rejects outright still need dropping. The sheet prompt names its own
+        # background, so no suffix goes on it.
+        active = drop_transparency_params(config, keep_output_format=False) if bare else config
+        text = prompt
+        alpha_path = "opaque by request"
+    else:
+        active = config
+        text = prompt + TRANSPARENT_SUFFIX
+        alpha_path = "native"
+
     try:
-        image, cost = once(config, prompt)
+        image, cost = once(active, text)
     except SystemExit as error:
         # Some models reject `output_format`/`background` outright instead of
         # ignoring them -- openai/gpt-image-2 answers "background: not
         # supported. Accepted: auto, opaque". Dropping the fields makes the
-        # model reachable, and the chroma path below supplies the transparency
-        # those fields were asking for. Without this the whole model is
-        # unusable, which is a worse outcome than one extra call.
+        # model reachable rather than losing the run. Reaching this branch for a
+        # model that IS in ALPHA_PATHS means the entry disagrees with the
+        # provider, so the recorded path says so and the entry needs
+        # re-measuring.
         if "400" not in str(error) or "parameter" not in str(error).lower():
             raise
-        config = ProviderConfig(
-            provider=config.provider,
-            model=config.model,
-            output_format=None,
-            background=None,
-            resolution=config.resolution,
-            aspect_ratio=config.aspect_ratio,
-            quality=config.quality,
-            extra=config.extra,
-        )
-        image, cost = once(config, prompt)
-        alpha_path = "params-dropped"
+        active = drop_transparency_params(active, keep_output_format=False)
+        image, cost = once(active, text)
+        alpha_path = f"params-dropped+{alpha_path}"
 
-    if not require_alpha:
-        alpha_path = "opaque by request"
-    elif not alpha_is_real(image):
-        # The provider ignored `background: transparent`, or never accepted it,
-        # so ask for a flat chroma background and key it out here instead.
-        image, cost = once(config, prompt + CHROMA_SUFFIX)
+    if chroma_first:
         image = key_out_chroma(image)
-        alpha_path = "chroma-key fallback" if alpha_path == "native" else "params-dropped+chroma-key"
+    elif require_alpha and not alpha_is_real(image):
+        # An unknown model that ignored `background: transparent`, or a table
+        # entry gone stale. Ask for a flat chroma field and key it out here.
+        text = prompt + CHROMA_SUFFIX
+        image, cost = once(drop_transparency_params(active, keep_output_format=True), text)
+        image = key_out_chroma(image)
+        alpha_path = f"{alpha_path}+chroma-key"
 
     provenance = {
         "provider": config.provider,
         "model": config.model,
         "endpoint": endpoint(),
-        "requested_background": config.background,
-        "requested_output_format": config.output_format,
+        "requested_background": active.background,
+        "requested_output_format": active.output_format,
         "alpha_path": alpha_path,
+        "alpha_path_source": "table" if declared else "probed",
+        # What was actually sent, so prompt.md and the packet cannot disagree
+        # with the request about which background was asked for.
+        "background_instruction": text[len(prompt):].strip(),
         "credential_source": credential_source(),
         "usage_cost_usd": round(cost, 6),
         "run_cost_usd": round(guard.cost, 6),
@@ -678,16 +824,27 @@ def generate_frame(
 
 
 def build_prompt(bundle: Path, state: str, index: int, frame_count: int, variant_intent: str, extra: str) -> str:
+    """The frame prompt.
+
+    It carries the house-form rules the run will be judged against, because
+    every one of them used to live only in SKILL.md prose. The background line
+    is deliberately absent: generate_frame appends the one the model's alpha
+    path actually needs.
+    """
     manifest = read_manifest(bundle / "character-bible.md")
+    # Every state is legless, so every prompt says so. The four whose name pulls
+    # towards legs get the longer version, which also says what to move instead.
+    movement = LEGLESS_MOTION if state in MOTION_STATES else LEGLESS_BODY
     return (
         f"Draw frame {index} of {frame_count} for the `{state}` sprite action of this Pet.\n"
         f"The attached images are the identity lock: image 1 is the canonical base, "
         f"image 2 is the previous approved frame of this same action.\n"
         f"Keep the silhouette, proportions, palette, face landmarks, props and scale identical to them.\n"
         f"Motion read: {variant_intent}\n"
-        f"Compose the whole body inside the frame with clear margin on all four sides. "
-        f"Transparent background. One character only, no shadow, no ground marks, no detached effects, "
-        f"no text.{manifest.prompt_block()}\n"
+        f"{movement}\n"
+        f"{FRAMING}\n"
+        f"One character only, and no text, letters or numbers anywhere."
+        f"{manifest.prompt_block()}\n"
         f"{extra}"
     ).strip()
 
@@ -789,9 +946,9 @@ def build_base_prompt(bundle: Path, variant_intent: str, from_cell: bool, derive
         f"Shared Geist identity: {HOUSE_FORM}\n"
         f"Variant intent: {variant_intent}\n"
         f"Composition/framing: one centred full-body character, front or soft three-quarter view, "
-        f"whole body inside the frame with clear margin on all four sides, transparent "
-        f"background, one character only, no shadow, no ground marks, no detached effects, "
-        f"no text.\n"
+        f"the whole body and every prop well inside the canvas with an even clear margin of at "
+        f"least 15% of the canvas on all four sides, one character only, and no text, letters "
+        f"or numbers anywhere.\n"
         f"Keep it simple enough to survive redrawing in nine animation states at 192x208: a base "
         f"that only reads at full resolution will lose its identity by the third state."
         f"{manifest.prompt_block()}\n"
@@ -950,6 +1107,8 @@ def write_packet(
     provenance: list[dict[str, Any]],
     transform: CellTransform,
     variant_intent: str,
+    inputs: dict[str, Any] | None = None,
+    generation_mode: str = "External Image Provider",
 ) -> Path:
     packet = bundle / "sources" / "candidates" / candidate_id
     frame_dir = packet / "frames"
@@ -967,7 +1126,8 @@ def write_packet(
     (packet / "prompt.md").write_text(prompt + "\n", encoding="utf-8")
     (packet / "inputs.json").write_text(
         json.dumps(
-            {
+            inputs
+            or {
                 "input_images": ["sources/canonical-base.png", "previous frame of this action"],
                 "mode": "External Image Provider",
                 "cell_transform": transform.as_dict(),
@@ -990,7 +1150,7 @@ def write_packet(
                 "generated_file": f"sources/candidates/{candidate_id}/contact-sheet.png",
                 "prompt_file": f"sources/candidates/{candidate_id}/prompt.md",
                 "prompt_text": prompt,
-                "generation_mode": "External Image Provider",
+                "generation_mode": generation_mode,
                 "cell_transform": transform.as_dict(),
                 "provenance": provenance,
                 "variant_intent": variant_intent,
@@ -1011,6 +1171,53 @@ def write_packet(
 # --------------------------------------------------------------------------- #
 # Entry point
 # --------------------------------------------------------------------------- #
+
+
+# How many frames a state draws before the mechanical checks get a veto.
+#
+# Every failed run on the Karate Crown Guardian build was five to eight frames
+# of a defect that was already in frame 0 or frame 1 -- and it cost the whole
+# state anyway, because nothing looked until the state was finished. Two frames
+# is enough to see clipping, an unkeyed background, and a body that changes
+# size, which are the three that repeat.
+PREFLIGHT_FRAMES = 2
+
+# How far a body's bbox area may drift from frame 0 before it stops being the
+# same character moving and starts being a different drawing.
+AREA_TOLERANCE = 0.35
+
+
+def frame_problems(cell: Image.Image, fit: dict[str, Any], first_area: int) -> tuple[list[str], list[str]]:
+    """Mechanical defects in one finished cell, split by how hard they stop a run.
+
+    Returns `(fatal, preflight)`. **Fatal** ends the state at whatever frame it
+    appears on. **Pre-flight** ends it only while the veto is still open, so a
+    marginal frame late in a state stays reportable and deterministically
+    repairable instead of throwing away the frames already paid for.
+
+    Nothing here needs a human or a provider call. What it cannot see is
+    anatomy: a state that draws legs fits, keys out and holds its area
+    perfectly. Legs are the prompt's job — `geist_house.LEGLESS_BODY`.
+    """
+    fatal: list[str] = []
+    preflight: list[str] = []
+
+    # Fatal, because the background is baked into the art. On frame 0 it is
+    # worse than one bad frame: alpha_bbox then covers the whole canvas, the
+    # derived scale shrinks that canvas into one cell, and every remaining frame
+    # of the state inherits the wrong scale.
+    if not alpha_is_real(cell):
+        fatal.append("background did not key out: the cell is largely opaque or its border is not clear")
+
+    if not fit["fits"]:
+        preflight.append(f"body reaches outside safe padding, bbox {fit.get('bbox')}")
+    bbox = alpha_bbox(cell)
+    area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) if bbox else 0
+    if first_area and area:
+        ratio = area / first_area
+        if not (1 - AREA_TOLERANCE) <= ratio <= (1 + AREA_TOLERANCE):
+            preflight.append(f"body area is {ratio:.2f}x frame 0, past the {AREA_TOLERANCE:.0%} tolerance")
+    return fatal, preflight
 
 
 def parse_frame_range(spec: str | None, frame_count: int) -> list[int]:
@@ -1099,6 +1306,74 @@ def run_concept_sheet(args: argparse.Namespace, bundle: Path, config: ProviderCo
     }
 
 
+def run_mirror(args: argparse.Namespace, bundle: Path) -> dict[str, Any]:
+    """`running-left` from the approved `running-right` row. No provider call.
+
+    The skill has always said `running-left` is the same cycle flipped, and
+    nothing enforced it: `running-left` is an ordinary member of FRAME_COUNTS,
+    so `--action running-left` drew eight frames through the provider and no
+    one was told. Drawing it independently also loses the guarantee the flip
+    gives for free -- that the two directions are the same character.
+    """
+    source_dir = bundle / "frames" / MIRROR_SOURCE
+    frame_count = FRAME_COUNTS[MIRROR_SOURCE]
+    if frame_count != FRAME_COUNTS[MIRROR_OF]:
+        raise SystemExit(
+            f"{MIRROR_SOURCE} has {frame_count} frames and {MIRROR_OF} wants "
+            f"{FRAME_COUNTS[MIRROR_OF]}; a mirror cannot bridge that. Draw {MIRROR_OF} with "
+            f"--independent-left, or fix the row spec in geist_grid.py."
+        )
+    sources = [source_dir / f"{index:02d}.png" for index in range(frame_count)]
+    missing = [path.name for path in sources if not path.is_file()]
+    if missing:
+        raise SystemExit(
+            f"{MIRROR_OF} mirrors the approved {MIRROR_SOURCE} row, and "
+            f"frames/{MIRROR_SOURCE}/ is missing {', '.join(missing)}. Approve {MIRROR_SOURCE} "
+            f"first, or pass --independent-left to draw {MIRROR_OF} through the provider instead."
+        )
+
+    produced: list[tuple[int, Image.Image]] = []
+    for index, path in enumerate(sources):
+        with Image.open(path) as opened:
+            flipped = opened.convert("RGBA").transpose(Image.FLIP_LEFT_RIGHT)
+        produced.append((index, flipped))
+
+    candidate_id = f"{MIRROR_OF}-{args.variant}"
+    operation = f"horizontal flip of every approved frames/{MIRROR_SOURCE}/NN.png"
+    packet = write_packet(
+        bundle,
+        candidate_id,
+        MIRROR_OF,
+        produced,
+        operation,
+        [{"frame": index, "operation": "FLIP_LEFT_RIGHT", "source": f"frames/{MIRROR_SOURCE}/{index:02d}.png"}
+         for index, _image in produced],
+        CellTransform(scale=1.0, offset_x=0, offset_y=0, source_size=(CELL_WIDTH, CELL_HEIGHT)),
+        operation,
+        inputs={
+            "input_images": [f"frames/{MIRROR_SOURCE}/{index:02d}.png" for index in range(frame_count)],
+            "mode": "Deterministic",
+            "operation": "PIL Image.FLIP_LEFT_RIGHT",
+        },
+        generation_mode="Deterministic",
+    )
+    return {
+        "action": MIRROR_OF,
+        "candidate_id": candidate_id,
+        "packet": str(packet),
+        "frames": [index for index, _image in produced],
+        "frames_requested": frame_count,
+        "mirrored_from": MIRROR_SOURCE,
+        "provider_calls": 0,
+        "spend": {"images": 0, "cost_usd": 0.0},
+        "next": (
+            f"render qa/{MIRROR_OF}-review.html and get the mirror approved like any other "
+            f"candidate. It is a deterministic operation, so a failure here is a "
+            f"{MIRROR_SOURCE} problem."
+        ),
+    }
+
+
 def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderConfig, guard: SpendGuard) -> dict[str, Any]:
     """The identity lock itself. No canonical base is attached, because this is it."""
     from_cell = bool(args.cell_image)
@@ -1127,6 +1402,7 @@ def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderC
     packets: list[str] = []
     candidate_ids: list[str] = []
     misfits: list[dict[str, Any]] = []
+    allowances: dict[str, Any] = {}
     for offset in range(args.variants):
         letter = chr(ord("a") + offset)
         if guard.ledger is not None:
@@ -1138,7 +1414,7 @@ def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderC
         # Each base variant is its own character, so each gets its own transform.
         # The shared-transform rule exists to stop one animation run's poses from
         # rescaling each other; it has nothing to say across separate candidates.
-        transform = CellTransform.from_reference(raw, args.safe_padding)
+        transform = CellTransform.from_reference(raw, args.safe_padding, args.motion_headroom)
         sprite = transform.apply(raw)
         fit = transform.fit_report(sprite, args.safe_padding)
         if not fit["fits"]:
@@ -1146,12 +1422,17 @@ def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderC
 
         record["reference_count"] = len(references)
         record["fits_safe_padding"] = fit["fits"]
+        # What this silhouette will have to move inside for all 57 later frames.
+        # A base tight on both axes fights every motion state, and this review is
+        # the last moment when swapping it costs one call instead of a state.
+        record["growth_allowance"] = transform.growth_allowance(sprite, args.safe_padding)
         candidate_id = f"canonical-base-{letter}"
         packet = write_base_packet(
             bundle, candidate_id, raw, sprite, transform, prompt, record, input_images, intent
         )
         candidate_ids.append(candidate_id)
         packets.append(str(packet))
+        allowances[candidate_id] = record["growth_allowance"]
 
     return {
         "action": CANONICAL_BASE,
@@ -1159,9 +1440,13 @@ def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderC
         "packets": packets,
         "from_approved_cell": from_cell,
         "candidates_outside_safe_padding": misfits,
+        "motion_headroom": round(args.motion_headroom, 4),
+        "growth_allowance": allowances,
         "next": (
             "pre-screen each candidate, then render qa/canonical-base-review.html and ask the "
-            "human to choose one id before copying it to sources/canonical-base.png"
+            "human to choose one id before copying it to sources/canonical-base.png. Read "
+            "growth_allowance while choosing: it is how far each silhouette can grow inside the "
+            "cell, and a base tight on both axes will fight all 57 later frames."
         ),
     }
 
@@ -1187,7 +1472,8 @@ def main() -> None:
                         help="Runaway-loop guardrail, not a spend control: a value this run "
                              "passes to itself. Defaults per action -- $3.00 for a sprite "
                              "action, near 2x a measured 57-frame pass, since the 2026-08-12 "
-                             "eval put openai/gpt-image-2 at ~$1.33 a pass. The real ceiling "
+                             "eval put openai/gpt-image-2 at ~$1.33 a pass across TWO billed "
+                             "calls per frame, which ALPHA_PATHS now halves to ~$0.67. The real ceiling "
                              "is the credit limit on the OpenRouter key, which is enforced "
                              "server-side and outside this process's reach.")
     parser.add_argument("--mode", choices=MODES, default=MODE_SUPERVISED,
@@ -1196,6 +1482,12 @@ def main() -> None:
                              "every ledger line, so a Pet whose frames nobody chose stays visible "
                              "as one months later.")
     parser.add_argument("--safe-padding", type=int, default=6)
+    parser.add_argument("--motion-headroom", type=float, default=MOTION_HEADROOM,
+                        help="Fraction of the safe box the first frame leaves empty so later "
+                             "frames of the same state have room to grow. The transform is built "
+                             "from frame 0 and applied unchanged to the rest, so a tight fit here "
+                             "clips every frame that moves. Raise it for a silhouette that swings "
+                             f"a long way; default {MOTION_HEADROOM:.0%}.")
     parser.add_argument("--extra-prompt", default="", help="Appended to every prompt")
     parser.add_argument("--base-url", help="Provider base URL. Defaults to OPENROUTER_BASE_URL, "
                         "then OpenRouter. Point at a broker or a local mock to keep the "
@@ -1207,6 +1499,13 @@ def main() -> None:
     sheet_group.add_argument("--grid", help="Override the grid as COLUMNSxROWS, for example 3x2")
     sheet_group.add_argument("--identity-image", help="Image 1 for a derived sheet or base; omit for an original cast")
     sheet_group.add_argument("--candidate-id", help="Packet id; defaults to concept-sheet-01")
+
+    parser.add_argument("--independent-left", action="store_true",
+                        help=f"Draw {MIRROR_OF} through the provider instead of mirroring the "
+                             f"approved {MIRROR_SOURCE} row. Costs a full state and drops the "
+                             f"guarantee the flip gives free -- that both directions are the same "
+                             f"character. Use it only when a human asked for independent "
+                             f"left-facing art.")
 
     base_group = parser.add_argument_group("canonical-base")
     base_group.add_argument("--cell-image", help="Approved concept cell to render at sprite scale, as Image 1")
@@ -1231,6 +1530,13 @@ def main() -> None:
         raise SystemExit("bundle and --action are required unless --verify-model is given")
 
     bundle = Path(args.bundle).expanduser().resolve()
+
+    # The flip needs no credential, no config and no ceiling, so it runs before
+    # any of that is resolved.
+    if action == MIRROR_OF and not args.independent_left:
+        print(json.dumps({"ok": True, "mode": "Deterministic", "decision_mode": args.mode,
+                          **run_mirror(args, bundle)}, indent=2))
+        return
 
     if action == CONCEPT_SHEET and not args.locks_file:
         raise SystemExit(
@@ -1297,7 +1603,10 @@ def main() -> None:
     first_prompt = ""
     misfits: list[dict[str, Any]] = []
 
-    for index in indices:
+    first_area = 0
+    aborted: dict[str, Any] | None = None
+
+    for position, index in enumerate(indices):
         ledger.frame = index
         references = [canonical_uri]
         if previous is not None:
@@ -1313,12 +1622,16 @@ def main() -> None:
 
         # Scale is decided once, by the first frame, and never revisited.
         if transform is None:
-            transform = CellTransform.from_reference(raw, args.safe_padding)
+            transform = CellTransform.from_reference(raw, args.safe_padding, args.motion_headroom)
         cell = transform.apply(raw)
 
         fit = transform.fit_report(cell, args.safe_padding)
         if not fit["fits"]:
             misfits.append({"frame": index, **fit})
+
+        bbox = alpha_bbox(cell)
+        if position == 0:
+            first_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) if bbox else 0
 
         record["frame"] = index
         record["reference_count"] = len(references)
@@ -1327,15 +1640,42 @@ def main() -> None:
         produced.append((index, cell))
         previous = cell
 
+        # The veto, and the whole point of drawing in this order: a prompt that
+        # cannot produce a usable frame costs two calls instead of eight.
+        fatal, preflight = frame_problems(cell, fit, first_area)
+        if fatal or (preflight and position < PREFLIGHT_FRAMES):
+            aborted = {"frame": index, "problems": fatal + preflight,
+                       "stopped_by": "fatal" if fatal else "pre-flight"}
+            break
+
     assert transform is not None
     packet = write_packet(
         bundle, candidate_id, action, produced, first_prompt, provenance, transform, args.variant_intent
     )
 
+    if aborted is not None:
+        listed = "; ".join(aborted["problems"])
+        next_step = (
+            f"pre-flight stopped this state at frame {aborted['frame']} of "
+            f"{len(indices)}: {listed}. Fix the prompt or the canonical base and run the "
+            f"state again -- the remaining {len(indices) - len(produced)} frames would have "
+            f"carried the same defect. The frames drawn so far are in the packet as evidence."
+        )
+    elif args.mode == MODE_SUPERVISED:
+        next_step = (
+            f"pre-screen the packet, then render qa/{action}-review.html "
+            "and ask the human to choose a candidate id"
+        )
+    else:
+        next_step = (
+            f"pre-screen the packet, render qa/{action}-review.html as the record, then "
+            "promote it by the tie-break ladder and log the decision in qa/approvals.json"
+        )
+
     print(
         json.dumps(
             {
-                "ok": True,
+                "ok": aborted is None,
                 "mode": "External Image Provider",
                 "decision_mode": args.mode,
                 "action": action,
@@ -1343,25 +1683,27 @@ def main() -> None:
                 "packet": str(packet),
                 "state": action,
                 "frames": [index for index, _image in produced],
+                "frames_requested": len(indices),
                 "model": config.model,
                 "cell_transform": transform.as_dict(),
                 "alpha_paths": sorted({record["alpha_path"] for record in provenance}),
                 "frames_outside_safe_padding": misfits,
+                "preflight": aborted or {"passed": True, "frames_checked": min(PREFLIGHT_FRAMES, len(produced))},
                 "spend": guard.as_dict(),
                 "ledger": ledger.as_dict(),
-                "next": (
-                    f"pre-screen the packet, then render qa/{action}-review.html "
-                    "and ask the human to choose a candidate id"
-                    if args.mode == MODE_SUPERVISED else
-                    f"pre-screen the packet, render qa/{action}-review.html as the record, then "
-                    "promote it by the tie-break ladder and log the decision in qa/approvals.json"
-                ),
+                "next": next_step,
             },
             indent=2,
         )
     )
     for warning in ledger.warnings:
         print(f"warning: {warning}", file=sys.stderr)
+
+    # A caller that reads only the exit code must not mistake a vetoed state for
+    # a finished one. The JSON is already on stdout, so the packet and the named
+    # cause survive the non-zero exit.
+    if aborted is not None:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

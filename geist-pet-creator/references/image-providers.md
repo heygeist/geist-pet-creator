@@ -126,14 +126,19 @@ creativity with no character reference. Cost is a projection from measured per-f
 | Model | 57-frame cost | 57-frame time | Alpha | Verdict |
 | --- | ---: | ---: | --- | --- |
 | **`openai/gpt-image-2`** (default) | **$1.33** | 68 min | params-dropped + chroma | best on cost *and* character completeness |
-
-Every figure in that column is `57 x` a median that billed **two** calls per frame, because that is what the pipeline did when the eval ran. `ALPHA_PATHS` now bills one call for the seven models with a known alpha path, so halve the column to project a pass today — `openai/gpt-image-2` lands near **$0.67**. Re-run `eval_providers.py` to replace the projection with a measurement.
 | `openai/gpt-5-image-mini` | $2.89 | 51 min | **native** | cheapest true-alpha path |
 | `google/gemini-3.1-flash-lite-image` | $3.88 | **11 min** | chroma-key | by far the fastest; quality drops |
 | `google/gemini-3.1-flash-image` | $7.74 | 22 min | chroma-key | |
 | `x-ai/grok-imagine-image-2.0` | $7.98 | 20 min | chroma-key | second on completeness and aesthetic; costly |
 | `openai/gpt-5-image` | $9.67 | 35 min | **native** | |
 | `google/gemini-3-pro-image` | $15.58 | 42 min | chroma-key | third on completeness; costly |
+
+**Every figure in the cost column budgets the waste.** It is `57 x` a median that billed **two**
+calls per frame, because that is what the pipeline did when the eval ran: one discarded opaque draw
+and one chroma draw that was kept. `ALPHA_PATHS` now bills one call for every model with a known
+alpha path, so halve the column to project 57 drawn frames today — the default lands near **$0.67**.
+A real pass is cheaper still, because `running-left` is mirrored rather than drawn: **~$0.57**. Re-run
+`eval_providers.py` to replace both projections with a measurement.
 
 Two results worth carrying forward. **Price does not track quality here** — the cheapest model won
 outright, and the most expensive produced a weaker character at 11.7× the cost. And **time is a

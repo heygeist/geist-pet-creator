@@ -31,9 +31,11 @@ from geist_grid import (
     cell_box,
 )
 from geist_manifest import PartManifest, read_manifest
-from geist_pixels import ALPHA_THRESHOLD, alpha_mask, clear_transparent_rgb, data_uri
+from geist_pixels import ALPHA_THRESHOLD, alpha_bbox, alpha_mask, clear_transparent_rgb, data_uri
 
 MAX_REPAIR_PASSES = 2
+# Lanczos resampling spreads an edge by roughly one pixel.
+RESAMPLE_BLEED = 1
 STRAY_COMPONENT_RATIO = 0.02
 MIN_COMPONENT_AREA = 12
 SUSPICION_FLAG = 45
@@ -244,14 +246,21 @@ def deterministic_repair(
         left, top, right, bottom = measurement.bbox
         shift_x = 0
         shift_y = 0
-        if left < safe_padding:
-            shift_x = safe_padding - left
-        elif right > CELL_WIDTH - safe_padding:
-            shift_x = (CELL_WIDTH - safe_padding) - right
-        if top < safe_padding:
-            shift_y = safe_padding - top
-        elif bottom > CELL_HEIGHT - safe_padding:
-            shift_y = (CELL_HEIGHT - safe_padding) - bottom
+        # Shift an axis only when the body actually fits along it. A body wider
+        # than the safe box has no offset that puts it inside, and the earlier
+        # if/elif took the `left` branch anyway -- pushing the sprite FURTHER off
+        # the right edge, then reporting a successful repair and burning a pass.
+        # A body that does not fit needs `refit_state`, not a translation.
+        if right - left <= CELL_WIDTH - 2 * safe_padding:
+            if left < safe_padding:
+                shift_x = safe_padding - left
+            elif right > CELL_WIDTH - safe_padding:
+                shift_x = (CELL_WIDTH - safe_padding) - right
+        if bottom - top <= CELL_HEIGHT - 2 * safe_padding:
+            if top < safe_padding:
+                shift_y = safe_padding - top
+            elif bottom > CELL_HEIGHT - safe_padding:
+                shift_y = (CELL_HEIGHT - safe_padding) - bottom
         if shift_x or shift_y:
             moved = Image.new("RGBA", repaired.size, (0, 0, 0, 0))
             moved.paste(repaired, (shift_x, shift_y))
@@ -688,18 +697,116 @@ def compare_to_pre_export(payload: dict[str, Any], reference_path: Path) -> list
     return mismatches
 
 
+def refit_state(grid: FrameGrid, state: str, safe_padding: int) -> tuple[float, list[Path]] | None:
+    """Rescale a whole state by one shared factor so its widest pose fits.
+
+    Cell bleed on frames that already exist is the most repairable defect there
+    is, and the per-frame shift cannot touch it: a body wider than the safe box
+    has no offset that puts it inside. What works is one factor derived from the
+    UNION bounding box of the state, applied to every frame of that state. The
+    frames stay in proportion to each other, so relative motion survives exactly.
+
+    Per-frame rescaling would not. It re-fits each pose to itself, which makes a
+    crouch come out the same size as a stretch -- the scale popping the QA rubric
+    rejects, and the reason the generator derives one transform per run.
+
+    Returns None when the state already fits, so a clean state is untouched.
+    """
+    paths = [path for path in grid.frame_paths(state) if path.is_file()]
+    if not paths:
+        return None
+
+    union: tuple[int, int, int, int] | None = None
+    for path in paths:
+        with Image.open(path) as opened:
+            box = alpha_bbox(opened.convert("RGBA"))
+        if box is None:
+            continue
+        union = box if union is None else (
+            min(union[0], box[0]), min(union[1], box[1]),
+            max(union[2], box[2]), max(union[3], box[3]),
+        )
+    if union is None:
+        return None
+
+    left, top, right, bottom = union
+    width = max(1, right - left)
+    height = max(1, bottom - top)
+    # Lanczos softens an edge by about a pixel and a soft pixel still counts as
+    # visible, so the target box reserves one. Without it a refit lands the body
+    # exactly on the safe-padding line and the re-audit reports the same bleed.
+    room_x = CELL_WIDTH - 2 * safe_padding
+    room_y = CELL_HEIGHT - 2 * safe_padding
+    if width <= room_x and height <= room_y:
+        return None
+
+    factor = min((room_x - 2 * RESAMPLE_BLEED) / width, (room_y - 2 * RESAMPLE_BLEED) / height)
+    centre_x = (left + right) / 2
+    centre_y = (top + bottom) / 2
+    offset_x = round(CELL_WIDTH / 2 - centre_x * factor)
+    offset_y = round(CELL_HEIGHT / 2 - centre_y * factor)
+
+    for path in paths:
+        with Image.open(path) as opened:
+            image = opened.convert("RGBA")
+        scaled = image.resize(
+            (max(1, round(image.width * factor)), max(1, round(image.height * factor))),
+            Image.LANCZOS,
+        )
+        cell = Image.new("RGBA", (CELL_WIDTH, CELL_HEIGHT), (0, 0, 0, 0))
+        cell.paste(scaled, (offset_x, offset_y))
+        clear_transparent_rgb(cell).save(path)
+    return factor, paths
+
+
 def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> dict[str, Any]:
     """Repair what already exists; queue what would need new artwork."""
     log = load_repair_log(grid.bundle)
     deterministic: list[dict[str, Any]] = []
     generative: list[dict[str, Any]] = []
+    flagged: list[dict[str, Any]] = []
     exhausted: list[str] = []
+
+    # Cell bleed is a whole-state property, so it is settled before the per-frame
+    # pass looks at anything. A state repaired here reaches that pass already
+    # fitting, and carries the note so it is not mistaken for an unrepaired
+    # frame and queued for paid regeneration.
+    refitted: dict[str, str] = {}
+    bleeding = {frame["state"] for frame in payload["frames"] if "cell_bleed" in frame["hard_errors"]}
+    for state in sorted(bleeding):
+        result = refit_state(grid, state, safe_padding)
+        if result is None:
+            continue
+        factor, paths = result
+        note = f"refit the whole {state} row by x{factor:.3f} from its union bounding box"
+        for path in paths:
+            refitted[grid.rel(path)] = note
 
     for frame in payload["frames"]:
         # A detached fragment is removable whatever its suspicion score, so it
         # gets repaired on its own evidence rather than on the ranking.
         has_fragment = frame.get("signals", {}).get("component_count", 1) > 1
-        if not (frame["hard_errors"] or frame["suspicion"] >= SUSPICION_FLAG or has_fragment):
+
+        # Suspicion ranks which cells to LOOK at. It never buys new art.
+        #
+        # suspicion_score awards up to 40 points for bbox_delta alone, so a
+        # `jumping` or directional frame crosses the flag by doing exactly what
+        # its state is for. Sending that to generative repair spends provider
+        # money on a correct frame and burns one of its two passes on the way.
+        # Measured on the 2026-08-12 build: five frames queued for paid
+        # regeneration on displacement alone, on an audit reporting `ok: true`
+        # with zero hard errors.
+        if not (frame["hard_errors"] or has_fragment):
+            if frame["suspicion"] >= SUSPICION_FLAG:
+                flagged.append(
+                    {
+                        "path": frame["path"],
+                        "state": frame["state"],
+                        "column": frame["column"],
+                        "suspicion": frame["suspicion"],
+                        "note": "ranked for a look; no hard error, so nothing is queued for redraw",
+                    }
+                )
             continue
         passes = log.get(frame["path"], 0)
         if passes >= MAX_REPAIR_PASSES:
@@ -712,6 +819,8 @@ def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> 
         with Image.open(frame_path) as opened:
             image = opened.convert("RGBA")
         repaired, applied = deterministic_repair(image, measure_cell(image), safe_padding)
+        if frame["path"] in refitted:
+            applied.insert(0, refitted[frame["path"]])
 
         if applied:
             backup = back_up_frame(grid.bundle, frame_path, frame["state"], frame["column"], passes + 1)
@@ -746,6 +855,7 @@ def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> 
     return {
         "deterministic": deterministic,
         "generative_repair_queue": generative,
+        "flagged_for_review": flagged,
         "passes_exhausted": exhausted,
         "max_passes_per_frame": MAX_REPAIR_PASSES,
     }

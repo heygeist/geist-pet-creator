@@ -38,6 +38,48 @@ NEVER_TRANSFERS = (
     "and black exterior outlines"
 )
 
+# Prompt blocks every frame call carries. They live here, beside the house form,
+# because they are facts about the house form -- and a rule that exists only in
+# SKILL.md prose is a rule the model never sees. That gap is what let a
+# directional state draw legs across all eight of its frames on 2026-08-12, and
+# lose the whole run.
+#
+# Each block states the target and puts the ban last, because a prohibition
+# drags the forbidden thing into context and half-reads as an instruction: "no
+# legs" spends most of its weight on `legs`. The ban is the guardrail; the
+# target ahead of it is the steering.
+
+FRAMING = (
+    "Framing: draw the character at the same body size in every frame of this action, "
+    "centred, with the whole body and every prop well inside the canvas and an even clear "
+    "margin of at least 15% of the canvas on all four sides. When a pose would carry any "
+    "part towards an edge, make the motion smaller and leave the character where it is."
+)
+
+LEGLESS_BODY = (
+    "Body: the Pet floats clear of any ground and its body ends in a smooth rounded base. Below "
+    "that base there is nothing but the Pet's own hanging parts: draw no legs, feet, knees, shoes "
+    "or foot-step poses."
+)
+
+# For the four states whose NAME pulls hardest towards legs. It ends with
+# LEGLESS_BODY rather than restating it, so a prompt carries one or the other
+# and the ban has one wording wherever it lands.
+LEGLESS_MOTION = (
+    "Movement: carry the motion with a lean, a drift, a glide, a sideways translation of the "
+    "whole body, soft squash and stretch, and trailing shapes off the back of the body. "
+) + LEGLESS_BODY
+
+FLAT_FIELD = (
+    "Keep the whole area behind the character one flat uniform field, edge to edge: no panel, "
+    "box, card, border, frame, vignette or backdrop, and no ground plane, floor line, horizon "
+    "or cast shadow."
+)
+
+# The states whose NAME pulls hardest towards legs. The word in the prompt is
+# what does the damage, so these are the ones that carry LEGLESS_MOTION.
+MOTION_STATES = frozenset({"running-right", "running-left", "running", "jumping"})
+
 # Cell count -> (columns, rows, aspect ratio).
 #
 # The aspect ratio is not decoration. A 5x2 grid requested on a square canvas
