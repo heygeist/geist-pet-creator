@@ -12,6 +12,7 @@ import argparse
 import html
 import json
 import shutil
+import statistics
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -32,6 +33,7 @@ from geist_grid import (
 )
 from geist_manifest import PartManifest, read_manifest
 from geist_pixels import ALPHA_THRESHOLD, alpha_bbox, alpha_mask, clear_transparent_rgb, data_uri
+import geist_registration as registration
 
 MAX_REPAIR_PASSES = 2
 # Lanczos resampling spreads an edge by roughly one pixel.
@@ -759,6 +761,91 @@ def refit_state(grid: FrameGrid, state: str, safe_padding: int) -> tuple[float, 
     return factor, paths
 
 
+def register_states(grid: FrameGrid, safe_padding: int) -> dict[str, str]:
+    """Put every state on one anchor and one size. Free, and it moves no art.
+
+    This is the repair for the two defects `geist_registration` describes: a
+    body that changes size when the state changes, and a body that wanders while
+    the state plays. Both are pure pixel arithmetic -- a shared rescale and a
+    whole-pixel translation -- so neither costs a provider call, and neither
+    invents a pixel that was not already drawn.
+
+    Size is corrected towards the **median state**, not towards the canonical
+    base's absolute size. The base is stored at provider resolution and the
+    frames were fitted under whatever `--motion-headroom` that build used, so
+    their absolute sizes are not comparable and chasing the base would rescale
+    every state in a bundle that has nothing wrong with it. The median is what
+    cross-state consistency actually means, and it leaves a healthy bundle
+    untouched.
+
+    Returns one note per changed frame, keyed the way `payload["frames"]` is, so
+    a registered frame is not later mistaken for an unrepaired one.
+    """
+    canonical = grid.bundle / "sources" / "canonical-base.png"
+    if not canonical.is_file():
+        return {}
+    with Image.open(canonical) as opened:
+        target = registration.ruler(opened.convert("RGBA"), safe_padding)
+
+    loaded: dict[str, list[tuple[Any, Image.Image]]] = {}
+    ratios: dict[str, float] = {}
+    for state, _row, _count in ROW_SPECS:
+        frames = []
+        for path in grid.frame_paths(state):
+            if not path.is_file():
+                continue
+            with Image.open(path) as opened:
+                frames.append((path, opened.convert("RGBA")))
+        if not frames:
+            continue
+        anchors = [registration.measure(image) for _path, image in frames]
+        anchors = [anchor for anchor in anchors if anchor is not None]
+        if not anchors:
+            continue
+        loaded[state] = frames
+        ratios[state] = registration.size_ratio(anchors, target)
+    if not ratios:
+        return {}
+
+    middle = statistics.median(ratios.values())
+    notes: dict[str, str] = {}
+    for state, frames in loaded.items():
+        applied: list[str] = []
+        images = [image for _path, image in frames]
+
+        factor = middle / ratios[state] if ratios[state] else 1.0
+        if abs(factor - 1.0) > registration.SIZE_TOLERANCE:
+            images = [_rescale_cell(image, factor) for image in images]
+            applied.append(
+                f"rescaled the whole {state} row by x{factor:.3f} onto the bundle's shared size"
+            )
+
+        images, moved = registration.register(images, state, target)
+        if moved:
+            budget = registration.budget_for(state)
+            applied.append(
+                f"registered {len(moved)} frame(s) onto the bundle anchor "
+                f"(travel budget {budget[0]}x{budget[1]}px)"
+            )
+        if not applied:
+            continue
+        for (path, _old), image in zip(frames, images):
+            clear_transparent_rgb(image).save(path)
+            notes[grid.rel(path)] = "; ".join(applied)
+    return notes
+
+
+def _rescale_cell(image: Image.Image, factor: float) -> Image.Image:
+    """Resize a finished cell about its centre, staying 192x208."""
+    scaled = image.resize(
+        (max(1, round(CELL_WIDTH * factor)), max(1, round(CELL_HEIGHT * factor))),
+        Image.LANCZOS,
+    )
+    cell = Image.new("RGBA", (CELL_WIDTH, CELL_HEIGHT), (0, 0, 0, 0))
+    cell.paste(scaled, ((CELL_WIDTH - scaled.width) // 2, (CELL_HEIGHT - scaled.height) // 2))
+    return cell
+
+
 def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> dict[str, Any]:
     """Repair what already exists; queue what would need new artwork."""
     log = load_repair_log(grid.bundle)
@@ -781,6 +868,7 @@ def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> 
         note = f"refit the whole {state} row by x{factor:.3f} from its union bounding box"
         for path in paths:
             refitted[grid.rel(path)] = note
+
 
     for frame in payload["frames"]:
         # A detached fragment is removable whatever its suspicion score, so it
@@ -851,9 +939,16 @@ def run_repairs(grid: FrameGrid, payload: dict[str, Any], safe_padding: int) -> 
                 }
             )
 
+    # Registration goes last, and the order is the point. A refit rescales a row
+    # and the per-frame pass deletes stray fragments -- both change where a body
+    # measures. Registering first would anchor every frame to a bounding box that
+    # a speck was still stretching, then leave it there.
+    registered = register_states(grid, safe_padding)
+
     save_repair_log(grid.bundle, log)
     return {
         "deterministic": deterministic,
+        "registered": [{"path": path, "applied": note} for path, note in sorted(registered.items())],
         "generative_repair_queue": generative,
         "flagged_for_review": flagged,
         "passes_exhausted": exhausted,

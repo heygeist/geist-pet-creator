@@ -61,6 +61,7 @@ from geist_house import (
 )
 from geist_manifest import read_manifest
 from geist_pixels import alpha_bbox, clear_transparent_rgb, data_uri
+import geist_registration as registration
 from geist_spend import KIND_VERIFY, MODE_SUPERVISED, MODES, SpendLedger
 
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
@@ -1599,6 +1600,7 @@ def main() -> None:
     candidate_id = f"{action}-{args.variant}"
     ledger.candidate_id = candidate_id
     produced: list[tuple[int, Image.Image]] = []
+    raws: list[tuple[int, Image.Image]] = []
     provenance: list[dict[str, Any]] = []
     transform: CellTransform | None = None
     previous: Image.Image | None = None
@@ -1622,10 +1624,14 @@ def main() -> None:
         first_prompt = first_prompt or prompt
         raw, record = generate_frame(config, prompt, references, guard)
 
-        # Scale is decided once, by the first frame, and never revisited.
+        # A provisional transform, good enough to judge a frame by and thrown
+        # away once the state is complete. It exists so the pre-flight veto below
+        # still fires on frame 2 rather than after eight paid calls -- the real
+        # scale needs every frame of the state and cannot be known this early.
         if transform is None:
             transform = CellTransform.from_reference(raw, args.safe_padding, args.motion_headroom)
         cell = transform.apply(raw)
+        raws.append((index, raw))
 
         fit = transform.fit_report(cell, args.safe_padding)
         if not fit["fits"]:
@@ -1651,6 +1657,52 @@ def main() -> None:
             break
 
     assert transform is not None
+
+    # The state is complete, so the real ruler can finally be applied. The
+    # provisional transform above answered "is this frame worth paying for"; this
+    # answers "how big is this Pet and where does it sit", and only the finished
+    # state can answer it -- a median over every frame is what averages the pose
+    # out, and a single frame 0 is the pose.
+    #
+    # Rebuilt from the RAW provider frames, not from the provisional cells, so
+    # the art is resampled once rather than twice.
+    registered: dict[str, Any] = {}
+    if aborted is None and raws:
+        with Image.open(canonical) as opened:
+            target = registration.ruler(opened.convert("RGBA"), args.safe_padding, args.motion_headroom)
+        anchors = [registration.measure(raw) for _index, raw in raws]
+        if all(anchor is not None for anchor in anchors):
+            scale = registration.state_scale(anchors, target, args.safe_padding, args.motion_headroom)
+            budget = registration.budget_for(action)
+            offset_x, offset_y = registration.placement(anchors, target, scale, budget)
+            cells = [registration.apply(raw, scale, offset_x, offset_y) for _index, raw in raws]
+            cells, moved = registration.register(cells, action, target)
+            produced = [(index, cell) for (index, _raw), cell in zip(raws, cells)]
+            transform = CellTransform(
+                scale=scale,
+                offset_x=offset_x,
+                offset_y=offset_y,
+                source_size=raws[0][1].size,
+                headroom=args.motion_headroom,
+            )
+            # The provisional transform's verdicts described pixels that no
+            # longer exist, so the fit is re-read against what actually shipped.
+            misfits = []
+            for index, cell in produced:
+                fit = transform.fit_report(cell, args.safe_padding)
+                if not fit["fits"]:
+                    misfits.append({"frame": index, **fit})
+            final = [registration.measure(cell) for _index, cell in produced]
+            registered = {
+                "anchor_x": target.x,
+                "anchor_base": target.base,
+                "budget": {"horizontal": budget[0], "vertical": budget[1]},
+                "size_vs_canonical_base": round(
+                    registration.size_ratio([a for a in final if a is not None], target), 4
+                ),
+                "frames_moved": moved,
+            }
+
     packet = write_packet(
         bundle, candidate_id, action, produced, first_prompt, provenance, transform, args.variant_intent
     )
@@ -1688,6 +1740,7 @@ def main() -> None:
                 "frames_requested": len(indices),
                 "model": config.model,
                 "cell_transform": transform.as_dict(),
+                "registration": registered,
                 "alpha_paths": sorted({record["alpha_path"] for record in provenance}),
                 "frames_outside_safe_padding": misfits,
                 "preflight": aborted or {"passed": True, "frames_checked": min(PREFLIGHT_FRAMES, len(produced))},
