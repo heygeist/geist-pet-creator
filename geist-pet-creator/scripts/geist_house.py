@@ -44,33 +44,43 @@ NEVER_TRANSFERS = (
 # letterboxes every cell, and the mascots shrink to fit the wasted height, which
 # is the one thing a concept sheet cannot afford: a cell too small to name is not
 # an option, it is a smudge.
-# Every ratio here must come from PROVIDER_ASPECT_RATIOS, so some grids get the
-# nearest legal ratio rather than the one they would like. 3x1 wants 3:1 and 5x2
-# wants 5:2; both are rejected, and both take 2:1 instead. Their cells then run
-# portrait rather than square, which suits a mascot -- a Pet is taller than it is
-# wide anyway.
+# Only three aspect ratios are actually served, so the grid is chosen to suit the
+# ratio rather than the other way round. Every layout here lands its cells at or
+# near square, which is what keeps a mascot readable.
+#
+# Counts that do not tile one of those ratios take the next grid up and leave
+# cells empty. That costs a little canvas and risks the model drawing into the
+# gap, which pre-screening catches; a long thin cell is not recoverable at all.
 GRID_LAYOUTS: dict[int, tuple[int, int, str]] = {
-    3: (3, 1, "2:1"),  # wants 3:1, which the provider rejects
+    3: (2, 2, "1:1"),  # 4 rects, 3 filled -- 3x1 needs a ratio nothing serves
     4: (2, 2, "1:1"),
-    5: (3, 2, "3:2"),  # six rects, five filled; the last one stays empty
+    5: (3, 2, "3:2"),  # 6 rects, 5 filled
     6: (3, 2, "3:2"),
-    8: (4, 2, "2:1"),
+    8: (3, 3, "1:1"),  # 9 rects, 8 filled -- 4x2 wants 2:1, which is rejected
     9: (3, 3, "1:1"),
-    10: (5, 2, "2:1"),  # wants 5:2, which the provider rejects
+    10: (4, 3, "4:3"),  # 12 rects, 10 filled -- 5x2 wants 5:2, also rejected
     12: (4, 3, "4:3"),
 }
 
-# The aspect ratios the provider will accept. This is a closed enum, not a
-# free-form ratio: a value outside it is rejected with HTTP 400 before the model
-# is ever reached.
+# Aspect ratios that actually draw. Measured 2026-08-12 by probing models
+# directly, one ratio at a time.
 #
-# Measured 2026-08-12, the expensive way. A whole eval case died on all seven
-# contenders at once because the table above asked for "3:1". Seven identical
-# 400s read like a provider outage, not like a typo in this file.
-PROVIDER_ASPECT_RATIOS = frozenset({
-    "1:1", "1:2", "1:4", "1:8", "2:1", "2:3", "3:2", "3:4",
-    "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "9:19.5", "19.5:9",
-})
+# This is NOT the provider's schema enum, and the difference is the whole point.
+# The schema accepts 1:2, 2:1, 4:1, 8:1, 9:16, 16:9 and more -- and then *no
+# provider serves them*, so the request dies anyway with a second, different 400:
+#
+#     schema reject:   "ZodError ... invalid_value"          (e.g. 3:1, 5:2)
+#     provider reject: "No provider for <model> supports
+#                       the requested parameters"            (e.g. 2:1, 4:1)
+#
+# Validating against the schema enum passes the first check and fails the second,
+# which is how "8 cells at 4x2 @ 2:1" sat in this table looking correct. Only
+# near-square ratios are served. Verified good on both openai/gpt-image-2 and
+# google/gemini-3.1-flash-lite-image; verified bad: 2:1 and 4:1 on both.
+#
+# Add to this set only after probing the ratio against a real model. Reasoning
+# from the schema is what produced two rounds of this bug.
+PROVIDER_ASPECT_RATIOS = frozenset({"1:1", "3:2", "4:3"})
 
 MAX_SHEET_CELLS = 12
 MIN_PASSING_CELLS = 3

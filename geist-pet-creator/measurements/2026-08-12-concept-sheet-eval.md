@@ -53,19 +53,46 @@ over.
 returned HTTP 400 with a `ZodError`. `aspect_ratio` is a **closed enum**, and the grid table asked for
 `3:1`, which is not in it. The provider rejects the request before any model sees it.
 
-The accepted list, from the error body:
+The schema's accepted list, from the error body:
 
 ```
 1:1  1:2  1:4  1:8  2:1  2:3  3:2  3:4  4:1  4:3  4:5  5:4  8:1  9:16  16:9  9:19.5  19.5:9
 ```
 
-Two of the eight shipped grid layouts were illegal: `3x1` at `3:1` and `5x2` at `5:2`. Both now take
-`2:1`, the nearest legal ratio, which makes their cells portrait rather than square — acceptable,
-since a Pet is taller than it is wide. `geist_house.py` now holds `PROVIDER_ASPECT_RATIOS` and
-refuses an illegal value locally, on a free read, rather than at the provider mid-run.
+**That list is not the supported set, and believing it was cost a second round of the same bug.**
+The first fix moved `3x1` and `5x2` onto `2:1`, which is in the schema. It fails anyway, with a
+different 400:
 
-Worth naming the shape of this mistake: seven identical 400s across seven unrelated models read like
-a provider outage. It is not the pattern that makes anyone check their own constant.
+```
+schema reject:   ZodError ... invalid_value                          3:1, 5:2
+provider reject: No provider for <model> supports the
+                 requested parameters                                2:1, 4:1, and presumably
+                                                                     8:1, 1:8, 16:9, 9:16
+```
+
+Probed directly, one ratio at a time, on two models — $0.24:
+
+| Ratio | `openai/gpt-image-2` | `google/gemini-3.1-flash-lite-image` |
+| --- | --- | --- |
+| `1:1` | OK | OK |
+| `3:2` | OK | OK |
+| `4:3` | OK | OK |
+| `2:1` | **no provider** | **no provider** |
+| `4:1` | **no provider** | not probed |
+
+**Only near-square ratios are served.** So `PROVIDER_ASPECT_RATIOS` is now the *measured* set —
+`1:1`, `3:2`, `4:3` — not the schema enum, and the grid is chosen to fit the ratio rather than the
+other way round. Counts that do not tile one of the three take the next grid up and leave cells
+empty.
+
+That made it **three** broken layouts, not two. `8 → 4x2 @ 2:1` was wrong in the original table as
+well, and no eval case used eight cells, so nothing caught it. It is now `3x3` with one empty cell.
+
+Two things worth carrying forward. Seven identical 400s across seven unrelated models read like a
+provider outage, not like a typo in a local constant — the symptom points away from the cause. And a
+schema enum is a *validator's* list, not a capability list: passing validation only means the request
+was well-formed enough to be refused later. Probe the ratio against a real model, the same way a
+model id is only settled by a live request.
 
 **`x-ai/grok-imagine-image-2.0` lost its last case to the key's credit limit.**
 
@@ -87,9 +114,21 @@ missing `cast-derived-3` sheets alone would have added roughly $0.60.
 
 ## Limitations
 
-- **`cast-derived-3` is still unmeasured.** The 3-cell layout has never successfully drawn. Its ratio
-  changed from an illegal `3:1` to `2:1`, and that replacement is untested — the cells are now
-  portrait at 0.67, which no case has yet exercised.
+- **The 3-cell layout draws, but does not pass comparability.** One real sheet at `2x2` / `1:1`,
+  `openai/gpt-image-2`, $0.0381: three mascots, row-major order intact, all three contained, scale
+  spread excellent at 1.6% — and the fourth rect left properly empty, which was the risk worth
+  checking. It still failed on **baseline spread, 17.8%** against a 15% threshold. The model composed
+  the three as a group around the hole rather than centring each in its own rect, so the lone bottom
+  mascot sits higher in its cell than the two above it.
+
+  That is a real cost of the empty-rect approach and it is not fixed by choosing a different ratio —
+  no served ratio tiles three cells evenly. The sheet is still usable for choosing between concepts,
+  since scale is what makes cells comparable and scale held; the baseline metric is doing its job by
+  flagging it. The 5, 8 and 10 layouts share the empty-rect shape and are untested against it.
+- **Only two of seven models were probed for aspect-ratio support.** `1:1`, `3:2` and `4:3` are
+  verified on `openai/gpt-image-2` and `google/gemini-3.1-flash-lite-image` only. The other five
+  drew sheets on those ratios during the eval, which is consistent, but they were never probed
+  directly.
 - **`cast-derived-12` was the hardest case for everyone**: only `gemini-3.1-flash-image` passed it.
   Whether that is a real ceiling on twelve cells or a symptom of thresholds tuned on six is not
   settled by one run per model.

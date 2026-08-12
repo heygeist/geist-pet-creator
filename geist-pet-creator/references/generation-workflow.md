@@ -82,18 +82,25 @@ Draw **one image**, not one image per concept. One call, an invisible grid, one 
 
 Set `aspect_ratio` to match the grid on every sheet call. A square request for a 5x2 grid letterboxes the cells and shrinks every mascot inside them.
 
-**`aspect_ratio` is a closed enum, not a free-form ratio.** The provider rejects anything outside it with HTTP 400, before the model is reached. Two grids therefore take the nearest legal ratio rather than their exact one, and their cells run portrait — which suits a mascot, since a Pet is taller than it is wide. `geist_house.py` holds the accepted list and refuses an illegal value locally.
+**Only three aspect ratios actually draw: `1:1`, `3:2`, `4:3`.** Everything else fails, in one of two ways that look nothing alike:
 
-| Cells | Grid | Aspect ratio | Cell shape |
-| ---: | --- | --- | --- |
-| 3 | 3x1 | 2:1 — wants 3:1, rejected | 0.67, portrait |
-| 4 | 2x2 | 1:1 | square |
-| 5 | 3x2, one cell left empty | 3:2 | square |
-| 6 | 3x2 | 3:2 | square |
-| 8 | 4x2 | 2:1 | square |
-| 9 | 3x3 | 1:1 | square |
-| 10 | 5x2 | 2:1 — wants 5:2, rejected | 0.80, portrait |
-| 12 | 4x3 | 4:3 | square |
+- A ratio outside the provider's schema — `3:1`, `5:2` — is rejected as a `ZodError`.
+- A ratio the schema accepts but no provider serves — `2:1`, `4:1`, `8:1`, `16:9` — is rejected with `No provider for <model> supports the requested parameters`.
+
+The second is the trap. The schema listing looks authoritative, a ratio drawn from it looks validated, and the request still dies. **Choose the grid to fit the ratio, never the ratio to fit the grid.** `geist_house.py` holds the verified set and refuses anything else locally, before a call is made.
+
+Counts that do not tile one of the three ratios take the next grid up and leave cells empty. That wastes a little canvas and risks the model drawing into the gap, which pre-screening catches — a long thin cell is not recoverable at all.
+
+| Cells | Grid | Aspect ratio | Rects | Empty | Cell shape |
+| ---: | --- | --- | ---: | ---: | --- |
+| 3 | 2x2 | 1:1 | 4 | 1 | square |
+| 4 | 2x2 | 1:1 | 4 | 0 | square |
+| 5 | 3x2 | 3:2 | 6 | 1 | square |
+| 6 | 3x2 | 3:2 | 6 | 0 | square |
+| 8 | 3x3 | 1:1 | 9 | 1 | square |
+| 9 | 3x3 | 1:1 | 9 | 0 | square |
+| 10 | 4x3 | 4:3 | 12 | 2 | square |
+| 12 | 4x3 | 4:3 | 12 | 0 | square |
 
 Twelve is the cap. Split anything larger across two sheets: a cell too small to name is not a concept, it is a smudge. Measured 2026-08-12, twelve cells held on both models tried, at 384x384 a cell — see [../measurements/2026-08-12-concept-sheet-smoke.md](../measurements/2026-08-12-concept-sheet-smoke.md).
 
