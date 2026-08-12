@@ -791,113 +791,114 @@
       "sheet": {
         "paper": [
           248,
-          244,
+          245,
           232
         ],
         "cells_drawn": 12,
         "cells_expected": 12,
         "cells_crossing": [],
-        "scale_cv": 0.0709,
-        "baseline_spread": 0.097,
+        "scale_cv": 0.0821,
+        "baseline_spread": 0.0731,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5965,
-            "height_fraction": 0.8729,
-            "baseline_fraction": 0.9799
+            "coverage": 0.5657,
+            "height_fraction": 0.8559,
+            "baseline_fraction": 0.9607
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
             "contained": true,
-            "coverage": 0.7192,
-            "height_fraction": 0.8462,
-            "baseline_fraction": 0.9799
+            "coverage": 0.7049,
+            "height_fraction": 0.8297,
+            "baseline_fraction": 0.9607
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4706,
-            "height_fraction": 0.7023,
-            "baseline_fraction": 0.9833
+            "coverage": 0.4806,
+            "height_fraction": 0.6856,
+            "baseline_fraction": 0.9607
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5663,
-            "height_fraction": 0.8495,
-            "baseline_fraction": 0.9799
+            "coverage": 0.5511,
+            "height_fraction": 0.8341,
+            "baseline_fraction": 0.9607
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
             "contained": true,
-            "coverage": 0.674,
-            "height_fraction": 0.8356,
-            "baseline_fraction": 0.9497
+            "coverage": 0.6725,
+            "height_fraction": 0.8657,
+            "baseline_fraction": 0.963
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5522,
-            "height_fraction": 0.8121,
-            "baseline_fraction": 0.9497
+            "coverage": 0.5742,
+            "height_fraction": 0.8426,
+            "baseline_fraction": 0.963
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6136,
-            "height_fraction": 0.8893,
-            "baseline_fraction": 0.9497
+            "coverage": 0.6716,
+            "height_fraction": 0.9213,
+            "baseline_fraction": 0.963
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
             "contained": true,
-            "coverage": 0.7417,
-            "height_fraction": 0.8691,
-            "baseline_fraction": 0.9497
+            "coverage": 0.7596,
+            "height_fraction": 0.9028,
+            "baseline_fraction": 0.963
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
             "contained": true,
-            "coverage": 0.4822,
-            "height_fraction": 0.7057,
-            "baseline_fraction": 0.8863
+            "coverage": 0.463,
+            "height_fraction": 0.7004,
+            "baseline_fraction": 0.8899
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5873,
-            "height_fraction": 0.8595,
-            "baseline_fraction": 0.8863
+            "coverage": 0.5794,
+            "height_fraction": 0.8502,
+            "baseline_fraction": 0.8899
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
             "contained": true,
-            "coverage": 0.6636,
-            "height_fraction": 0.8261,
-            "baseline_fraction": 0.8863
+            "coverage": 0.693,
+            "height_fraction": 0.8194,
+            "baseline_fraction": 0.8899
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
             "contained": true,
-            "coverage": 0.5462,
-            "height_fraction": 0.7993,
-            "baseline_fraction": 0.8863
+            "coverage": 0.5379,
+            "height_fraction": 0.793,
+            "baseline_fraction": 0.8899
           }
         ]
-      }
+      },
+      "scored_against": "snapped-to-gutters"
     },
     {
       "model": "google/gemini-3.1-flash-image",
