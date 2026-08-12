@@ -181,2886 +181,66 @@
       "order_hues": null
     }
   ],
-  "calls": 34,
-  "cost_usd": 3.105202,
+  "calls": 42,
+  "cost_usd": 3.7544,
   "stopped_early": null,
+  "merged_from": [
+    "concept-sheet-eval",
+    "concept-sheet-eval-3cell",
+    "concept-sheet-eval-grok12"
+  ],
   "summary": [
     {
       "model": "google/gemini-3.1-flash-image",
-      "returned": "5/6",
-      "mechanical_pass": "5/6",
-      "median_s": 25.19,
-      "total_cost_usd": 0.34344,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.06869,
-      "sheets_comparable": "5/6",
-      "sheets_order_held": 1,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
+      "sheets_comparable": "6/6",
+      "median_sheet_usd": 0.0688,
+      "median_s": 29.65,
+      "run_cost_usd": 0.4125
     },
     {
       "model": "google/gemini-3.1-flash-lite-image",
-      "returned": "5/6",
-      "mechanical_pass": "4/6",
-      "median_s": 5.53,
-      "total_cost_usd": 0.171911,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.034345,
-      "sheets_comparable": "4/6",
-      "sheets_order_held": 1,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "returned": "4/6",
-      "mechanical_pass": "4/6",
-      "median_s": 13.63,
-      "total_cost_usd": 0.3,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.075,
-      "sheets_comparable": "4/6",
-      "sheets_order_held": 1,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-        "image request failed: HTTP 403: {\"error\":{\"message\":\"Key limit exceeded (total limit). Manage it using https://openrouter.ai/workspaces/default/keys/8998e4c69d2fd391e811662481382e8bb8e8633d307890ae0077fc5dc15948ef\",\"code\":403}}"
-      ]
+      "sheets_comparable": "5/6",
+      "median_sheet_usd": 0.0344,
+      "median_s": 5.7,
+      "run_cost_usd": 0.2068
     },
     {
       "model": "google/gemini-3-pro-image",
-      "returned": "5/6",
-      "mechanical_pass": "3/6",
-      "median_s": 36.15,
-      "total_cost_usd": 0.694478,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.138572,
-      "sheets_comparable": "3/6",
-      "sheets_order_held": 1,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
+      "sheets_comparable": "4/6",
+      "median_sheet_usd": 0.1386,
+      "median_s": 39.92,
+      "run_cost_usd": 0.8324
     },
     {
-      "model": "openai/gpt-5-image-mini",
-      "returned": "5/6",
-      "mechanical_pass": "2/6",
-      "median_s": 51.84,
-      "total_cost_usd": 0.245563,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.052034,
-      "sheets_comparable": "2/6",
-      "sheets_order_held": 0,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
+      "model": "x-ai/grok-imagine-image-2.0",
+      "sheets_comparable": "4/6",
+      "median_sheet_usd": 0.08,
+      "median_s": 15.64,
+      "run_cost_usd": 0.46
     },
     {
       "model": "openai/gpt-5-image",
-      "returned": "5/6",
-      "mechanical_pass": "2/6",
-      "median_s": 51.61,
-      "total_cost_usd": 1.21419,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.2578,
       "sheets_comparable": "2/6",
-      "sheets_order_held": 0,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
+      "median_sheet_usd": 0.2578,
+      "median_s": 53.26,
+      "run_cost_usd": 1.391
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "sheets_comparable": "2/6",
+      "median_sheet_usd": 0.052,
+      "median_s": 53.38,
+      "run_cost_usd": 0.2814
     },
     {
       "model": "openai/gpt-image-2",
-      "returned": "5/6",
-      "mechanical_pass": "1/6",
-      "median_s": 33.87,
-      "total_cost_usd": 0.135619,
-      "median_cost_usd": 0.0,
-      "projected_pass_usd": 0.0,
-      "median_sheet_usd": 0.025181,
       "sheets_comparable": "1/6",
-      "sheets_order_held": 1,
-      "alpha_paths": [
-        "opaque by request"
-      ],
-      "errors": [
-        "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    "
-      ]
+      "median_sheet_usd": 0.0298,
+      "median_s": 35.67,
+      "run_cost_usd": 0.1702
     }
   ],
   "attempts": [
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 7.76,
-      "cost_usd": 0.034345,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          246,
-          242,
-          232
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.072,
-        "baseline_spread": 0.1109,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4795,
-            "height_fraction": 0.7948,
-            "baseline_fraction": 0.9175
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.477,
-            "height_fraction": 0.7241,
-            "baseline_fraction": 0.9175
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3742,
-            "height_fraction": 0.6203,
-            "baseline_fraction": 0.9175
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4351,
-            "height_fraction": 0.7241,
-            "baseline_fraction": 0.8066
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5417,
-            "height_fraction": 0.7099,
-            "baseline_fraction": 0.8066
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4195,
-            "height_fraction": 0.6981,
-            "baseline_fraction": 0.8066
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 20.15,
-      "cost_usd": 0.06869,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          249,
-          245,
-          236
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0738,
-        "baseline_spread": 0.059,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4914,
-            "height_fraction": 0.8019,
-            "baseline_fraction": 0.9057
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5434,
-            "height_fraction": 0.7618,
-            "baseline_fraction": 0.9104
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3902,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.9057
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4683,
-            "height_fraction": 0.7642,
-            "baseline_fraction": 0.8514
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5754,
-            "height_fraction": 0.6958,
-            "baseline_fraction": 0.8514
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4394,
-            "height_fraction": 0.717,
-            "baseline_fraction": 0.8514
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3-pro-image",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 50.27,
-      "cost_usd": 0.13812,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          248,
-          244,
-          228
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.102,
-        "baseline_spread": 0.1085,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5284,
-            "height_fraction": 0.8491,
-            "baseline_fraction": 0.9316
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5333,
-            "height_fraction": 0.7476,
-            "baseline_fraction": 0.9316
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3816,
-            "height_fraction": 0.6132,
-            "baseline_fraction": 0.9316
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4623,
-            "height_fraction": 0.7429,
-            "baseline_fraction": 0.8231
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.575,
-            "height_fraction": 0.6816,
-            "baseline_fraction": 0.8231
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4242,
-            "height_fraction": 0.6816,
-            "baseline_fraction": 0.8231
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image-mini",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 53.38,
-      "cost_usd": 0.052541,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-04, cell-05, cell-06",
-        "baselines spread over 16% of cell height"
-      ],
-      "sheet": {
-        "paper": [
-          255,
-          250,
-          237
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-04",
-          "cell-05",
-          "cell-06"
-        ],
-        "scale_cv": 0.0509,
-        "baseline_spread": 0.1641,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.5574,
-            "height_fraction": 0.8809,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.74,
-            "height_fraction": 0.873,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4743,
-            "height_fraction": 0.7734,
-            "baseline_fraction": 0.9922
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.497,
-            "height_fraction": 0.8398,
-            "baseline_fraction": 0.8398
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.8457,
-            "height_fraction": 0.8457,
-            "baseline_fraction": 0.8457
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.4813,
-            "height_fraction": 0.7773,
-            "baseline_fraction": 0.8359
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 54.71,
-      "cost_usd": 0.25983,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01",
-        "baselines spread over 18% of cell height"
-      ],
-      "sheet": {
-        "paper": [
-          255,
-          252,
-          243
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01"
-        ],
-        "scale_cv": 0.0536,
-        "baseline_spread": 0.1777,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.5845,
-            "height_fraction": 0.8574,
-            "baseline_fraction": 0.998
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6497,
-            "height_fraction": 0.8379,
-            "baseline_fraction": 0.9746
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4795,
-            "height_fraction": 0.7793,
-            "baseline_fraction": 0.9727
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4761,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.8223
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.52,
-            "height_fraction": 0.75,
-            "baseline_fraction": 0.8242
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5054,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.8203
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-image-2",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 33.87,
-      "cost_usd": 0.029759,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06"
-      ],
-      "sheet": {
-        "paper": [
-          251,
-          248,
-          242
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06"
-        ],
-        "scale_cv": 0.0769,
-        "baseline_spread": 0.1172,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.7127,
-            "height_fraction": 0.9238,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.7585,
-            "height_fraction": 0.8887,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.5391,
-            "height_fraction": 0.7188,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.6518,
-            "height_fraction": 0.8828,
-            "baseline_fraction": 0.8828
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.7603,
-            "height_fraction": 0.8848,
-            "baseline_fraction": 0.8848
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.6342,
-            "height_fraction": 0.8848,
-            "baseline_fraction": 0.8848
-          }
-        ]
-      }
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "cast-derived-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 15.64,
-      "cost_usd": 0.08,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1248,
-        832
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          255,
-          253,
-          247
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0439,
-        "baseline_spread": 0.1081,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4254,
-            "height_fraction": 0.7404,
-            "baseline_fraction": 0.8942
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4941,
-            "height_fraction": 0.7212,
-            "baseline_fraction": 0.8942
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3962,
-            "height_fraction": 0.6514,
-            "baseline_fraction": 0.8942
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4244,
-            "height_fraction": 0.7236,
-            "baseline_fraction": 0.7861
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4577,
-            "height_fraction": 0.6899,
-            "baseline_fraction": 0.7861
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4524,
-            "height_fraction": 0.738,
-            "baseline_fraction": 0.7909
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 4.72,
-      "cost_usd": 0.034062,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          246,
-          242,
-          231
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0742,
-        "baseline_spread": 0.125,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3896,
-            "height_fraction": 0.7193,
-            "baseline_fraction": 0.8774
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4224,
-            "height_fraction": 0.6651,
-            "baseline_fraction": 0.8774
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.304,
-            "height_fraction": 0.5613,
-            "baseline_fraction": 0.8774
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3543,
-            "height_fraction": 0.6486,
-            "baseline_fraction": 0.7524
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.446,
-            "height_fraction": 0.6274,
-            "baseline_fraction": 0.7524
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3429,
-            "height_fraction": 0.625,
-            "baseline_fraction": 0.7524
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 11.14,
-      "cost_usd": 0.069176,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          250,
-          246,
-          237
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0801,
-        "baseline_spread": 0.0731,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4667,
-            "height_fraction": 0.8325,
-            "baseline_fraction": 0.9316
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5201,
-            "height_fraction": 0.7783,
-            "baseline_fraction": 0.9292
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3653,
-            "height_fraction": 0.6462,
-            "baseline_fraction": 0.9269
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4275,
-            "height_fraction": 0.7594,
-            "baseline_fraction": 0.8608
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5644,
-            "height_fraction": 0.7005,
-            "baseline_fraction": 0.8585
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.408,
-            "height_fraction": 0.7217,
-            "baseline_fraction": 0.8608
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3-pro-image",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 39.92,
-      "cost_usd": 0.136976,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-03, cell-04, cell-06"
-      ],
-      "sheet": {
-        "paper": [
-          248,
-          245,
-          231
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [
-          "cell-03",
-          "cell-04",
-          "cell-06"
-        ],
-        "scale_cv": 0.0633,
-        "baseline_spread": 0.1439,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.54,
-            "height_fraction": 0.8208,
-            "baseline_fraction": 0.8939
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5885,
-            "height_fraction": 0.7618,
-            "baseline_fraction": 0.8939
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.631,
-            "height_fraction": 0.7547,
-            "baseline_fraction": 1.0
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.7056,
-            "height_fraction": 0.8561,
-            "baseline_fraction": 0.8561
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6044,
-            "height_fraction": 0.7288,
-            "baseline_fraction": 0.8561
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.7077,
-            "height_fraction": 0.8561,
-            "baseline_fraction": 0.8561
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image-mini",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 48.22,
-      "cost_usd": 0.051986,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          255,
-          252,
-          241
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0347,
-        "baseline_spread": 0.1074,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5656,
-            "height_fraction": 0.8418,
-            "baseline_fraction": 0.9688
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6069,
-            "height_fraction": 0.8242,
-            "baseline_fraction": 0.9707
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4798,
-            "height_fraction": 0.7559,
-            "baseline_fraction": 0.9688
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4892,
-            "height_fraction": 0.8027,
-            "baseline_fraction": 0.8633
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5427,
-            "height_fraction": 0.8008,
-            "baseline_fraction": 0.8691
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4791,
-            "height_fraction": 0.7812,
-            "baseline_fraction": 0.8691
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 51.61,
-      "cost_usd": 0.25761,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          255,
-          252,
-          244
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0227,
-        "baseline_spread": 0.0976,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4585,
-            "height_fraction": 0.8066,
-            "baseline_fraction": 0.9453
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4892,
-            "height_fraction": 0.7852,
-            "baseline_fraction": 0.9434
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4579,
-            "height_fraction": 0.7539,
-            "baseline_fraction": 0.9336
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4547,
-            "height_fraction": 0.7812,
-            "baseline_fraction": 0.8516
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5675,
-            "height_fraction": 0.7832,
-            "baseline_fraction": 0.8477
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4616,
-            "height_fraction": 0.8066,
-            "baseline_fraction": 0.8496
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-image-2",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 35.67,
-      "cost_usd": 0.025086,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          254,
-          250,
-          245
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0675,
-        "baseline_spread": 0.1329,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4532,
-            "height_fraction": 0.7461,
-            "baseline_fraction": 0.9102
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5309,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9102
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3773,
-            "height_fraction": 0.6172,
-            "baseline_fraction": 0.9102
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4331,
-            "height_fraction": 0.7246,
-            "baseline_fraction": 0.7773
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5103,
-            "height_fraction": 0.6875,
-            "baseline_fraction": 0.7871
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4382,
-            "height_fraction": 0.7168,
-            "baseline_fraction": 0.7871
-          }
-        ]
-      }
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "cast-original-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 11.22,
-      "cost_usd": 0.07,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1248,
-        832
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          254,
-          253,
-          248
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0502,
-        "baseline_spread": 0.125,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4036,
-            "height_fraction": 0.6995,
-            "baseline_fraction": 0.8678
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4148,
-            "height_fraction": 0.6611,
-            "baseline_fraction": 0.8678
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3412,
-            "height_fraction": 0.5913,
-            "baseline_fraction": 0.8678
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3918,
-            "height_fraction": 0.6707,
-            "baseline_fraction": 0.7428
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4147,
-            "height_fraction": 0.6635,
-            "baseline_fraction": 0.7452
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3932,
-            "height_fraction": 0.6731,
-            "baseline_fraction": 0.7476
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 6.18,
-      "cost_usd": 0.03432,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          246,
-          242,
-          231
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.0972,
-        "baseline_spread": 0.125,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3182,
-            "height_fraction": 0.5449,
-            "baseline_fraction": 0.8184
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.2847,
-            "height_fraction": 0.6875,
-            "baseline_fraction": 0.8555
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3686,
-            "height_fraction": 0.5566,
-            "baseline_fraction": 0.7344
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.2742,
-            "height_fraction": 0.5684,
-            "baseline_fraction": 0.7305
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 33.86,
-      "cost_usd": 0.06864,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          250,
-          247,
-          240
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.053,
-        "baseline_spread": 0.0351,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3184,
-            "height_fraction": 0.5801,
-            "baseline_fraction": 0.8008
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3094,
-            "height_fraction": 0.6602,
-            "baseline_fraction": 0.8105
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3673,
-            "height_fraction": 0.584,
-            "baseline_fraction": 0.7793
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3115,
-            "height_fraction": 0.5996,
-            "baseline_fraction": 0.7754
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3-pro-image",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 20.22,
-      "cost_usd": 0.13964,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          247,
-          243,
-          231
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.0651,
-        "baseline_spread": 0.1152,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.468,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9355
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4217,
-            "height_fraction": 0.8086,
-            "baseline_fraction": 0.9238
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4975,
-            "height_fraction": 0.6738,
-            "baseline_fraction": 0.8203
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4136,
-            "height_fraction": 0.7617,
-            "baseline_fraction": 0.8203
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image-mini",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 42.43,
-      "cost_usd": 0.035908,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          255,
-          251,
-          242
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.0435,
-        "baseline_spread": 0.0859,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.635,
-            "height_fraction": 0.7578,
-            "baseline_fraction": 0.9238
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6463,
-            "height_fraction": 0.8398,
-            "baseline_fraction": 0.9316
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6216,
-            "height_fraction": 0.7578,
-            "baseline_fraction": 0.8457
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5922,
-            "height_fraction": 0.7715,
-            "baseline_fraction": 0.8457
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-5-image",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 33.87,
-      "cost_usd": 0.17691,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          255,
-          250,
-          242
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.0753,
-        "baseline_spread": 0.1113,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4561,
-            "height_fraction": 0.6523,
-            "baseline_fraction": 0.8965
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5268,
-            "height_fraction": 0.8027,
-            "baseline_fraction": 0.9355
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5508,
-            "height_fraction": 0.748,
-            "baseline_fraction": 0.8242
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4855,
-            "height_fraction": 0.7695,
-            "baseline_fraction": 0.8418
-          }
-        ]
-      }
-    },
-    {
-      "model": "openai/gpt-image-2",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 28.75,
-      "cost_usd": 0.021039,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-03, cell-04",
-        "baselines spread over 22% of cell height"
-      ],
-      "sheet": {
-        "paper": [
-          254,
-          251,
-          245
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [
-          "cell-03",
-          "cell-04"
-        ],
-        "scale_cv": 0.1246,
-        "baseline_spread": 0.2168,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.48,
-            "height_fraction": 0.6113,
-            "baseline_fraction": 0.9648
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4894,
-            "height_fraction": 0.793,
-            "baseline_fraction": 0.9668
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.4709,
-            "height_fraction": 0.5781,
-            "baseline_fraction": 0.75
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.4927,
-            "height_fraction": 0.6484,
-            "baseline_fraction": 0.7656
-          }
-        ]
-      }
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "variants-single-4",
-      "ok": true,
-      "error": null,
-      "duration_s": 15.7,
-      "cost_usd": 0.08,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1024,
-        1024
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          254,
-          253,
-          248
-        ],
-        "cells_drawn": 4,
-        "cells_expected": 4,
-        "cells_crossing": [],
-        "scale_cv": 0.0343,
-        "baseline_spread": 0.1074,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3902,
-            "height_fraction": 0.6465,
-            "baseline_fraction": 0.8594
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3707,
-            "height_fraction": 0.7109,
-            "baseline_fraction": 0.8574
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4712,
-            "height_fraction": 0.6777,
-            "baseline_fraction": 0.752
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3496,
-            "height_fraction": 0.668,
-            "baseline_fraction": 0.7539
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 4.06,
-      "cost_usd": 0.034783,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          247,
-          241,
-          229
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0168,
-        "baseline_spread": 0.0401,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3387,
-            "height_fraction": 0.5991,
-            "baseline_fraction": 0.7995
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3431,
-            "height_fraction": 0.6108,
-            "baseline_fraction": 0.8113
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3452,
-            "height_fraction": 0.6132,
-            "baseline_fraction": 0.8137
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3347,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3353,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3347,
-            "height_fraction": 0.5896,
-            "baseline_fraction": 0.7736
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 25
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 55
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 125
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 235
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 325
-            }
-          ],
-          "misplaced": [],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 25.19,
-      "cost_usd": 0.068132,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          251,
-          247,
-          236
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0016,
-        "baseline_spread": 0.0802,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.8278
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3613,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.8278
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3607,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.8278
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.7476
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3627,
-            "height_fraction": 0.5755,
-            "baseline_fraction": 0.7476
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3621,
-            "height_fraction": 0.5731,
-            "baseline_fraction": 0.7476
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 35
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 65
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 125
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 235
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 315
-            }
-          ],
-          "misplaced": [],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "google/gemini-3-pro-image",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 22.88,
-      "cost_usd": 0.14117,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1264,
-        848
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          248,
-          245,
-          230
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0019,
-        "baseline_spread": 0.0094,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3933,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3909,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3918,
-            "height_fraction": 0.6344,
-            "baseline_fraction": 0.8349
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3948,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3923,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3933,
-            "height_fraction": 0.6368,
-            "baseline_fraction": 0.8255
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 35
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 65
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 135
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 235
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 315
-            }
-          ],
-          "misplaced": [],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "openai/gpt-5-image-mini",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 51.84,
-      "cost_usd": 0.052034,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "row-major order broken at cell-04, cell-05"
-      ],
-      "sheet": {
-        "paper": [
-          255,
-          253,
-          239
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0351,
-        "baseline_spread": 0.043,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5638,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9219
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5667,
-            "height_fraction": 0.7676,
-            "baseline_fraction": 0.9219
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5638,
-            "height_fraction": 0.7656,
-            "baseline_fraction": 0.9219
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5836,
-            "height_fraction": 0.7969,
-            "baseline_fraction": 0.8789
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5946,
-            "height_fraction": 0.8184,
-            "baseline_fraction": 0.8789
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6041,
-            "height_fraction": 0.8359,
-            "baseline_fraction": 0.8789
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 35
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 75
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 75
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 35
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 325
-            }
-          ],
-          "misplaced": [
-            "cell-04",
-            "cell-05"
-          ],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "openai/gpt-5-image",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 47.39,
-      "cost_usd": 0.2578,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "row-major order broken at cell-05"
-      ],
-      "sheet": {
-        "paper": [
-          255,
-          251,
-          243
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0011,
-        "baseline_spread": 0.0957,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.8711
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.8711
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4057,
-            "height_fraction": 0.668,
-            "baseline_fraction": 0.8711
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4082,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4069,
-            "height_fraction": 0.6699,
-            "baseline_fraction": 0.7754
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 15
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 25
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 65
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 105
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 15
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 335
-            }
-          ],
-          "misplaced": [
-            "cell-05"
-          ],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "openai/gpt-image-2",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 31.53,
-      "cost_usd": 0.025181,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1536,
-        1024
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "baselines spread over 20% of cell height"
-      ],
-      "sheet": {
-        "paper": [
-          254,
-          253,
-          249
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0,
-        "baseline_spread": 0.205,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3418,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.8984
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3441,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3418,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3429,
-            "height_fraction": 0.6055,
-            "baseline_fraction": 0.6934
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 25
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 65
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 145
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 225
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 325
-            }
-          ],
-          "misplaced": [],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "order-count-6",
-      "ok": true,
-      "error": null,
-      "duration_s": 11.63,
-      "cost_usd": 0.07,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1248,
-        832
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          254,
-          253,
-          248
-        ],
-        "cells_drawn": 6,
-        "cells_expected": 6,
-        "cells_crossing": [],
-        "scale_cv": 0.0057,
-        "baseline_spread": 0.1395,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3419,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3374,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3389,
-            "height_fraction": 0.6322,
-            "baseline_fraction": 0.851
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3428,
-            "height_fraction": 0.6394,
-            "baseline_fraction": 0.7115
-          }
-        ],
-        "order": {
-          "placement": [
-            {
-              "cell_id": "cell-01",
-              "expected": "red",
-              "observed_hue": 5
-            },
-            {
-              "cell_id": "cell-02",
-              "expected": "orange",
-              "observed_hue": 25
-            },
-            {
-              "cell_id": "cell-03",
-              "expected": "yellow-green",
-              "observed_hue": 65
-            },
-            {
-              "cell_id": "cell-04",
-              "expected": "green",
-              "observed_hue": 135
-            },
-            {
-              "cell_id": "cell-05",
-              "expected": "indigo",
-              "observed_hue": 235
-            },
-            {
-              "cell_id": "cell-06",
-              "expected": "magenta",
-              "observed_hue": 325
-            }
-          ],
-          "misplaced": [],
-          "unreadable": [],
-          "method": "monotonic hue rank"
-        }
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 1.81,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.57,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "google/gemini-3-pro-image",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.29,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "openai/gpt-5-image-mini",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.17,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "openai/gpt-5-image",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.28,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "openai/gpt-image-2",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.24,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "cast-derived-3",
-      "ok": false,
-      "error": "image request failed: HTTP 400: {\"success\":false,\"error\":{\"name\":\"ZodError\",\"message\":\"[\\n  {\\n    \\\"code\\\": \\\"invalid_value\\\",\\n    \\\"values\\\": [\\n      \\\"1:1\\\",\\n      \\\"1:2\\\",\\n      \\\"1:4\\\",\\n      \\\"1:8\\\",\\n      \\\"2:1\\\",\\n      \\\"2:3\\\",\\n      \\\"3:2\\\",\\n      \\\"3:4\\\",\\n      \\\"4:1\\\",\\n      \\\"4:3\\\",\\n      \\\"4:5\\\",\\n      \\\"5:4\\\",\\n      \\\"8:1\\\",\\n      \\\"9:16\\\",\\n      \\\"16:9\\\",\\n      \\\"9:19.5\\\",\\n      \\\"19.5:9\\\",\\n    ",
-      "duration_s": 0.25,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
-      "size": [
-        0,
-        0
-      ],
-      "mechanical_pass": false,
-      "reasons": []
-    },
-    {
-      "model": "google/gemini-3.1-flash-lite-image",
-      "case": "cast-derived-12",
-      "ok": true,
-      "error": null,
-      "duration_s": 5.53,
-      "cost_usd": 0.034402,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1200,
-        896
-      ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-05, cell-06",
-        "baselines spread over 26% of cell height"
-      ],
-      "sheet": {
-        "paper": [
-          249,
-          244,
-          233
-        ],
-        "cells_drawn": 12,
-        "cells_expected": 12,
-        "cells_crossing": [
-          "cell-05",
-          "cell-06"
-        ],
-        "scale_cv": 0.0815,
-        "baseline_spread": 0.2642,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4126,
-            "height_fraction": 0.7324,
-            "baseline_fraction": 0.9498
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.452,
-            "height_fraction": 0.699,
-            "baseline_fraction": 0.9498
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3221,
-            "height_fraction": 0.5753,
-            "baseline_fraction": 0.9498
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4003,
-            "height_fraction": 0.7023,
-            "baseline_fraction": 0.9498
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.4532,
-            "height_fraction": 0.6443,
-            "baseline_fraction": 0.8221
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": false,
-            "coverage": 0.5454,
-            "height_fraction": 0.6678,
-            "baseline_fraction": 0.8221
-          },
-          {
-            "cell_id": "cell-07",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3834,
-            "height_fraction": 0.7013,
-            "baseline_fraction": 0.8221
-          },
-          {
-            "cell_id": "cell-08",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3699,
-            "height_fraction": 0.6644,
-            "baseline_fraction": 0.8221
-          },
-          {
-            "cell_id": "cell-09",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3708,
-            "height_fraction": 0.6622,
-            "baseline_fraction": 0.6856
-          },
-          {
-            "cell_id": "cell-10",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3033,
-            "height_fraction": 0.5385,
-            "baseline_fraction": 0.6856
-          },
-          {
-            "cell_id": "cell-11",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3754,
-            "height_fraction": 0.6187,
-            "baseline_fraction": 0.6856
-          },
-          {
-            "cell_id": "cell-12",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.3596,
-            "height_fraction": 0.6421,
-            "baseline_fraction": 0.6856
-          }
-        ]
-      }
-    },
-    {
-      "model": "google/gemini-3.1-flash-image",
-      "case": "cast-derived-12",
-      "ok": true,
-      "error": null,
-      "duration_s": 29.65,
-      "cost_usd": 0.068803,
-      "calls": 1,
-      "alpha_path": "opaque by request",
-      "size": [
-        1200,
-        896
-      ],
-      "mechanical_pass": true,
-      "reasons": [],
-      "sheet": {
-        "paper": [
-          248,
-          244,
-          232
-        ],
-        "cells_drawn": 12,
-        "cells_expected": 12,
-        "cells_crossing": [],
-        "scale_cv": 0.0709,
-        "baseline_spread": 0.097,
-        "cells": [
-          {
-            "cell_id": "cell-01",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5965,
-            "height_fraction": 0.8729,
-            "baseline_fraction": 0.9799
-          },
-          {
-            "cell_id": "cell-02",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.7192,
-            "height_fraction": 0.8462,
-            "baseline_fraction": 0.9799
-          },
-          {
-            "cell_id": "cell-03",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4706,
-            "height_fraction": 0.7023,
-            "baseline_fraction": 0.9833
-          },
-          {
-            "cell_id": "cell-04",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5663,
-            "height_fraction": 0.8495,
-            "baseline_fraction": 0.9799
-          },
-          {
-            "cell_id": "cell-05",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.674,
-            "height_fraction": 0.8356,
-            "baseline_fraction": 0.9497
-          },
-          {
-            "cell_id": "cell-06",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5522,
-            "height_fraction": 0.8121,
-            "baseline_fraction": 0.9497
-          },
-          {
-            "cell_id": "cell-07",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6136,
-            "height_fraction": 0.8893,
-            "baseline_fraction": 0.9497
-          },
-          {
-            "cell_id": "cell-08",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.7417,
-            "height_fraction": 0.8691,
-            "baseline_fraction": 0.9497
-          },
-          {
-            "cell_id": "cell-09",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.4822,
-            "height_fraction": 0.7057,
-            "baseline_fraction": 0.8863
-          },
-          {
-            "cell_id": "cell-10",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5873,
-            "height_fraction": 0.8595,
-            "baseline_fraction": 0.8863
-          },
-          {
-            "cell_id": "cell-11",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.6636,
-            "height_fraction": 0.8261,
-            "baseline_fraction": 0.8863
-          },
-          {
-            "cell_id": "cell-12",
-            "occupied": true,
-            "contained": true,
-            "coverage": 0.5462,
-            "height_fraction": 0.7993,
-            "baseline_fraction": 0.8863
-          }
-        ]
-      }
-    },
     {
       "model": "google/gemini-3-pro-image",
       "case": "cast-derived-12",
@@ -3201,142 +381,1426 @@
       }
     },
     {
-      "model": "openai/gpt-5-image-mini",
-      "case": "cast-derived-12",
+      "model": "google/gemini-3-pro-image",
+      "case": "cast-derived-3",
       "ok": true,
       "error": null,
-      "duration_s": 60.44,
-      "cost_usd": 0.053094,
+      "duration_s": 120.03,
+      "cost_usd": 0.137904,
       "calls": 1,
       "alpha_path": "opaque by request",
       "size": [
-        1536,
+        1024,
         1024
       ],
-      "mechanical_pass": false,
-      "reasons": [
-        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-09, cell-10, cell-11, cell-12"
-      ],
+      "mechanical_pass": true,
+      "reasons": [],
       "sheet": {
         "paper": [
-          255,
-          248,
-          229
+          247,
+          243,
+          228
         ],
-        "cells_drawn": 12,
-        "cells_expected": 12,
-        "cells_crossing": [
-          "cell-01",
-          "cell-02",
-          "cell-03",
-          "cell-04",
-          "cell-05",
-          "cell-06",
-          "cell-07",
-          "cell-08",
-          "cell-09",
-          "cell-10",
-          "cell-11",
-          "cell-12"
-        ],
-        "scale_cv": 0.0635,
-        "baseline_spread": 0.044,
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [],
+        "scale_cv": 0.0962,
+        "baseline_spread": 0.0703,
         "cells": [
           {
             "cell_id": "cell-01",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6124,
-            "height_fraction": 0.915,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5653,
+            "height_fraction": 0.8691,
+            "baseline_fraction": 0.916
           },
           {
             "cell_id": "cell-02",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.7169,
-            "height_fraction": 0.8739,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.5674,
+            "height_fraction": 0.7852,
+            "baseline_fraction": 0.9043
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4499,
+            "height_fraction": 0.6855,
+            "baseline_fraction": 0.8457
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 50.27,
+      "cost_usd": 0.13812,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          248,
+          244,
+          228
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.102,
+        "baseline_spread": 0.1085,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5284,
+            "height_fraction": 0.8491,
+            "baseline_fraction": 0.9316
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5333,
+            "height_fraction": 0.7476,
+            "baseline_fraction": 0.9316
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3816,
+            "height_fraction": 0.6132,
+            "baseline_fraction": 0.9316
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4623,
+            "height_fraction": 0.7429,
+            "baseline_fraction": 0.8231
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.575,
+            "height_fraction": 0.6816,
+            "baseline_fraction": 0.8231
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4242,
+            "height_fraction": 0.6816,
+            "baseline_fraction": 0.8231
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 39.92,
+      "cost_usd": 0.136976,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-03, cell-04, cell-06"
+      ],
+      "sheet": {
+        "paper": [
+          248,
+          245,
+          231
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [
+          "cell-03",
+          "cell-04",
+          "cell-06"
+        ],
+        "scale_cv": 0.0633,
+        "baseline_spread": 0.1439,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.54,
+            "height_fraction": 0.8208,
+            "baseline_fraction": 0.8939
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5885,
+            "height_fraction": 0.7618,
+            "baseline_fraction": 0.8939
           },
           {
             "cell_id": "cell-03",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5331,
-            "height_fraction": 0.8123,
+            "coverage": 0.631,
+            "height_fraction": 0.7547,
             "baseline_fraction": 1.0
           },
           {
             "cell_id": "cell-04",
             "occupied": true,
             "contained": false,
-            "coverage": 0.5632,
-            "height_fraction": 0.8651,
-            "baseline_fraction": 1.0
+            "coverage": 0.7056,
+            "height_fraction": 0.8561,
+            "baseline_fraction": 0.8561
           },
           {
             "cell_id": "cell-05",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.638,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6044,
+            "height_fraction": 0.7288,
+            "baseline_fraction": 0.8561
           },
           {
             "cell_id": "cell-06",
             "occupied": true,
             "contained": false,
-            "coverage": 0.6797,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "coverage": 0.7077,
+            "height_fraction": 0.8561,
+            "baseline_fraction": 0.8561
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 22.88,
+      "cost_usd": 0.14117,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          248,
+          245,
+          230
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0019,
+        "baseline_spread": 0.0094,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3933,
+            "height_fraction": 0.6344,
+            "baseline_fraction": 0.8349
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3909,
+            "height_fraction": 0.6344,
+            "baseline_fraction": 0.8349
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3918,
+            "height_fraction": 0.6344,
+            "baseline_fraction": 0.8349
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3948,
+            "height_fraction": 0.6368,
+            "baseline_fraction": 0.8255
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3923,
+            "height_fraction": 0.6368,
+            "baseline_fraction": 0.8255
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3933,
+            "height_fraction": 0.6368,
+            "baseline_fraction": 0.8255
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 35
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 135
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 315
+            }
+          ],
+          "misplaced": [],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "google/gemini-3-pro-image",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 20.22,
+      "cost_usd": 0.13964,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          247,
+          243,
+          231
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.0651,
+        "baseline_spread": 0.1152,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.468,
+            "height_fraction": 0.7656,
+            "baseline_fraction": 0.9355
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4217,
+            "height_fraction": 0.8086,
+            "baseline_fraction": 0.9238
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4975,
+            "height_fraction": 0.6738,
+            "baseline_fraction": 0.8203
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4136,
+            "height_fraction": 0.7617,
+            "baseline_fraction": 0.8203
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 29.65,
+      "cost_usd": 0.068803,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1200,
+        896
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          248,
+          244,
+          232
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [],
+        "scale_cv": 0.0709,
+        "baseline_spread": 0.097,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5965,
+            "height_fraction": 0.8729,
+            "baseline_fraction": 0.9799
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.7192,
+            "height_fraction": 0.8462,
+            "baseline_fraction": 0.9799
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4706,
+            "height_fraction": 0.7023,
+            "baseline_fraction": 0.9833
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5663,
+            "height_fraction": 0.8495,
+            "baseline_fraction": 0.9799
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.674,
+            "height_fraction": 0.8356,
+            "baseline_fraction": 0.9497
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5522,
+            "height_fraction": 0.8121,
+            "baseline_fraction": 0.9497
           },
           {
             "cell_id": "cell-07",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.9089,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.6136,
+            "height_fraction": 0.8893,
+            "baseline_fraction": 0.9497
           },
           {
             "cell_id": "cell-08",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.6641,
-            "height_fraction": 1.0,
-            "baseline_fraction": 1.0
+            "contained": true,
+            "coverage": 0.7417,
+            "height_fraction": 0.8691,
+            "baseline_fraction": 0.9497
           },
           {
             "cell_id": "cell-09",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5119,
-            "height_fraction": 0.9589,
-            "baseline_fraction": 0.9589
+            "contained": true,
+            "coverage": 0.4822,
+            "height_fraction": 0.7057,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-10",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5669,
-            "height_fraction": 0.9589,
-            "baseline_fraction": 0.9589
+            "contained": true,
+            "coverage": 0.5873,
+            "height_fraction": 0.8595,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-11",
             "occupied": true,
-            "contained": false,
-            "coverage": 0.5452,
-            "height_fraction": 0.956,
-            "baseline_fraction": 0.956
+            "contained": true,
+            "coverage": 0.6636,
+            "height_fraction": 0.8261,
+            "baseline_fraction": 0.8863
           },
           {
             "cell_id": "cell-12",
             "occupied": true,
+            "contained": true,
+            "coverage": 0.5462,
+            "height_fraction": 0.7993,
+            "baseline_fraction": 0.8863
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 61.93,
+      "cost_usd": 0.069071,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          247,
+          242,
+          229
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [],
+        "scale_cv": 0.1034,
+        "baseline_spread": 0.086,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.494,
+            "height_fraction": 0.8574,
+            "baseline_fraction": 0.9258
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4937,
+            "height_fraction": 0.75,
+            "baseline_fraction": 0.9258
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3837,
+            "height_fraction": 0.666,
+            "baseline_fraction": 0.8398
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 20.15,
+      "cost_usd": 0.06869,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          249,
+          245,
+          236
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0738,
+        "baseline_spread": 0.059,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4914,
+            "height_fraction": 0.8019,
+            "baseline_fraction": 0.9057
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5434,
+            "height_fraction": 0.7618,
+            "baseline_fraction": 0.9104
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3902,
+            "height_fraction": 0.6368,
+            "baseline_fraction": 0.9057
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4683,
+            "height_fraction": 0.7642,
+            "baseline_fraction": 0.8514
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5754,
+            "height_fraction": 0.6958,
+            "baseline_fraction": 0.8514
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4394,
+            "height_fraction": 0.717,
+            "baseline_fraction": 0.8514
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 11.14,
+      "cost_usd": 0.069176,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          250,
+          246,
+          237
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0801,
+        "baseline_spread": 0.0731,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4667,
+            "height_fraction": 0.8325,
+            "baseline_fraction": 0.9316
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5201,
+            "height_fraction": 0.7783,
+            "baseline_fraction": 0.9292
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3653,
+            "height_fraction": 0.6462,
+            "baseline_fraction": 0.9269
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4275,
+            "height_fraction": 0.7594,
+            "baseline_fraction": 0.8608
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5644,
+            "height_fraction": 0.7005,
+            "baseline_fraction": 0.8585
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.408,
+            "height_fraction": 0.7217,
+            "baseline_fraction": 0.8608
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 25.19,
+      "cost_usd": 0.068132,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          251,
+          247,
+          236
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0016,
+        "baseline_spread": 0.0802,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3621,
+            "height_fraction": 0.5731,
+            "baseline_fraction": 0.8278
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3613,
+            "height_fraction": 0.5731,
+            "baseline_fraction": 0.8278
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3607,
+            "height_fraction": 0.5731,
+            "baseline_fraction": 0.8278
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3621,
+            "height_fraction": 0.5731,
+            "baseline_fraction": 0.7476
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3627,
+            "height_fraction": 0.5755,
+            "baseline_fraction": 0.7476
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3621,
+            "height_fraction": 0.5731,
+            "baseline_fraction": 0.7476
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 35
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 125
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 315
+            }
+          ],
+          "misplaced": [],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-image",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 33.86,
+      "cost_usd": 0.06864,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          250,
+          247,
+          240
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.053,
+        "baseline_spread": 0.0351,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3184,
+            "height_fraction": 0.5801,
+            "baseline_fraction": 0.8008
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3094,
+            "height_fraction": 0.6602,
+            "baseline_fraction": 0.8105
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3673,
+            "height_fraction": 0.584,
+            "baseline_fraction": 0.7793
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3115,
+            "height_fraction": 0.5996,
+            "baseline_fraction": 0.7754
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 5.53,
+      "cost_usd": 0.034402,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1200,
+        896
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-05, cell-06",
+        "baselines spread over 26% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          249,
+          244,
+          233
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [
+          "cell-05",
+          "cell-06"
+        ],
+        "scale_cv": 0.0815,
+        "baseline_spread": 0.2642,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4126,
+            "height_fraction": 0.7324,
+            "baseline_fraction": 0.9498
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.452,
+            "height_fraction": 0.699,
+            "baseline_fraction": 0.9498
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3221,
+            "height_fraction": 0.5753,
+            "baseline_fraction": 0.9498
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4003,
+            "height_fraction": 0.7023,
+            "baseline_fraction": 0.9498
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
             "contained": false,
-            "coverage": 0.5948,
-            "height_fraction": 0.9677,
-            "baseline_fraction": 0.9677
+            "coverage": 0.4532,
+            "height_fraction": 0.6443,
+            "baseline_fraction": 0.8221
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5454,
+            "height_fraction": 0.6678,
+            "baseline_fraction": 0.8221
+          },
+          {
+            "cell_id": "cell-07",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3834,
+            "height_fraction": 0.7013,
+            "baseline_fraction": 0.8221
+          },
+          {
+            "cell_id": "cell-08",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3699,
+            "height_fraction": 0.6644,
+            "baseline_fraction": 0.8221
+          },
+          {
+            "cell_id": "cell-09",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3708,
+            "height_fraction": 0.6622,
+            "baseline_fraction": 0.6856
+          },
+          {
+            "cell_id": "cell-10",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3033,
+            "height_fraction": 0.5385,
+            "baseline_fraction": 0.6856
+          },
+          {
+            "cell_id": "cell-11",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3754,
+            "height_fraction": 0.6187,
+            "baseline_fraction": 0.6856
+          },
+          {
+            "cell_id": "cell-12",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3596,
+            "height_fraction": 0.6421,
+            "baseline_fraction": 0.6856
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 5.7,
+      "cost_usd": 0.03493,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          247,
+          242,
+          231
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [],
+        "scale_cv": 0.0841,
+        "baseline_spread": 0.1407,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4323,
+            "height_fraction": 0.7793,
+            "baseline_fraction": 0.9219
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4154,
+            "height_fraction": 0.6973,
+            "baseline_fraction": 0.9219
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3521,
+            "height_fraction": 0.6348,
+            "baseline_fraction": 0.7812
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 7.76,
+      "cost_usd": 0.034345,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          246,
+          242,
+          232
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.072,
+        "baseline_spread": 0.1109,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4795,
+            "height_fraction": 0.7948,
+            "baseline_fraction": 0.9175
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.477,
+            "height_fraction": 0.7241,
+            "baseline_fraction": 0.9175
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3742,
+            "height_fraction": 0.6203,
+            "baseline_fraction": 0.9175
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4351,
+            "height_fraction": 0.7241,
+            "baseline_fraction": 0.8066
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5417,
+            "height_fraction": 0.7099,
+            "baseline_fraction": 0.8066
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4195,
+            "height_fraction": 0.6981,
+            "baseline_fraction": 0.8066
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 4.72,
+      "cost_usd": 0.034062,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          246,
+          242,
+          231
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0742,
+        "baseline_spread": 0.125,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3896,
+            "height_fraction": 0.7193,
+            "baseline_fraction": 0.8774
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4224,
+            "height_fraction": 0.6651,
+            "baseline_fraction": 0.8774
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.304,
+            "height_fraction": 0.5613,
+            "baseline_fraction": 0.8774
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3543,
+            "height_fraction": 0.6486,
+            "baseline_fraction": 0.7524
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.446,
+            "height_fraction": 0.6274,
+            "baseline_fraction": 0.7524
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3429,
+            "height_fraction": 0.625,
+            "baseline_fraction": 0.7524
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 4.06,
+      "cost_usd": 0.034783,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          247,
+          241,
+          229
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0168,
+        "baseline_spread": 0.0401,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3387,
+            "height_fraction": 0.5991,
+            "baseline_fraction": 0.7995
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3431,
+            "height_fraction": 0.6108,
+            "baseline_fraction": 0.8113
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3452,
+            "height_fraction": 0.6132,
+            "baseline_fraction": 0.8137
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3347,
+            "height_fraction": 0.5896,
+            "baseline_fraction": 0.7736
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3353,
+            "height_fraction": 0.5896,
+            "baseline_fraction": 0.7736
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3347,
+            "height_fraction": 0.5896,
+            "baseline_fraction": 0.7736
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 25
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 55
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 125
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 325
+            }
+          ],
+          "misplaced": [],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 6.18,
+      "cost_usd": 0.03432,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          246,
+          242,
+          231
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.0972,
+        "baseline_spread": 0.125,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3182,
+            "height_fraction": 0.5449,
+            "baseline_fraction": 0.8184
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.2847,
+            "height_fraction": 0.6875,
+            "baseline_fraction": 0.8555
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3686,
+            "height_fraction": 0.5566,
+            "baseline_fraction": 0.7344
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.2742,
+            "height_fraction": 0.5684,
+            "baseline_fraction": 0.7305
           }
         ]
       }
@@ -3483,6 +1947,958 @@
       }
     },
     {
+      "model": "openai/gpt-5-image",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 53.26,
+      "cost_usd": 0.17682,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03",
+        "baselines spread over 61% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          253,
+          250,
+          242
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03"
+        ],
+        "scale_cv": 0.0554,
+        "baseline_spread": 0.6113,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4427,
+            "height_fraction": 0.4453,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4199,
+            "height_fraction": 0.4199,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.3887,
+            "height_fraction": 0.3887,
+            "baseline_fraction": 0.3887
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 54.71,
+      "cost_usd": 0.25983,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01",
+        "baselines spread over 18% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          252,
+          243
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [
+          "cell-01"
+        ],
+        "scale_cv": 0.0536,
+        "baseline_spread": 0.1777,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5845,
+            "height_fraction": 0.8574,
+            "baseline_fraction": 0.998
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6497,
+            "height_fraction": 0.8379,
+            "baseline_fraction": 0.9746
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4795,
+            "height_fraction": 0.7793,
+            "baseline_fraction": 0.9727
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4761,
+            "height_fraction": 0.75,
+            "baseline_fraction": 0.8223
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.52,
+            "height_fraction": 0.75,
+            "baseline_fraction": 0.8242
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5054,
+            "height_fraction": 0.7656,
+            "baseline_fraction": 0.8203
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 51.61,
+      "cost_usd": 0.25761,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          255,
+          252,
+          244
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0227,
+        "baseline_spread": 0.0976,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4585,
+            "height_fraction": 0.8066,
+            "baseline_fraction": 0.9453
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4892,
+            "height_fraction": 0.7852,
+            "baseline_fraction": 0.9434
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4579,
+            "height_fraction": 0.7539,
+            "baseline_fraction": 0.9336
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4547,
+            "height_fraction": 0.7812,
+            "baseline_fraction": 0.8516
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5675,
+            "height_fraction": 0.7832,
+            "baseline_fraction": 0.8477
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4616,
+            "height_fraction": 0.8066,
+            "baseline_fraction": 0.8496
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 47.39,
+      "cost_usd": 0.2578,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "row-major order broken at cell-05"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          251,
+          243
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0011,
+        "baseline_spread": 0.0957,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4082,
+            "height_fraction": 0.6699,
+            "baseline_fraction": 0.8711
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4082,
+            "height_fraction": 0.6699,
+            "baseline_fraction": 0.8711
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4057,
+            "height_fraction": 0.668,
+            "baseline_fraction": 0.8711
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4082,
+            "height_fraction": 0.6699,
+            "baseline_fraction": 0.7754
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4082,
+            "height_fraction": 0.6699,
+            "baseline_fraction": 0.7754
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4069,
+            "height_fraction": 0.6699,
+            "baseline_fraction": 0.7754
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 15
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 25
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 105
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 15
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 335
+            }
+          ],
+          "misplaced": [
+            "cell-05"
+          ],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-5-image",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 33.87,
+      "cost_usd": 0.17691,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          255,
+          250,
+          242
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.0753,
+        "baseline_spread": 0.1113,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4561,
+            "height_fraction": 0.6523,
+            "baseline_fraction": 0.8965
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5268,
+            "height_fraction": 0.8027,
+            "baseline_fraction": 0.9355
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5508,
+            "height_fraction": 0.748,
+            "baseline_fraction": 0.8242
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4855,
+            "height_fraction": 0.7695,
+            "baseline_fraction": 0.8418
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 60.44,
+      "cost_usd": 0.053094,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08, cell-09, cell-10, cell-11, cell-12"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          248,
+          229
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03",
+          "cell-04",
+          "cell-05",
+          "cell-06",
+          "cell-07",
+          "cell-08",
+          "cell-09",
+          "cell-10",
+          "cell-11",
+          "cell-12"
+        ],
+        "scale_cv": 0.0635,
+        "baseline_spread": 0.044,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6124,
+            "height_fraction": 0.915,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7169,
+            "height_fraction": 0.8739,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5331,
+            "height_fraction": 0.8123,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5632,
+            "height_fraction": 0.8651,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.638,
+            "height_fraction": 1.0,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6797,
+            "height_fraction": 1.0,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-07",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.9089,
+            "height_fraction": 1.0,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-08",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6641,
+            "height_fraction": 1.0,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-09",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5119,
+            "height_fraction": 0.9589,
+            "baseline_fraction": 0.9589
+          },
+          {
+            "cell_id": "cell-10",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5669,
+            "height_fraction": 0.9589,
+            "baseline_fraction": 0.9589
+          },
+          {
+            "cell_id": "cell-11",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5452,
+            "height_fraction": 0.956,
+            "baseline_fraction": 0.956
+          },
+          {
+            "cell_id": "cell-12",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5948,
+            "height_fraction": 0.9677,
+            "baseline_fraction": 0.9677
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 57.46,
+      "cost_usd": 0.035885,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03",
+        "baselines spread over 44% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          251,
+          240
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03"
+        ],
+        "scale_cv": 0.0674,
+        "baseline_spread": 0.4395,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.627,
+            "height_fraction": 0.627,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5352,
+            "height_fraction": 0.5352,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5605,
+            "height_fraction": 0.5605,
+            "baseline_fraction": 0.5605
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 53.38,
+      "cost_usd": 0.052541,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-04, cell-05, cell-06",
+        "baselines spread over 16% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          250,
+          237
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-04",
+          "cell-05",
+          "cell-06"
+        ],
+        "scale_cv": 0.0509,
+        "baseline_spread": 0.1641,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5574,
+            "height_fraction": 0.8809,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.74,
+            "height_fraction": 0.873,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4743,
+            "height_fraction": 0.7734,
+            "baseline_fraction": 0.9922
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.497,
+            "height_fraction": 0.8398,
+            "baseline_fraction": 0.8398
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.8457,
+            "height_fraction": 0.8457,
+            "baseline_fraction": 0.8457
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4813,
+            "height_fraction": 0.7773,
+            "baseline_fraction": 0.8359
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 48.22,
+      "cost_usd": 0.051986,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          255,
+          252,
+          241
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0347,
+        "baseline_spread": 0.1074,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5656,
+            "height_fraction": 0.8418,
+            "baseline_fraction": 0.9688
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6069,
+            "height_fraction": 0.8242,
+            "baseline_fraction": 0.9707
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4798,
+            "height_fraction": 0.7559,
+            "baseline_fraction": 0.9688
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4892,
+            "height_fraction": 0.8027,
+            "baseline_fraction": 0.8633
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5427,
+            "height_fraction": 0.8008,
+            "baseline_fraction": 0.8691
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4791,
+            "height_fraction": 0.7812,
+            "baseline_fraction": 0.8691
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 51.84,
+      "cost_usd": 0.052034,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "row-major order broken at cell-04, cell-05"
+      ],
+      "sheet": {
+        "paper": [
+          255,
+          253,
+          239
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0351,
+        "baseline_spread": 0.043,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5638,
+            "height_fraction": 0.7656,
+            "baseline_fraction": 0.9219
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5667,
+            "height_fraction": 0.7676,
+            "baseline_fraction": 0.9219
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5638,
+            "height_fraction": 0.7656,
+            "baseline_fraction": 0.9219
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5836,
+            "height_fraction": 0.7969,
+            "baseline_fraction": 0.8789
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5946,
+            "height_fraction": 0.8184,
+            "baseline_fraction": 0.8789
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6041,
+            "height_fraction": 0.8359,
+            "baseline_fraction": 0.8789
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 35
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 75
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 75
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 35
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 325
+            }
+          ],
+          "misplaced": [
+            "cell-04",
+            "cell-05"
+          ],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-5-image-mini",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 42.43,
+      "cost_usd": 0.035908,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          255,
+          251,
+          242
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.0435,
+        "baseline_spread": 0.0859,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.635,
+            "height_fraction": 0.7578,
+            "baseline_fraction": 0.9238
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6463,
+            "height_fraction": 0.8398,
+            "baseline_fraction": 0.9316
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6216,
+            "height_fraction": 0.7578,
+            "baseline_fraction": 0.8457
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5922,
+            "height_fraction": 0.7715,
+            "baseline_fraction": 0.8457
+          }
+        ]
+      }
+    },
+    {
       "model": "openai/gpt-image-2",
       "case": "cast-derived-12",
       "ok": true,
@@ -3622,20 +3038,937 @@
       }
     },
     {
-      "model": "x-ai/grok-imagine-image-2.0",
-      "case": "cast-derived-12",
-      "ok": false,
-      "error": "image request failed: HTTP 403: {\"error\":{\"message\":\"Key limit exceeded (total limit). Manage it using https://openrouter.ai/workspaces/default/keys/8998e4c69d2fd391e811662481382e8bb8e8633d307890ae0077fc5dc15948ef\",\"code\":403}}",
-      "duration_s": 0.13,
-      "cost_usd": 0.0,
-      "calls": 0,
-      "alpha_path": "-",
+      "model": "openai/gpt-image-2",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 36.24,
+      "cost_usd": 0.034614,
+      "calls": 1,
+      "alpha_path": "opaque by request",
       "size": [
-        0,
-        0
+        1024,
+        1024
       ],
       "mechanical_pass": false,
-      "reasons": []
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03",
+        "baselines spread over 16% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          254,
+          252,
+          247
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03"
+        ],
+        "scale_cv": 0.0484,
+        "baseline_spread": 0.1602,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6419,
+            "height_fraction": 0.8906,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5778,
+            "height_fraction": 0.791,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.579,
+            "height_fraction": 0.8398,
+            "baseline_fraction": 0.8398
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 33.87,
+      "cost_usd": 0.029759,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06"
+      ],
+      "sheet": {
+        "paper": [
+          251,
+          248,
+          242
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03",
+          "cell-04",
+          "cell-05",
+          "cell-06"
+        ],
+        "scale_cv": 0.0769,
+        "baseline_spread": 0.1172,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7127,
+            "height_fraction": 0.9238,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7585,
+            "height_fraction": 0.8887,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5391,
+            "height_fraction": 0.7188,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6518,
+            "height_fraction": 0.8828,
+            "baseline_fraction": 0.8828
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7603,
+            "height_fraction": 0.8848,
+            "baseline_fraction": 0.8848
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6342,
+            "height_fraction": 0.8848,
+            "baseline_fraction": 0.8848
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 35.67,
+      "cost_usd": 0.025086,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          254,
+          250,
+          245
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0675,
+        "baseline_spread": 0.1329,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4532,
+            "height_fraction": 0.7461,
+            "baseline_fraction": 0.9102
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5309,
+            "height_fraction": 0.7656,
+            "baseline_fraction": 0.9102
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3773,
+            "height_fraction": 0.6172,
+            "baseline_fraction": 0.9102
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4331,
+            "height_fraction": 0.7246,
+            "baseline_fraction": 0.7773
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5103,
+            "height_fraction": 0.6875,
+            "baseline_fraction": 0.7871
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4382,
+            "height_fraction": 0.7168,
+            "baseline_fraction": 0.7871
+          }
+        ]
+      }
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 31.53,
+      "cost_usd": 0.025181,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "baselines spread over 20% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          249
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0,
+        "baseline_spread": 0.205,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3441,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.8984
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3418,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.8984
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3441,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.8984
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3441,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.6934
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3418,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.6934
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3429,
+            "height_fraction": 0.6055,
+            "baseline_fraction": 0.6934
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 25
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 145
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 225
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 325
+            }
+          ],
+          "misplaced": [],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 28.75,
+      "cost_usd": 0.021039,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-03, cell-04",
+        "baselines spread over 22% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          254,
+          251,
+          245
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [
+          "cell-03",
+          "cell-04"
+        ],
+        "scale_cv": 0.1246,
+        "baseline_spread": 0.2168,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.48,
+            "height_fraction": 0.6113,
+            "baseline_fraction": 0.9648
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4894,
+            "height_fraction": 0.793,
+            "baseline_fraction": 0.9668
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4709,
+            "height_fraction": 0.5781,
+            "baseline_fraction": 0.75
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4927,
+            "height_fraction": 0.6484,
+            "baseline_fraction": 0.7656
+          }
+        ]
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 18.19,
+      "cost_usd": 0.08,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1152,
+        864
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-05, cell-06, cell-10",
+        "baselines spread over 28% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          249
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [
+          "cell-05",
+          "cell-06",
+          "cell-10"
+        ],
+        "scale_cv": 0.0721,
+        "baseline_spread": 0.2812,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.488,
+            "height_fraction": 0.7639,
+            "baseline_fraction": 0.9653
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5017,
+            "height_fraction": 0.7014,
+            "baseline_fraction": 0.9618
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4352,
+            "height_fraction": 0.6562,
+            "baseline_fraction": 0.9688
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4922,
+            "height_fraction": 0.75,
+            "baseline_fraction": 0.9688
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4702,
+            "height_fraction": 0.6944,
+            "baseline_fraction": 0.8264
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7325,
+            "height_fraction": 0.8507,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-07",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4726,
+            "height_fraction": 0.7604,
+            "baseline_fraction": 0.8403
+          },
+          {
+            "cell_id": "cell-08",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4895,
+            "height_fraction": 0.6944,
+            "baseline_fraction": 0.8299
+          },
+          {
+            "cell_id": "cell-09",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4398,
+            "height_fraction": 0.6597,
+            "baseline_fraction": 0.7188
+          },
+          {
+            "cell_id": "cell-10",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4636,
+            "height_fraction": 0.7257,
+            "baseline_fraction": 0.7257
+          },
+          {
+            "cell_id": "cell-11",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4796,
+            "height_fraction": 0.7083,
+            "baseline_fraction": 0.7292
+          },
+          {
+            "cell_id": "cell-12",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4394,
+            "height_fraction": 0.684,
+            "baseline_fraction": 0.7292
+          }
+        ]
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "cast-derived-3",
+      "ok": true,
+      "error": null,
+      "duration_s": 14.2,
+      "cost_usd": 0.08,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "baselines spread over 20% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          248
+        ],
+        "cells_drawn": 3,
+        "cells_expected": 3,
+        "cells_crossing": [],
+        "scale_cv": 0.0793,
+        "baseline_spread": 0.2031,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4597,
+            "height_fraction": 0.752,
+            "baseline_fraction": 0.9336
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4684,
+            "height_fraction": 0.7012,
+            "baseline_fraction": 0.9336
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.387,
+            "height_fraction": 0.6191,
+            "baseline_fraction": 0.7305
+          }
+        ]
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "cast-derived-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 15.64,
+      "cost_usd": 0.08,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1248,
+        832
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          255,
+          253,
+          247
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0439,
+        "baseline_spread": 0.1081,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4254,
+            "height_fraction": 0.7404,
+            "baseline_fraction": 0.8942
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4941,
+            "height_fraction": 0.7212,
+            "baseline_fraction": 0.8942
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3962,
+            "height_fraction": 0.6514,
+            "baseline_fraction": 0.8942
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4244,
+            "height_fraction": 0.7236,
+            "baseline_fraction": 0.7861
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4577,
+            "height_fraction": 0.6899,
+            "baseline_fraction": 0.7861
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4524,
+            "height_fraction": 0.738,
+            "baseline_fraction": 0.7909
+          }
+        ]
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "cast-original-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 11.22,
+      "cost_usd": 0.07,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1248,
+        832
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          248
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0502,
+        "baseline_spread": 0.125,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4036,
+            "height_fraction": 0.6995,
+            "baseline_fraction": 0.8678
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4148,
+            "height_fraction": 0.6611,
+            "baseline_fraction": 0.8678
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3412,
+            "height_fraction": 0.5913,
+            "baseline_fraction": 0.8678
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3918,
+            "height_fraction": 0.6707,
+            "baseline_fraction": 0.7428
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4147,
+            "height_fraction": 0.6635,
+            "baseline_fraction": 0.7452
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3932,
+            "height_fraction": 0.6731,
+            "baseline_fraction": 0.7476
+          }
+        ]
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 11.63,
+      "cost_usd": 0.07,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1248,
+        832
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          248
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0057,
+        "baseline_spread": 0.1395,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3419,
+            "height_fraction": 0.6322,
+            "baseline_fraction": 0.851
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3374,
+            "height_fraction": 0.6322,
+            "baseline_fraction": 0.851
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3389,
+            "height_fraction": 0.6322,
+            "baseline_fraction": 0.851
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3428,
+            "height_fraction": 0.6394,
+            "baseline_fraction": 0.7115
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3428,
+            "height_fraction": 0.6394,
+            "baseline_fraction": 0.7115
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3428,
+            "height_fraction": 0.6394,
+            "baseline_fraction": 0.7115
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 25
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 135
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 325
+            }
+          ],
+          "misplaced": [],
+          "unreadable": [],
+          "method": "monotonic hue rank"
+        }
+      }
+    },
+    {
+      "model": "x-ai/grok-imagine-image-2.0",
+      "case": "variants-single-4",
+      "ok": true,
+      "error": null,
+      "duration_s": 15.7,
+      "cost_usd": 0.08,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1024,
+        1024
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          254,
+          253,
+          248
+        ],
+        "cells_drawn": 4,
+        "cells_expected": 4,
+        "cells_crossing": [],
+        "scale_cv": 0.0343,
+        "baseline_spread": 0.1074,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3902,
+            "height_fraction": 0.6465,
+            "baseline_fraction": 0.8594
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3707,
+            "height_fraction": 0.7109,
+            "baseline_fraction": 0.8574
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4712,
+            "height_fraction": 0.6777,
+            "baseline_fraction": 0.752
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3496,
+            "height_fraction": 0.668,
+            "baseline_fraction": 0.7539
+          }
+        ]
+      }
     }
   ]
 }

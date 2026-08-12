@@ -226,7 +226,8 @@ SHEET_CASES: tuple[dict[str, Any], ...] = (
     sheet_case("order-count-6", ORDER_LOCKS, [HOUSE_SHEET],
                "row-major order, read mechanically from body hue", ORDER_HUES),
     sheet_case("cast-derived-3", CAST_LOCKS[:3], [HXH_BASE, HOUSE_SHEET],
-               "the 3:1 aspect ratio -- odd canvas shapes break models"),
+               "3 cells on a 2x2 grid -- is the spare rect left empty, and do "
+               "baselines survive composing around a hole?"),
     sheet_case("cast-derived-12", CAST_LOCKS * 2, [DBZ_BASE, HOUSE_SHEET],
                "stress: where cell fidelity breaks, and whether the 12-cell cap holds"),
 )

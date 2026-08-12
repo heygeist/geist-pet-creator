@@ -141,6 +141,43 @@ The qwen models were measured and then dropped. Alibaba's filter rejected approv
 with `"Input data is suspected of being involved in IP infringement"`. A provider that refuses your
 own identity lock cannot serve derived Pets at any price.
 
+### Sheets rank differently from frames
+
+Measured 2026-08-12 over 42 sheets, six cases per model. Full record in
+[measurements/2026-08-12-concept-sheet-eval.md](../measurements/2026-08-12-concept-sheet-eval.md).
+`comparable` counts sheets whose cells came out usable together — right count, contained, matched
+scale and baseline, row-major order intact.
+
+| Model | Comparable | Sheet cost | Median time |
+| --- | ---: | ---: | ---: |
+| **`google/gemini-3.1-flash-image`** | **6/6** | $0.0687 | 25.2s |
+| `google/gemini-3.1-flash-lite-image` | 5/6 | **$0.0343** | **5.5s** |
+| `google/gemini-3-pro-image` | 4/6 | $0.1386 | 36.2s |
+| `x-ai/grok-imagine-image-2.0` | 4/6 | $0.0750 | 14.2s |
+| `openai/gpt-5-image-mini` | 2/6 | $0.0520 | 51.8s |
+| `openai/gpt-5-image` | 2/6 | $0.2578 | 51.6s |
+| `openai/gpt-image-2` (default) | **1/6** | $0.0252 | 33.9s |
+
+**`openai/gpt-image-2` wins the frame eval and comes last here.** These are different jobs: a frame
+redraws one approved creature, a sheet places many on a grid at matched scale and baseline. Layout
+skill is not something the frame eval ever tested.
+
+`DEFAULT_MODEL` stays as it is, because 56 of a Pet's 57 frames are frames and that is where the cost
+lives. **Name a Gemini model for the one sheet call instead**, with `--model`, which overrides for a
+single run without touching the bundle:
+
+```
+scripts/with_openrouter_key.sh python3 scripts/generate_candidates.py PetName.pet \
+  --action concept-sheet --cells 6 --model google/gemini-3.1-flash-image
+```
+
+The split is by vendor, not by tier. All three Gemini models place mascots on the implied grid; no
+OpenAI model reliably does, and on the 3-cell sheet all three OpenAI models had every cell cross its
+rect. The cheapest Gemini beats the most expensive OpenAI model 5 to 2. Use
+`gemini-3.1-flash-lite-image` at six cells or fewer — it matches the winner there, costs half as
+much, and is four times faster. Reserve `gemini-3.1-flash-image` for a 12-cell sheet, which nothing
+else passed.
+
 ### The API
 
 `POST {base}/images`, where `{base}` defaults to `https://openrouter.ai/api/v1` and is overridable
