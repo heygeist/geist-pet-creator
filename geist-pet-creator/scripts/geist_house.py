@@ -65,9 +65,20 @@ LEGLESS_BODY = (
 # For the four states whose NAME pulls hardest towards legs. It ends with
 # LEGLESS_BODY rather than restating it, so a prompt carries one or the other
 # and the ban has one wording wherever it lands.
+# "Trailing shapes off the back of the body" was measured drawing detached speed
+# lines -- 2-4 blue streaks floating beside the Pet on every frame of
+# running-right and jumping, on a build where idle and waving came back clean.
+# The phrase means a trailing shape OF the body; the model read it as a trailing
+# mark BESIDE it. Detached marks are on the never-carry list, and the anatomy
+# audit counts them as stray fragments, which is one of only two things that
+# buys paid art. So the phrase now says whose shapes they are, and the ban is
+# stated here rather than left to SKILL.md, which the model never reads.
 LEGLESS_MOTION = (
     "Movement: carry the motion with a lean, a drift, a glide, a sideways translation of the "
-    "whole body, soft squash and stretch, and trailing shapes off the back of the body. "
+    "whole body, soft squash and stretch, and trailing shapes that are part of the body itself "
+    "and joined to it. Draw no speed lines, motion trails, streaks, dashes, swooshes, wind "
+    "marks, dust, sparks or any other mark floating beside or behind the character: every mark "
+    "in the frame is part of the Pet and touches it. "
 ) + LEGLESS_BODY
 
 FLAT_FIELD = (
