@@ -83,6 +83,28 @@ match the grid. This is not the paper-trimming that `crop_gallery_cells.py` stil
 a gutter is empty paper *between* mascots, measured far from any outline, rather than a threshold
 pulled tight against one.
 
+## Field test of the whole route
+
+Separately, **$0.0798** to run the route end to end on a real brainstorm — an original cast of six
+coding-session Geists, no identity reference. One sheet at $0.0256, one canonical base at $0.0542.
+
+Every step behaved: sheet in one call, per-cell pre-screen, review page, crop, canonical base at
+sprite scale with the character still recognisable. Two things are worth recording.
+
+**The per-cell failure policy earned its place immediately.** `cell-04` drew a tall net hoop that
+crossed into the row above, so a crop would have clipped it. Five cells passed, the sheet passed, and
+the human still had five real options. Under the rule this change replaced — a gallery passes only if
+every cell passes — that entire sheet would have been discarded and redrawn over one cell. The
+failure was found by the containment check, not by eye, and the cropper then refused `cell-04` when
+asked for it.
+
+**The canonical-base image cap is tight by design, and correct.** The run consumed exactly 2 of its
+2 allowed images on one variant, which looks like a cap about to fail. It is not. `openai/gpt-image-2`
+chains both fallbacks, but the first call is rejected with HTTP 400 before `decode_image`, so
+`SpendGuard.record` never sees it: a rejected call costs nothing and counts nothing. The worst real
+path is two *counted* calls per variant, which is what `--variants x2` allows. There is no path that
+needs a third.
+
 ## Limitations
 
 - **Two of six cases, two of seven contenders, one sample each.** Enough to price a sheet and shake
