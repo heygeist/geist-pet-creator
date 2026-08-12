@@ -82,16 +82,18 @@ Draw **one image**, not one image per concept. One call, an invisible grid, one 
 
 Set `aspect_ratio` to match the grid on every sheet call. A square request for a 5x2 grid letterboxes the cells and shrinks every mascot inside them.
 
-| Cells | Grid | Aspect ratio |
-| ---: | --- | --- |
-| 3 | 3x1 | 3:1 |
-| 4 | 2x2 | 1:1 |
-| 5 | 3x2, one cell left empty | 3:2 |
-| 6 | 3x2 | 3:2 |
-| 8 | 4x2 | 2:1 |
-| 9 | 3x3 | 1:1 |
-| 10 | 5x2 | 5:2 |
-| 12 | 4x3 | 4:3 |
+**`aspect_ratio` is a closed enum, not a free-form ratio.** The provider rejects anything outside it with HTTP 400, before the model is reached. Two grids therefore take the nearest legal ratio rather than their exact one, and their cells run portrait — which suits a mascot, since a Pet is taller than it is wide. `geist_house.py` holds the accepted list and refuses an illegal value locally.
+
+| Cells | Grid | Aspect ratio | Cell shape |
+| ---: | --- | --- | --- |
+| 3 | 3x1 | 2:1 — wants 3:1, rejected | 0.67, portrait |
+| 4 | 2x2 | 1:1 | square |
+| 5 | 3x2, one cell left empty | 3:2 | square |
+| 6 | 3x2 | 3:2 | square |
+| 8 | 4x2 | 2:1 | square |
+| 9 | 3x3 | 1:1 | square |
+| 10 | 5x2 | 2:1 — wants 5:2, rejected | 0.80, portrait |
+| 12 | 4x3 | 4:3 | square |
 
 Twelve is the cap. Split anything larger across two sheets: a cell too small to name is not a concept, it is a smudge. Measured 2026-08-12, twelve cells held on both models tried, at 384x384 a cell — see [../measurements/2026-08-12-concept-sheet-smoke.md](../measurements/2026-08-12-concept-sheet-smoke.md).
 
@@ -113,7 +115,7 @@ Cells are allowed to differ in silhouette, crown cue, prop choice, and palette a
 
 The house-form invariants never vary between cells: one compact rounded legless floating body, one thick Sky outline, Cream body area, two Ink dot eyes, one tiny mouth, exactly one centered Mango heart, tiny attached arm nubs, flat fills, no floor or shadow. A sheet whose cells disagree about the house form is not a set of options, it is a set of mistakes.
 
-This licence ends at `canonical-base` approval. From there on, sprite-action variants vary motion only.
+This licence ends at `canonical-base` approval. From there on, sprite-action variants vary motion read and expression only — never identity, palette, props, or style.
 
 #### When a cell fails pre-screen
 
@@ -137,7 +139,7 @@ When a sheet reads generic, run a second round that keeps the same row-major fam
 
 ## Sprite Action Variant Review
 
-Every sprite action/state requires its own human validation before source frames are written. The required sprite actions are:
+Every sprite action/state requires its own recorded decision before source frames are written — a human choice under supervised mode, an agent choice under full automation. The required sprite actions are:
 
 - `canonical-base`
 - `idle`
@@ -152,17 +154,37 @@ Every sprite action/state requires its own human validation before source frames
 
 For each sprite action:
 
-1. Generate at least 3 variants with the built-in image generation capability unless the human specifies another count.
+1. Generate variants with the active image generation capability: **3** under supervised mode unless the human specifies another count, **1** under full automation.
 2. Store each variant as its own candidate packet or as a clearly named variant inside an action candidate set.
 3. Include the exact generation prompt for every variant in `prompt.md`.
-4. Pre-screen each variant and reject obvious failures before human review.
+4. Pre-screen each variant and reject obvious failures before review.
 5. Render an HTML review page with candidate id, moving sprite preview, prompt, preserved identity traits, risks, a **Choose** button, and a **Copy Prompt** button for every passing variant. Contact sheets may appear as supporting artifacts, but animation-state review must show motion.
-6. Wait for the human to choose one candidate id for that action.
+6. Under supervised mode, wait for the human to choose one candidate id. Under full automation, choose by the ladder below and record the reason.
 7. Normalize only the selected candidate into `frames/<state>/`.
+
+### What varies between variants
+
+Variants vary **motion read and expression**: how far the body travels, how much it bobs, and the posture and expression language that carry the state. Expression is how `waiting` reads differently from `idle`, and it stays inside the Part Manifest, so the anatomy audit still counts it.
+
+Identity, palette, props, and style never vary here. Identity variance belongs to the concept sheet, before `canonical-base` is approved. A "variant" that changes the crown cue is not a variant, it is a different Pet.
+
+### Choosing without a human
+
+Full automation draws one variant per state, so its judgement happens against the character bible rather than against a spread. Rank by this ladder, in order, and stop at the first level that separates the candidates:
+
+1. **Pre-screen status.** A `fail` is not choosable, whatever else it has going for it.
+2. **The identity tests** from [identity-blend.md](identity-blend.md): naming, silhouette, heart. Applied to a state variant these ask whether the Pet is still nameable in motion.
+3. **Footprint consistency** against `idle` or `sources/canonical-base.png`, measured as [qa-rubric.md](qa-rubric.md) § Layout QA measures it — the cleaned visible component, not raw alpha bounds.
+
+Write the ranking and the deciding level into the decision record in `qa/approvals.json`. A choice with no stated reason cannot be reviewed after the fact, which defeats the point of keeping the packets at all.
+
+A variant that fails pre-screen is regenerated at most **twice** — the same limit anatomy repair uses. After that, stop and report the state as a character-bible or prompt problem rather than promoting a third attempt or the least-bad frame.
+
+The review page is still rendered under full automation. Nothing waits on it, but it is what makes an automated build reviewable later, and it costs one script call.
 
 Exception for directional rows: create and approve `running-right` first. Then create `running-left` as a deterministic horizontal flip of the approved `running-right` normalized frames, render it as a single candidate such as `running-left-from-right-flip`, and ask the human to approve that exact mirrored candidate before writing `frames/running-left/`. Do not independently generate `running-left` variants unless the human explicitly asks for asymmetric directional art.
 
-A broad "go", "continue", or "looks good" should be treated as permission to generate or continue reviewing candidates, not as approval to promote a candidate. Approval must name the candidate id or clearly choose one of the shown options.
+A broad "go", "continue", or "looks good" should be treated as permission to generate or continue reviewing candidates, not as approval to promote a candidate. Approval must name the candidate id or clearly choose one of the shown options. It is not a grant of full automation either: that takes an explicit statement about who makes the decisions.
 
 Do not present code-only affine transforms, CSS/canvas animations, or mechanically distorted copies of the canonical base as final sprite-action candidates unless the human explicitly asks for deterministic prototypes. Exception: `running-left` is normally a deterministic horizontal flip of the approved `running-right` source frames for directional consistency. Code may create temporary previews, but active review candidates should be generated imagery except for that mirrored left row. Use code after generation for slicing, chroma-key removal, alpha cleanup, `192x208` normalization, validation, export, and HTML rendering.
 
@@ -291,6 +313,8 @@ Use human approval at these gates:
 5. Repair approval when a regenerated frame changes expression, pose, prop placement, or silhouette.
 6. Final contact-sheet approval before export, install, or delivery when the user is available.
 
+Full automation moves gates 1, 3, 4, and 5 to the agent. **Gate 2 and gate 6 never move**: a concept sheet exists so a human can compare identities, and the final audit approves one exact set of pixels before anyone receives them. Export enforces gate 6 in code, so an automated build ends there and waits regardless of what any prompt said.
+
 When asking for approval, render and show an HTML review page:
 
 ```bash
@@ -344,7 +368,7 @@ Motion read: subtle polite lean and breathing bob, expectant asking posture, dis
 
 When transparent alpha is not reliable from the image generator, prompt for a flat chroma-key background and remove it only after the candidate is selected or when a clean preview is needed. Do not let chroma residue enter `frames/`.
 
-When creating multiple variants, change only motion intent, not identity. Example variant prompts:
+When creating multiple variants, change only motion and expression intent, never identity. Example variant prompts:
 
 ```text
 Variant A: subtle polite lean, smallest motion, calm waiting.
@@ -371,8 +395,8 @@ Repair the smallest failing unit:
 1. Read `qa/validation.json` and visual QA notes.
 2. Identify the failed frame or state.
 3. Regenerate or edit only that frame/state as a candidate packet using the canonical base and character bible.
-4. Pre-screen at least 2 repair variants when the visible art changes, then ask the human to choose one.
-5. Normalize the approved repair into `frames/`.
+4. Pre-screen at least 2 repair variants when the visible art changes, then ask the human to choose one. Under full automation, pre-screen one and choose it by the ladder, inside the same 2-pass limit.
+5. Normalize the selected repair into `frames/`.
 6. Re-run validation and export.
 
 Regenerate the canonical base only when many states fail for the same identity reason.

@@ -44,16 +44,33 @@ NEVER_TRANSFERS = (
 # letterboxes every cell, and the mascots shrink to fit the wasted height, which
 # is the one thing a concept sheet cannot afford: a cell too small to name is not
 # an option, it is a smudge.
+# Every ratio here must come from PROVIDER_ASPECT_RATIOS, so some grids get the
+# nearest legal ratio rather than the one they would like. 3x1 wants 3:1 and 5x2
+# wants 5:2; both are rejected, and both take 2:1 instead. Their cells then run
+# portrait rather than square, which suits a mascot -- a Pet is taller than it is
+# wide anyway.
 GRID_LAYOUTS: dict[int, tuple[int, int, str]] = {
-    3: (3, 1, "3:1"),
+    3: (3, 1, "2:1"),  # wants 3:1, which the provider rejects
     4: (2, 2, "1:1"),
     5: (3, 2, "3:2"),  # six rects, five filled; the last one stays empty
     6: (3, 2, "3:2"),
     8: (4, 2, "2:1"),
     9: (3, 3, "1:1"),
-    10: (5, 2, "5:2"),
+    10: (5, 2, "2:1"),  # wants 5:2, which the provider rejects
     12: (4, 3, "4:3"),
 }
+
+# The aspect ratios the provider will accept. This is a closed enum, not a
+# free-form ratio: a value outside it is rejected with HTTP 400 before the model
+# is ever reached.
+#
+# Measured 2026-08-12, the expensive way. A whole eval case died on all seven
+# contenders at once because the table above asked for "3:1". Seven identical
+# 400s read like a provider outage, not like a typo in this file.
+PROVIDER_ASPECT_RATIOS = frozenset({
+    "1:1", "1:2", "1:4", "1:8", "2:1", "2:3", "3:2", "3:4",
+    "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "9:19.5", "19.5:9",
+})
 
 MAX_SHEET_CELLS = 12
 MIN_PASSING_CELLS = 3
@@ -61,10 +78,28 @@ MIN_PASSING_CELLS = 3
 HOUSE_STYLE_NAMES = ("geist-house-style.jpg", "geist-house-style.jpeg", "geist-house-style.png")
 
 
+def check_aspect_ratio(aspect_ratio: str) -> None:
+    """Refuse an illegal ratio here, on a free local read.
+
+    The alternative is discovering it at the provider, mid-run, as an HTTP 400
+    that names no cause -- which is exactly how the 3:1 entry survived into a
+    shipped grid table and then killed a whole eval case.
+    """
+    if aspect_ratio in PROVIDER_ASPECT_RATIOS:
+        return
+    legal = ", ".join(sorted(PROVIDER_ASPECT_RATIOS))
+    raise SystemExit(
+        f"aspect ratio '{aspect_ratio}' is not one the provider accepts, so this request "
+        f"would fail with HTTP 400 before any model saw it.\n\nAccepted: {legal}"
+    )
+
+
 def layout_for(cells: int) -> tuple[int, int, str]:
     """The grid and aspect ratio for a cell count, or a refusal that says why."""
     if cells in GRID_LAYOUTS:
-        return GRID_LAYOUTS[cells]
+        columns, rows, aspect_ratio = GRID_LAYOUTS[cells]
+        check_aspect_ratio(aspect_ratio)
+        return columns, rows, aspect_ratio
     if cells > MAX_SHEET_CELLS:
         raise SystemExit(
             f"{cells} cells is over the {MAX_SHEET_CELLS}-cell cap. Split the brainstorm "
