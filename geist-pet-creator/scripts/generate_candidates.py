@@ -1487,7 +1487,9 @@ def main() -> None:
                              "frames of the same state have room to grow. The transform is built "
                              "from frame 0 and applied unchanged to the rest, so a tight fit here "
                              "clips every frame that moves. Raise it for a silhouette that swings "
-                             f"a long way; default {MOTION_HEADROOM:.0%}.")
+                             # argparse %-interpolates help text, so a literal percent sign has
+                             # to arrive doubled or --help raises instead of printing.
+                             f"a long way; default {MOTION_HEADROOM * 100:.0f}%%.")
     parser.add_argument("--extra-prompt", default="", help="Appended to every prompt")
     parser.add_argument("--base-url", help="Provider base URL. Defaults to OPENROUTER_BASE_URL, "
                         "then OpenRouter. Point at a broker or a local mock to keep the "
