@@ -1,6 +1,6 @@
 ---
 name: geist-pet-creator
-description: Create, validate, repair, audit, and export consistent Geist-compatible Pet source bundles from approved alpha PNG frames. Use when Codex needs to make or fix a Geist Pet, Pet source bundle, character bible, Part Manifest, generated Pet candidates, sprite-frame QA, anatomy drift in a spritesheet, alpha PNG cleanup, human-in-the-loop art approval, an external image generator for Pet art, Geist pet.json metadata, spritesheet.webp export, or local Geist Pet installation. Also use when a Pet is derived from an existing character, cast, mascot, or franchise and its identity must be blended into the Geist house style, or when brainstorming Pet concepts, design variants, or a multi-character cast as a single concept sheet to choose from.
+description: Create, validate, repair, audit, and export consistent Geist-compatible Pet source bundles from approved alpha PNG frames. Use when Codex needs to make or fix a Geist Pet, Pet source bundle, character bible, Part Manifest, generated Pet candidates, sprite-frame QA, anatomy drift in a spritesheet, alpha PNG cleanup, human-in-the-loop art approval, an external image generator for Pet art, Geist pet.json metadata, spritesheet.webp export, or local Geist Pet installation. Also use when a Pet is derived from an existing character, cast, mascot, or franchise and its identity must be blended into the Geist house style, or when brainstorming Pet concepts, design variants, or a multi-character cast as a single concept sheet to choose from. Also use when a human delegates every design decision and wants a Pet built autonomously, when they want several candidates per animation state to choose between, or when accounting for what a Pet's art cost to generate.
 ---
 
 # Geist Pet Creator
@@ -48,14 +48,65 @@ Run that before changing any `model` value in an `imagegen.json` or in `KNOWN_MO
 
 For generated or visibly changed art, stop at candidate packets until the human approves a specific option. A broad response such as "go", "continue", or "looks good" only authorizes the next generation step; it is not approval to promote generated art, normalize frames, export, or install unless the human explicitly approves the named candidate or variant. For deterministic cleanup that preserves visible art, such as clearing transparent RGB residue on already-approved frames, approval is not required.
 
+That is the supervised default. Full automation moves most of those choices to the agent, and the next section says exactly which ones it does not move.
+
+## Decision Modes
+
+The image generation mode decides what draws the pixels. The **decision mode** decides who chooses between what it drew. They are independent — either drawing mode runs under either decision mode.
+
+- **Supervised** is the default, and it is also what "explore the design ideas for each state" asks for: 3 variants per action, a review page, and a human choosing by candidate id.
+- **Full Automation** is opt-in: one variant per animation state, chosen by the agent, with two gates left standing.
+
+Switch to full automation only on an explicit statement about **decisions** — "fully automate", "all decisions are up to you", "don't ask me, just build it". "Just do it", "hurry", and "go" are about speed rather than authority, so ask once which was meant. A mode is never inherited from momentum.
+
+Modes mix per action: "automate the rest, show me options for `idle`" is one supervised action inside an automated build. Record the resolved mode on every decision record in `qa/approvals.json`, and pass `--mode auto|supervised` to `generate_candidates.py` so every ledger line carries it too.
+
+### What full automation decides
+
+| Phase | Under full automation |
+| --- | --- |
+| Concept sheet | **human gate stands** — see below |
+| `canonical-base` | 2-3 options, agent chooses by the tie-break ladder |
+| the nine animation states | **one** variant each, agent chooses |
+| generative repair queue | agent promotes, inside the existing 2-pass limit |
+| `final-audit` | **human gate stands** — export refuses without it |
+| install | separate explicit request, as always |
+
+Spend variance where it is cheap. A base option costs about $0.023 and decides what all 57 frames are counted against; a second variant of a whole state costs about $0.16 and only changes how it moves. So automation buys options at the base and one take per state.
+
+The **tie-break ladder**, in order: pre-screen status, then the naming, silhouette, and heart tests from [references/identity-blend.md](references/identity-blend.md), then footprint consistency against `idle` or the canonical base. Record the ranking and the reason on the decision record — a choice with no stated reason cannot be audited afterwards.
+
+A candidate that fails pre-screen gets at most 2 regenerations, the same limit anatomy repair uses, and then the run stops and reports it as a character-bible or prompt problem. Never promote a frame already known to fail.
+
+### A brainstorm still stops for a human
+
+The concept sheet exists so a human can compare identities, so it stays a human gate even under full automation, and the route still fires on **detection** — multiple characters, or multiple design directions for one Pet. "Fully automate Pets for these six characters" draws the sheet and waits. Automation may not route around that gate by treating a cast as a list of jobs.
+
+When nobody is available to choose, draw the sheet, pre-screen every cell, render `qa/concept-sheet-review.html`, then stop and report. That spends the $0.10 which makes the decision reviewable and withholds the $1.31 that depends on it.
+
+Once cells are chosen, automation resumes. Rendering a chosen cell at sprite scale is execution, not an identity choice.
+
+### Before and after an automated run
+
+Before the first call, state the estimate and the ceiling: about **$1.31** for 57 frames at the measured per-frame cost, plus base options. It is an announcement, not a request for confirmation — the authority was already granted.
+
+When the frames are built, hand over one report:
+
+- one line per state: the variant chosen, and the ladder reason it won
+- cost estimated versus actual, and the ledger path
+- the flagged-frame count from the anatomy audit
+- every state that exhausted its 2 passes
+
+Feedback naming a state re-runs that state as a single variant with the note folded into the prompt. If that fails pre-screen twice, escalate that one state to a 3-variant spread and ask. Read [references/generation-workflow.md](references/generation-workflow.md) § Sprite Action Variant Review for the per-action mechanics, and [references/image-providers.md](references/image-providers.md) § The spend ledger for what each run records.
+
 ## Core Workflow
 
 1. Capture a Pet brief: name, personality, visual references, required props, forbidden changes, and target style. When the Pet is derived from something already recognizable, capture the source and read [references/identity-blend.md](references/identity-blend.md) before anything else.
 2. Read `references/contract.md`, then write `pet.json` and `character-bible.md` before generating animation frames. `character-bible.md` must include a `## Part Manifest` table, because it is what every frame gets counted against later. A derived Pet also needs an `## Identity Blend` table, because it is what decides which source cues survive the house form.
 3. **Draw a concept sheet first when the request is a brainstorm.** If the human names multiple characters — a cast, a crew, a roster, a franchise — or asks for multiple design directions for one Pet, draw **one** image holding every concept on an invisible grid before anything else is generated. Pre-screen it cell by cell, render `qa/concept-sheet-review.html`, and ask the human to choose cells by id. Read [references/generation-workflow.md](references/generation-workflow.md) § Concept Sheet Route. A request for one named Pet with no brainstorm skips this step.
-4. Generate or choose canonical-base candidates as candidate packets under `sources/candidates/` using image generation for any new visible art. Pre-screen each packet, then render an HTML review page with prompts and choice controls before asking the human to choose one for `sources/canonical-base.png`. A chosen sheet cell re-enters this gate as its own sprite-scale candidate with the crop as Image 1 — a cell is a concept and is never written straight to `sources/canonical-base.png`.
-5. For every sprite action/state, generate multiple candidate variants with image generation before producing source frames. Exception: generate and approve `running-right` first, then create `running-left` as a deterministic horizontal flip of the approved `running-right` frames unless the human explicitly requests independent left-facing art. Pre-screen every variant, render an HTML review page with prompts and choice controls, and ask the human to choose which variant to use for that action.
-6. Normalize only the human-selected variant for each sprite action into `frames/<state>/<index>.png`.
+4. Generate or choose canonical-base candidates as candidate packets under `sources/candidates/` using image generation for any new visible art. Pre-screen each packet, then render an HTML review page with prompts and choice controls before asking the human to choose one for `sources/canonical-base.png`. Under full automation, draw 2-3 options and choose by the tie-break ladder instead of asking. A chosen sheet cell re-enters this gate as its own sprite-scale candidate with the crop as Image 1 — a cell is a concept and is never written straight to `sources/canonical-base.png`.
+5. For every sprite action/state, generate candidate variants with image generation before producing source frames — three under supervised mode, one under full automation. Exception: generate and approve `running-right` first, then create `running-left` as a deterministic horizontal flip of the approved `running-right` frames unless the human explicitly requests independent left-facing art. Pre-screen every variant and render an HTML review page with prompts and choice controls; under supervised mode ask the human to choose, and under full automation the page is the record of a choice already made.
+6. Normalize only the selected variant for each sprite action into `frames/<state>/<index>.png`.
 7. Validate the source bundle and save machine-readable QA:
 
 ```bash
@@ -70,7 +121,7 @@ python "$SKILL_DIR/scripts/validate_source_bundle.py" /absolute/path/PetName.pet
 python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --repair
 ```
 
-Work `repairs.generative_repair_queue` from `qa/final-audit.json`: regenerate each queued frame as a candidate packet, get it approved, promote it, then audit again. Repeat until the queue is empty or the frames reach their 2-pass limit. Report the frames that reached the limit as a character-bible or prompt problem rather than promoting a third attempt.
+Work `repairs.generative_repair_queue` from `qa/final-audit.json`: regenerate each queued frame as a candidate packet, get it approved — or promote it by the ladder under full automation — then audit again. Repeat until the queue is empty or the frames reach their 2-pass limit. Report the frames that reached the limit as a character-bible or prompt problem rather than promoting a third attempt.
 
 10. Look at all 57 artwork cells on `qa/final-audit.html`, against the Part Manifest. Write a verdict for every cell into `qa/final-audit.json`, then prove none was skipped:
 
@@ -78,7 +129,7 @@ Work `repairs.generative_repair_queue` from `qa/final-audit.json`: regenerate ea
 python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --verify-verdicts
 ```
 
-11. Ask the human to approve the audit by its digest, and record that approval in `qa/approvals.json` with `approved_action: "final-audit"`.
+11. Ask the human to approve the audit by its digest, and record that approval in `qa/approvals.json` with `approved_action: "final-audit"`. This gate is human in **both** decision modes, so an automated build ends here and waits.
 12. Export. It refuses without an approved audit for these exact frames:
 
 ```bash
@@ -124,6 +175,7 @@ PetName.pet/
     review/00.png ...
   qa/
     approvals.json
+    spend.jsonl              # one line per provider call, appended as it happens
   final/
 ```
 
@@ -145,15 +197,16 @@ Required state frame counts:
 
 ## Human Approval Gates
 
-- Do not promote generated art into `sources/canonical-base.png` or `frames/` until a human approves it.
-- Treat the canonical base and every animation state as separate sprite actions that each need their own human validation. Required action approvals are: `canonical-base`, `idle`, `running-right`, `running-left`, `waving`, `jumping`, `failed`, `waiting`, `running`, `review`, and `final-audit`.
+- Under supervised mode, do not promote generated art into `sources/canonical-base.png` or `frames/` until a human approves it. Under full automation the agent decides and records the decision — except at the two gates below, which never move.
+- **`final-audit` is a human gate in both decision modes, and so is a concept sheet whenever the brainstorm route fires.** Everything else in the list below is a decision that full automation may make for itself.
+- Treat the canonical base and every animation state as separate sprite actions that each need their own recorded decision. Required action decisions are: `canonical-base`, `idle`, `running-right`, `running-left`, `waving`, `jumping`, `failed`, `waiting`, `running`, `review`, and `final-audit`.
 - `concept-sheet` is a **conditional** gate. It joins the required list only when the brainstorm route fires — multiple characters, or multiple design directions for one Pet. It never replaces `canonical-base`.
 - `final-audit` is the last gate before export. It approves one exact set of pixels by `atlas_digest`, so changing any frame reopens it.
 - A concept sheet satisfies the `canonical-base` gate's variant requirement: its cells are the options, and the human chooses by cell id such as `cell-04`. The chosen cell then returns through the `canonical-base` gate as a sprite-scale candidate before it becomes `sources/canonical-base.png`. Record both decisions in `qa/approvals.json`.
 - **Pre-screen a sheet per cell, not as one candidate.** Write a verdict for every cell. Failing cells appear on the review page struck out and cannot be chosen. Regenerate the whole sheet only when fewer than 3 cells pass, or when the cell that failed is a character the human named. One weak cell among strong ones is information, not a reason to redraw the sheet.
-- For each sprite action, provide at least 3 distinct candidate variants unless the human asks for a different count. Exception: `running-left` should normally be a single deterministic mirror candidate made from the approved `running-right` row, with its own review page and approval. Each variant must include the generated image or contact sheet, the exact prompt or deterministic operation used to create it, and a compact pre-screen summary.
+- For each sprite action under supervised mode, provide at least 3 distinct candidate variants unless the human asks for a different count. Full automation provides one. Exception: `running-left` should normally be a single deterministic mirror candidate made from the approved `running-right` row, with its own review page and approval. Each variant must include the generated image or contact sheet, the exact prompt or deterministic operation used to create it, and a compact pre-screen summary.
 - For each approval gate, create an HTML review page at `qa/<sprite-action>-review.html` using `scripts/render_candidate_review_html.py`. For animation states, the page must render each candidate as a moving sprite preview, not only as a static contact sheet. The page must also show all passing candidates, exact prompts, pre-screen summaries, a **Choose** button, and a **Copy Prompt** button for each candidate.
-- Ask the human to choose one variant by candidate id before promoting that action. Do not infer approval from "go" or from approval of a different action.
+- Under supervised mode, ask the human to choose one variant by candidate id before promoting that action. Do not infer approval from "go" or from approval of a different action, and do not infer full automation from either.
 - Pre-screen every candidate first. Reject obvious identity, layout, alpha, state-semantics, or prompt-compliance failures without asking the human.
 - Show the human only pre-screened candidates plus a compact approval context: what was generated, the prompt used, what it must preserve, what passed, what risks remain, and the exact decision needed.
 - Record approvals in `qa/approvals.json` with candidate id, approved file path, target destination, approver note, and timestamp when available.
@@ -195,7 +248,7 @@ When the human brainstorms rather than naming one finished Pet — a cast, a cre
 - Treat `character-bible.md` and `sources/canonical-base.png` as the identity lock for every frame. For a derived Pet, the `## Identity Blend` table is part of that lock and travels into every prompt alongside the Part Manifest.
 - Draw canonical-base candidates and sprite-action candidate art with the active image generation mode. The candidate's visible pose, expression, motion read, and frame artwork should come from generated imagery, not from scripted transforms alone.
 - Every generation call must produce a candidate packet: generated file path, exact prompt, input images, target state/frame/action, identity invariants, generation provenance, pre-screen result, and human-facing approval summary.
-- **Once `canonical-base` is approved, variants vary motion only.** For each sprite action, vary candidates intentionally: for example subtle, energetic, and expressive motion reads. Keep all variants inside the character bible; do not create variants by changing identity, palette, props, or style.
+- **Once `canonical-base` is approved, variants vary motion read and expression.** For each sprite action, vary candidates intentionally: for example subtle, energetic, and expressive motion reads, and the posture and expression language that go with them. Expression is how `waiting` reads differently from `idle`, and it stays inside the Part Manifest, so the anatomy audit still counts it. Keep all variants inside the character bible; never create a variant by changing identity, palette, props, or style.
 - **Before `canonical-base` is approved, the concept sheet is where identity varies.** Cells may differ in silhouette, crown cue, prop choice, and palette accents — that is what a brainstorm is for. The house-form invariants never vary between cells: one compact rounded legless floating body, one thick Sky outline, Cream body area, two Ink dot eyes, one tiny mouth, exactly one centered Mango heart, tiny attached arm nubs, flat fills, no floor or shadow.
 - Do not offer affine transforms, CSS/canvas motion, or code-distorted copies of the canonical base as final sprite-action candidates unless the human explicitly asks for deterministic prototyping. If used, label them as prototypes or archive them outside the active review set.
 - Use code for processing generated art: slicing contact sheets, removing chroma-key backgrounds, alpha cleanup, resizing to `192x208`, validating frames, exporting atlases, and rendering HTML review pages.
@@ -274,16 +327,18 @@ Reference images, attached to generation calls and read when judging a derived c
 
 - `scripts/validate_source_bundle.py`: checks frame counts, dimensions, alpha, empty frames, safe padding, transparent RGB residue, and chroma fringe on true boundary pixels. Use `--fix-transparent-rgb` only for invisible RGB cleanup. Cyan fringe detection is opt-in via `--detect-cyan-fringe`, because Pet outlines are often blue or teal and their antialiased edges read as cyan.
 - `scripts/audit_spritesheet.py`: audits all 57 artwork cells for anatomy drift, asserts the 15 unused cells are transparent, ranks frames by suspicion, and renders `qa/final-audit.html`. `--repair` applies deterministic repairs and queues the rest; `--mode post-export` audits the written spritesheet; `--verify-verdicts` fails while any cell lacks an agent verdict.
-- `scripts/generate_candidates.py`: draws through the External Image Provider at every phase, selected with `--action`: `concept-sheet` (one call, no canonical base), `canonical-base` (`--variants N`), or any of the nine animation states (one frame per call, canonical base and previous frame as references). Enforces `--max-images` and `--max-cost-usd` with per-action defaults, refuses a `model` pin outside `KNOWN_MODELS`, and answers `--verify-model <id>` with a live request when a model id is in doubt. `--state` remains as a deprecated alias for `--action`.
+- `scripts/generate_candidates.py`: draws through the External Image Provider at every phase, selected with `--action`: `concept-sheet` (one call, no canonical base), `canonical-base` (`--variants N`), or any of the nine animation states (one frame per call, canonical base and previous frame as references). Enforces `--max-images` and `--max-cost-usd` with per-action defaults, refuses a `model` pin outside `KNOWN_MODELS`, and answers `--verify-model <id>` with a live request when a model id is in doubt. Appends a spend ledger line for every provider call, tagged with the `--mode` this run belongs to. `--state` remains as a deprecated alias for `--action`.
 - `scripts/with_openrouter_key.sh`: resolves `OPENROUTER_API_KEY` from the macOS login keychain and execs the given command with it set in that child only. Use it for every provider call rather than exporting the key in a shell profile. A missing keychain item is an error, never a fallback.
 - `scripts/eval_providers.py`: measures image models on reference-conditioned generation — cost, duration, mechanical QA, silhouette test — and writes a review page for the naming and blend judgements that stay human. Run it rather than trusting a model list or a price that has aged. Concept-sheet cases are scored on whether their cells are *comparable*: cell count, containment, scale spread, baseline spread, and row-major order read mechanically from an ordered body-hue probe.
 - `scripts/export_geist_pet.py`: validates, requires an approved final audit for these exact frames, composes `1536x1872` Geist atlas output, writes exported `pet.json`, writes `qa/contact-sheet.png`, and optionally installs into `${GEIST_HOME:-$HOME}/.geist/pets/<id>/`.
 - `scripts/render_candidate_review_html.py`: renders `qa/<sprite-action>-review.html` from candidate packets with moving sprite previews, choose buttons, and copy-prompt buttons for human validation. It auto-builds `animated-preview.webp` from `contact-sheet.png` for known Geist animation states when an animated preview is missing. `--action concept-sheet` renders the sheet page instead: numbered row-major cell overlay, per-cell identity lock and verdict, failing cells struck out.
+- `scripts/spend_report.py`: reports what a Pet's art cost, from a bundle, a directory of bundles, or the machine-wide ledger with `--home`. Needs no credential, which is why it is not a flag on `generate_candidates.py`. `--record` appends a line for a draw this pipeline did not make, which is how Built-in Image Generation gets counted; those lines carry `cost_usd: null`, because an invented price in a file that reads like a receipt is worse than an honest gap.
 - `scripts/crop_gallery_cells.py`: crops chosen cells out of an approved concept sheet using the grid recorded in `candidate-context.json`, writing `sources/candidates/<candidate-id>/cells/cell-NN.png`. It refuses a cell carrying a `fail` verdict and does not trim the paper margin, because trimming an off-white background needs a threshold and a wrong one eats the outline. Bundle scaffolding stays with the agent.
 
-Four modules sit behind those scripts and are imported, not run:
+Five modules sit behind those scripts and are imported, not run:
 
 - `scripts/geist_grid.py`: the atlas contract, and `FrameGrid`, which answers which file is frame N of a sprite action. Every finding names a path this module produced, so a finding always names a file that exists.
 - `scripts/geist_pixels.py`: alpha primitives and the alpha threshold.
 - `scripts/geist_manifest.py`: reads the Part Manifest and renders it into prompts, so generation and audit describe the same Pet.
 - `scripts/geist_house.py`: the house form as prompt text, the concept-sheet grid table, and the row-major cell geometry. The generator, the cropper, and the eval all read it, so none of them can hold a private idea of where `cell-04` is.
+- `scripts/geist_spend.py`: the ledger — line schema, the two paths, the append, and the rollup. Lines are appended the moment a provider answers rather than when a packet lands, because a run killed at a ceiling spends real money and writes no packet.

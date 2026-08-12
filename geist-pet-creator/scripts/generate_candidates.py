@@ -56,6 +56,7 @@ from geist_house import (
 )
 from geist_manifest import read_manifest
 from geist_pixels import alpha_bbox, clear_transparent_rgb, data_uri
+from geist_spend import KIND_VERIFY, MODE_SUPERVISED, MODES, SpendLedger
 
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 
@@ -304,12 +305,21 @@ def verify_model_live(model: str) -> None:
             raise SystemExit(f"{model}: NOT REACHABLE -- {detail}") from None
         raise SystemExit(f"{model}: request failed -- {detail}") from None
     cost = float((payload.get("usage") or {}).get("cost") or 0.0)
+
+    # A probe writes no candidate packet, so the ledger is the only place this
+    # ~$0.01 is ever visible. It belongs to no bundle, so the home ledger takes
+    # it alone.
+    probe = SpendLedger(model=model, mode=None, kind=KIND_VERIFY, endpoint=endpoint())
+    probe.record(cost, note="--verify-model probe")
+
     listed = model in KNOWN_MODELS
     print(f"{model}: REACHABLE. cost ${cost:.5f}.")
     print(f"  in KNOWN_MODELS: {listed}")
     if not listed:
         print("  It works but is not pinned as known. Add it to KNOWN_MODELS if you want it,")
         print("  and measure it with eval_providers.py before making it a default.")
+    for warning in probe.warnings:
+        print(f"  warning: {warning}")
 
 
 def guard_against_secrets(path: Path, raw: dict[str, Any]) -> None:
@@ -365,11 +375,12 @@ class SpendGuard:
     """Bound a run before it bounds itself. 3 variants x 9 states x per-frame is
     171 calls, and nothing else in the pipeline notices that."""
 
-    def __init__(self, max_images: int, max_cost_usd: float) -> None:
+    def __init__(self, max_images: int, max_cost_usd: float, ledger: SpendLedger | None = None) -> None:
         self.max_images = max_images
         self.max_cost_usd = max_cost_usd
         self.images = 0
         self.cost = 0.0
+        self.ledger = ledger
 
     def check(self) -> None:
         if self.images >= self.max_images:
@@ -380,6 +391,11 @@ class SpendGuard:
     def record(self, cost: float) -> None:
         self.images += 1
         self.cost += cost
+        if self.ledger is not None:
+            # Appended here, not with the packet. This is the moment the money was
+            # spent, and a run that dies at the next ceiling check writes no
+            # packet at all -- that spend would otherwise be invisible.
+            self.ledger.record(cost)
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -1055,13 +1071,16 @@ def run_concept_sheet(args: argparse.Namespace, bundle: Path, config: ProviderCo
     references.append(image_reference(house))
     input_images.append({"path": str(house), "role": "house-style reference"})
 
+    candidate_id = args.candidate_id or "concept-sheet-01"
+    if guard.ledger is not None:
+        guard.ledger.candidate_id = candidate_id
+
     prompt = build_sheet_prompt(locks, columns, rows, derived, args.extra_prompt)
     sheet, record = generate_frame(
         opaque(config, aspect_ratio), prompt, references, guard, require_alpha=False
     )
     record["reference_count"] = len(references)
 
-    candidate_id = args.candidate_id or "concept-sheet-01"
     packet = write_sheet_packet(
         bundle, candidate_id, sheet, locks, columns, rows, aspect_ratio, prompt, [record], input_images
     )
@@ -1110,6 +1129,8 @@ def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderC
     misfits: list[dict[str, Any]] = []
     for offset in range(args.variants):
         letter = chr(ord("a") + offset)
+        if guard.ledger is not None:
+            guard.ledger.candidate_id = f"canonical-base-{letter}"
         intent = args.variant_intent if args.variants == 1 else f"{args.variant_intent} (variant {letter.upper()})"
         prompt = build_base_prompt(bundle, intent, from_cell, bool(args.identity_image), args.extra_prompt)
         raw, record = generate_frame(config, prompt, references, guard)
@@ -1169,6 +1190,11 @@ def main() -> None:
                              "eval put openai/gpt-image-2 at ~$1.33 a pass. The real ceiling "
                              "is the credit limit on the OpenRouter key, which is enforced "
                              "server-side and outside this process's reach.")
+    parser.add_argument("--mode", choices=MODES, default=MODE_SUPERVISED,
+                        help="Decision mode this run belongs to. 'supervised' means a human picks "
+                             "the candidate; 'auto' means full automation picks it. Recorded on "
+                             "every ledger line, so a Pet whose frames nobody chose stays visible "
+                             "as one months later.")
     parser.add_argument("--safe-padding", type=int, default=6)
     parser.add_argument("--extra-prompt", default="", help="Appended to every prompt")
     parser.add_argument("--base-url", help="Provider base URL. Defaults to OPENROUTER_BASE_URL, "
@@ -1227,18 +1253,29 @@ def main() -> None:
 
     config = load_config(bundle, args.model)
     api_key()  # fail before any work when the environment is not set up
-    guard = SpendGuard(max_images, max_cost)
+    ledger = SpendLedger(
+        model=config.model,
+        mode=args.mode,
+        action=action,
+        bundle=bundle,
+        provider=config.provider,
+        endpoint=endpoint(),
+    )
+    guard = SpendGuard(max_images, max_cost, ledger)
 
     if action in PRE_FRAME_ACTIONS:
         runner = run_concept_sheet if action == CONCEPT_SHEET else run_canonical_base
         result = runner(args, bundle, config, guard)
         print(
             json.dumps(
-                {"ok": True, "mode": "External Image Provider", "model": config.model,
-                 **result, "spend": guard.as_dict()},
+                {"ok": True, "mode": "External Image Provider", "decision_mode": args.mode,
+                 "model": config.model, **result, "spend": guard.as_dict(),
+                 "ledger": ledger.as_dict()},
                 indent=2,
             )
         )
+        for warning in ledger.warnings:
+            print(f"warning: {warning}", file=sys.stderr)
         return
 
     frame_count = FRAME_COUNTS[action]
@@ -1252,6 +1289,7 @@ def main() -> None:
     canonical_uri = image_reference(canonical)
 
     candidate_id = f"{action}-{args.variant}"
+    ledger.candidate_id = candidate_id
     produced: list[tuple[int, Image.Image]] = []
     provenance: list[dict[str, Any]] = []
     transform: CellTransform | None = None
@@ -1260,6 +1298,7 @@ def main() -> None:
     misfits: list[dict[str, Any]] = []
 
     for index in indices:
+        ledger.frame = index
         references = [canonical_uri]
         if previous is not None:
             references.append(data_uri(previous))
@@ -1298,6 +1337,7 @@ def main() -> None:
             {
                 "ok": True,
                 "mode": "External Image Provider",
+                "decision_mode": args.mode,
                 "action": action,
                 "candidate_id": candidate_id,
                 "packet": str(packet),
@@ -1308,14 +1348,20 @@ def main() -> None:
                 "alpha_paths": sorted({record["alpha_path"] for record in provenance}),
                 "frames_outside_safe_padding": misfits,
                 "spend": guard.as_dict(),
+                "ledger": ledger.as_dict(),
                 "next": (
                     f"pre-screen the packet, then render qa/{action}-review.html "
                     "and ask the human to choose a candidate id"
+                    if args.mode == MODE_SUPERVISED else
+                    f"pre-screen the packet, render qa/{action}-review.html as the record, then "
+                    "promote it by the tie-break ladder and log the decision in qa/approvals.json"
                 ),
             },
             indent=2,
         )
     )
+    for warning in ledger.warnings:
+        print(f"warning: {warning}", file=sys.stderr)
 
 
 if __name__ == "__main__":

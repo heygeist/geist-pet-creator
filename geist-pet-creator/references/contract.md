@@ -39,6 +39,7 @@ PetName.pet/
     <state>/<index>.png
   qa/
     approvals.json
+    spend.jsonl          # append-only, one line per provider call
     <sprite-action>-review.html
     final-audit.json
     final-audit.html
@@ -48,7 +49,9 @@ PetName.pet/
 
 `frames/` is the durable source of truth. `sources/raw/` may contain high-resolution generations, strips, masks, or rejected attempts, but those files are not exported directly.
 
-`sources/candidates/` contains generated art before approval. Candidate files are review artifacts, not source frames. A candidate becomes source truth only after agent pre-screening and human approval of that exact candidate id, then normalization into `sources/canonical-base.png` or `frames/`.
+`sources/candidates/` contains generated art before approval. Candidate files are review artifacts, not source frames. A candidate becomes source truth only after agent pre-screening and an approval of that exact candidate id — from a human under supervised mode, from the agent under full automation — then normalization into `sources/canonical-base.png` or `frames/`.
+
+`qa/spend.jsonl` is append-only and authoritative for what this Pet cost. Every provider call adds a line when the provider answers, so spend that produced no candidate packet is still recorded. Read it with `spend_report.py`; the schema is in [image-providers.md](image-providers.md) § The spend ledger.
 
 Each sprite action must have its own approval before it enters `frames/`. Sprite actions are `canonical-base`, `idle`, `running-right`, `running-left`, `waving`, `jumping`, `failed`, `waiting`, `running`, and `review`. Approval for one action does not approve another action.
 
@@ -171,7 +174,9 @@ Unused atlas cells after each state's final frame must remain fully transparent.
 
 ## Approval Contract
 
-Maintain `qa/approvals.json` when generated art is used. The required approvals are the ten sprite actions plus `final-audit`.
+Maintain `qa/approvals.json` when generated art is used. Every one of the ten sprite actions plus `final-audit` needs a decision record. Who made each decision depends on the decision mode, so every record carries `decided_by`, either `human` or `agent`.
+
+Two of those decisions must carry `decided_by: "human"` whatever the mode: `final-audit`, which export enforces in code, and `concept-sheet` when the brainstorm route fired. A `final-audit` record written with `decided_by: "agent"` is invalid — it claims a human approved pixels nobody looked at.
 
 The `final-audit` approval carries an `atlas_digest`, so an approval cannot outlive the artwork it approved. Change one pixel of one frame and the digest changes, which reopens the gate:
 
@@ -183,6 +188,7 @@ The `final-audit` approval carries an `atlas_digest`, so an approval cannot outl
   "atlas_digest": "22db90a8d97fbf6e42e31823a1e7edac602461e6c9b80bfcb63293343558f508",
   "source": "qa/final-audit.html",
   "decision": "approved",
+  "decided_by": "human",
   "approver_note": "All 57 frames read correctly against the Part Manifest.",
   "decided_at": "2026-08-12T00:00:00Z"
 }
@@ -209,15 +215,40 @@ Sprite-action approvals keep their existing shape:
     "source": "sources/candidates/waiting-b/contact-sheet.png",
     "prompt_file": "sources/candidates/waiting-b/prompt.md",
     "decision": "approved",
+    "decided_by": "human",
     "approver_note": "Chosen from waiting-a, waiting-b, and waiting-c.",
     "decided_at": "2026-07-05T00:10:00Z"
   }
 ]
 ```
 
-If no human approval is possible in the current run, stop before promoting generated candidates. Do not treat "go" as approval unless it clearly chooses a shown candidate id. Deterministic cleanup of already-approved or existing source frames may continue without a new approval.
+An agent decision under full automation uses the same shape and adds why it won, because a choice with no stated reason cannot be reviewed later:
 
-For the default directional workflow, record the `running-left` approval against the mirrored candidate, for example `running-left-from-right-flip`, with `source` pointing to that candidate's contact sheet and notes naming the approved `running-right` source candidate. Mirroring approved frames is deterministic, but it still requires human approval before `frames/running-left/` is written.
+```json
+{
+  "candidate_id": "waiting-a",
+  "approved_action": "waiting",
+  "approved_for": "frames/waiting/",
+  "source": "sources/candidates/waiting-a/contact-sheet.png",
+  "prompt_file": "sources/candidates/waiting-a/prompt.md",
+  "decision": "approved",
+  "decided_by": "agent",
+  "decision_mode": "auto",
+  "ladder": {
+    "deciding_level": "pre-screen",
+    "ranking": ["waiting-a"],
+    "reason": "single variant, pre-screen pass on all five checks; footprint within 2px of idle"
+  },
+  "regenerations": 0,
+  "decided_at": "2026-08-12T10:47:59Z"
+}
+```
+
+`ladder.deciding_level` is the first level that separated the candidates: `pre-screen`, `identity-tests`, or `footprint`. `regenerations` counts pre-screen failures redrawn for this action, and it may not exceed 2 — a third attempt is a character-bible or prompt problem, not a candidate.
+
+If no human decision is possible in a supervised run, stop before promoting generated candidates. Do not treat "go" as approval unless it clearly chooses a shown candidate id, and never read it as a grant of full automation. Deterministic cleanup of already-approved or existing source frames may continue without a new decision.
+
+For the default directional workflow, record the `running-left` approval against the mirrored candidate, for example `running-left-from-right-flip`, with `source` pointing to that candidate's contact sheet and notes naming the approved `running-right` source candidate. Mirroring approved frames is deterministic, but it still needs its own decision record before `frames/running-left/` is written.
 
 ## Export Contract
 

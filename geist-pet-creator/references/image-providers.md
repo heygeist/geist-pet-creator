@@ -320,10 +320,70 @@ minted. It is enforced server-side before a request reaches a provider, so a blo
 nothing upstream, and it holds regardless of what flags a caller passes. Set one. A concurrent burst
 can overshoot it slightly.
 
+## The spend ledger
+
+A ceiling bounds an accident. The ledger answers a different question — what did this actually cost —
+and it is the only answer available for a build nobody watched.
+
+Every provider call appends one line, in two places:
+
+| File | Job | If the write fails |
+| --- | --- | --- |
+| `<bundle>/qa/spend.jsonl` | what this Pet cost | **fatal** — a Pet that cannot account for its own art is a defect |
+| `${GEIST_HOME:-$HOME}/.geist/spend.jsonl` | what every Pet on this machine cost | **warning** — it is rebuildable from bundle ledgers |
+
+The split follows what is recoverable, not what is important. Home resolution matches how
+`export_geist_pet.py` resolves an install target, so one `GEIST_HOME` moves the Pets and their
+receipts together.
+
+**Lines are appended when the provider answers, not when the packet lands.** Cost already appears in
+every candidate packet under `provenance[].usage_cost_usd`, so a ledger that only summed packets
+would look redundant — and would be blind to exactly the spend worth finding. A run stopped at
+`--max-images` writes no packet at all. A `--verify-model` probe writes no packet. Both spent money.
+
+One line, keyed on `pet.json`'s `id` because a bundle path changes when someone renames a directory
+and an id does not:
+
+```json
+{"schema":1,"at":"2026-08-12T10:47:59Z","pet_id":"rainy-geist","bundle":"/abs/path/Rainy.pet",
+ "kind":"draw","action":"waiting","candidate_id":"waiting-a","frame":0,"mode":"auto",
+ "provider":"openrouter","model":"openai/gpt-image-2","images":1,"cost_usd":0.0231,"priced":true}
+```
+
+`mode` carries the decision mode from `--mode`, so a Pet whose frames nobody chose stays visible as
+one months later. `priced` is false with `cost_usd: null` when no price was reported — Built-in Image
+Generation reports none. Those images are **counted, never estimated**: a plausible number in a file
+that reads like a receipt is worse than an honest gap.
+
+Concurrent writers are safe by construction. Each line is one `write()` on an `O_APPEND` handle, held
+under 4096 bytes; a line that would run over sheds its optional fields rather than its atomicity.
+That matters because this skill runs candidate subagents in parallel, and eight of them appending at
+once is the normal case rather than the exceptional one.
+
+Read it with `spend_report.py`, which needs no credential:
+
+```bash
+python "$SKILL_DIR/scripts/spend_report.py" /absolute/path/PetName.pet --by-action
+python "$SKILL_DIR/scripts/spend_report.py" /absolute/path/work-directory
+python "$SKILL_DIR/scripts/spend_report.py" --home
+```
+
+Asking for `--home` and a bundle in the same run is refused: both files hold the same lines, so
+summing them would double every number in the report.
+
+Under Built-in Image Generation nothing makes an HTTP call, so the agent records its own draws:
+
+```bash
+python "$SKILL_DIR/scripts/spend_report.py" --record --pet /absolute/path/PetName.pet \
+  --action waiting --images 6 --unpriced --mode auto
+```
+
+`--record` refuses to run without either `--cost-usd` or `--unpriced`. A missing price is not zero.
+
 ## What this mode does not change
 
 The External Image Provider changes what draws the pixels. Everything else holds:
 
-- The same approval gates, in the same order.
-- The same candidate packets, pre-screened before a human sees them.
+- The same gates, in the same order. **Which of them a human answers is the decision mode's business, not this mode's** — see SKILL.md § Decision Modes. `--mode` only records the answer; it never moves a gate.
+- The same candidate packets, pre-screened before anything is promoted.
 - The same subagent authority: subagents write candidate packets, and promotion, approval, export, and install stay with the main agent and the human.

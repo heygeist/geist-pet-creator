@@ -97,9 +97,9 @@ Hovering a frame on `qa/final-audit.html` shows what it gained (red) and lost (b
 Repair runs automatically and splits by whether the pixels already exist:
 
 - **Deterministic repair** moves or clears existing pixels: transparent RGB residue, detached fragments under 2% of the body, and a body shifted back inside safe padding. It writes in place after copying the original to `sources/raw/repair-backups/`.
-- **Generative repair** creates pixels, because a missing wing cannot be recovered from a file that lacks it. It produces a candidate packet and waits for the human to approve it, exactly like any other generated art.
+- **Generative repair** creates pixels, because a missing wing cannot be recovered from a file that lacks it. It produces a candidate packet and is decided exactly like any other generated art: the human approves it under supervised mode, and under full automation the agent promotes it by the tie-break ladder in [generation-workflow.md](generation-workflow.md) § Choosing without a human.
 
-A frame gets at most 2 repair passes. A frame that fails twice has a prompt problem or a Part Manifest problem, so fix the character bible or the prompt rather than the frame.
+A frame gets at most 2 repair passes. A frame that fails twice has a prompt problem or a Part Manifest problem, so fix the character bible or the prompt rather than the frame. That limit is what makes an unattended repair loop safe to run: it is the same number the animation phase uses for a pre-screen failure, and it binds the agent as tightly as it binds a human.
 
 Keep the flagged-frame count visible even after repairs succeed. A Pet flagging 15 of 57 frames is telling you the identity lock is weak, and repairing 15 frames hides that.
 
