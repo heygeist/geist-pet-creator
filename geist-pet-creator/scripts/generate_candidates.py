@@ -193,6 +193,7 @@ def load_config(bundle: Path, override_model: str | None) -> ProviderConfig:
         raise SystemExit(f"imagegen.json names provider '{provider}'; this script speaks openrouter only")
 
     known = {"provider", "model", "output_format", "background", "resolution", "aspect_ratio", "quality"}
+    check_model(override_model or raw.get("model", DEFAULT_MODEL), path)
     config = ProviderConfig(
         provider=provider,
         model=override_model or raw.get("model", DEFAULT_MODEL),
@@ -210,6 +211,67 @@ def load_config(bundle: Path, override_model: str | None) -> ProviderConfig:
     if config.background == "transparent" and config.output_format not in {"png", "webp"}:
         raise SystemExit("a transparent background needs output_format png or webp")
     return config
+
+
+CATALOG_TRAP = """
+Do NOT "verify" a model id against GET /api/v1/models and repin on the result.
+That listing is INCOMPLETE. Measured 2026-08-12: openai/gpt-image-2,
+qwen/qwen-image-3-pro and x-ai/grok-imagine-image-2.0 are all absent from it,
+authenticated and unauthenticated, and all three answer real requests.
+openai/gpt-image-2 is this skill's default and draws frames for ~$0.023 each.
+
+This mistake has been made repeatedly, and it makes things worse: sessions have
+repinned working bundles onto openai/gpt-5.4-image-2, which rejects the
+transparency parameters this pipeline sends. A confident-looking catalog check
+returning the wrong answer is exactly why this message exists.
+
+The only test that settles whether a model works is a live request:
+
+    scripts/with_openrouter_key.sh python3 scripts/generate_candidates.py \\
+        --verify-model MODEL_ID
+
+It costs about $0.01 and answers definitively. Use it before changing any pin.
+"""
+
+
+def check_model(model: str, path: Path) -> None:
+    """Reject an unknown pin, and say why the obvious verification is wrong.
+
+    A bundle's imagegen.json is data that travels between machines, so it can
+    name anything. Catching it here fails on a cheap local read rather than at
+    the provider, mid-run, after money has been spent.
+    """
+    if model in KNOWN_MODELS:
+        return
+    raise SystemExit(
+        f"{path} pins model '{model}', which is not in KNOWN_MODELS.\n\n"
+        f"Verified working ids:\n  " + "\n  ".join(KNOWN_MODELS) + "\n"
+        f"{CATALOG_TRAP}"
+    )
+
+
+def verify_model_live(model: str) -> None:
+    """Settle a model id the only way that is authoritative: ask the provider.
+
+    Prints what actually happened -- reachable, rejected, or unknown -- so nobody
+    has to infer existence from a catalog that omits working models.
+    """
+    print(f"live request to {endpoint()} for {model} ...", flush=True)
+    config = ProviderConfig(model=model, output_format=None, background=None)
+    try:
+        payload = call_provider(config, "a small red circle on a plain background", [], retries=0)
+    except SystemExit as error:
+        detail = str(error)
+        if "404" in detail or "no endpoints" in detail.lower():
+            raise SystemExit(f"{model}: NOT REACHABLE -- {detail}") from None
+        raise SystemExit(f"{model}: request failed -- {detail}") from None
+    cost = float((payload.get("usage") or {}).get("cost") or 0.0)
+    listed = model in KNOWN_MODELS
+    print(f"{model}: REACHABLE. cost ${cost:.5f}.")
+    print(f"  in KNOWN_MODELS: {listed}")
+    if not listed:
+        print("  It works but is not pinned as known. Add it to KNOWN_MODELS if you want it,")
+        print("  and measure it with eval_providers.py before making it a default.")
 
 
 def guard_against_secrets(path: Path, raw: dict[str, Any]) -> None:
@@ -635,8 +697,12 @@ def parse_frame_range(spec: str | None, frame_count: int) -> list[int]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("bundle", help="Path to PetName.pet source bundle")
-    parser.add_argument("--state", required=True, choices=sorted(FRAME_COUNTS), help="Sprite action to generate")
+    parser.add_argument("bundle", nargs="?", help="Path to PetName.pet source bundle")
+    parser.add_argument("--verify-model", metavar="MODEL_ID",
+                        help="Settle whether a model id actually works, with one live "
+                             "request (~$0.01). The catalog listing is incomplete and "
+                             "must not be used for this. Exits after reporting.")
+    parser.add_argument("--state", choices=sorted(FRAME_COUNTS), help="Sprite action to generate")
     parser.add_argument("--variant", default="a", help="Variant letter; becomes part of the candidate id")
     parser.add_argument("--variant-intent", default="restrained, readable motion", help="How this variant should move")
     parser.add_argument("--frames", help="Frame indices to generate, e.g. 0-5 or 2,4; defaults to the whole state")
@@ -656,6 +722,13 @@ def main() -> None:
     args = parser.parse_args()
 
     set_base_url(args.base_url)
+
+    if args.verify_model:
+        api_key()
+        verify_model_live(args.verify_model)
+        return
+    if not args.bundle or not args.state:
+        raise SystemExit("bundle and --state are required unless --verify-model is given")
 
     bundle = Path(args.bundle).expanduser().resolve()
     frame_count = FRAME_COUNTS[args.state]

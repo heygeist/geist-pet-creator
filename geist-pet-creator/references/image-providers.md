@@ -21,6 +21,38 @@ The bundle draws through OpenRouter over HTTP. Turn it on by writing `imagegen.j
 
 The presence of that file switches the mode. A human asking for a different model in a single run overrides `model` for that run only. The mode never switches on its own: when the built-in capability is unavailable, say so and stop, because a silent switch makes the provenance recorded in every candidate packet false.
 
+### The catalog listing is not proof
+
+**`GET /api/v1/models` omits usable models.** Verified 2026-08-12, authenticated and
+unauthenticated, against an account that had just spent real credit:
+
+| Model | In the listing | Answers requests |
+| --- | --- | --- |
+| `openai/gpt-image-2` (this skill's default) | **no** | **yes**, ~$0.007 a call |
+| `x-ai/grok-imagine-image-2.0` | **no** | **yes** |
+| `qwen/qwen-image-3-pro` | **no** | **yes** |
+
+This matters because the wrong check is the obvious one. Sessions have looked a pinned model up in
+that listing, found it absent, concluded it was fabricated, and repinned working bundles onto
+`openai/gpt-5.4-image-2` — which rejects the `output_format` and `background` values this pipeline
+sends. The verification feels rigorous, returns a confident negative, and makes things worse.
+
+Model *pages* also resolve for ids the API omits, so `openrouter.ai/openai/gpt-image-2` loading is
+not proof either way.
+
+The only authoritative test is a live request:
+
+```
+scripts/with_openrouter_key.sh python3 scripts/generate_candidates.py --verify-model <MODEL_ID>
+```
+
+It costs about $0.01 and reports reachable, rejected, or unreachable. Allow generous timeouts —
+`qwen/qwen-image-3-pro` takes 85 seconds, and a 60-second timeout once produced a false negative.
+
+A pin outside `KNOWN_MODELS` is refused when the bundle config loads, before any spend, with this
+same explanation. That failure is deliberate: it is cheaper to stop on a local read than to discover
+a bad pin at the provider mid-run.
+
 ### Models
 
 Measure, do not trust this list. An earlier version of this table named two models that do not

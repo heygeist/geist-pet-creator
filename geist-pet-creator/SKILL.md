@@ -29,6 +29,20 @@ The mode changes what draws the pixels. Approval gates, candidate packets, and s
 
 Read [references/image-providers.md](references/image-providers.md) before configuring or using the External Image Provider.
 
+### Never repin a model from the catalog listing
+
+`GET /api/v1/models` is **incomplete**. Models absent from it answer requests normally. Measured 2026-08-12: `openai/gpt-image-2` — this skill's default — is absent from that listing both authenticated and unauthenticated, and draws frames for about $0.023 each. So are `x-ai/grok-imagine-image-2.0` and `qwen/qwen-image-3-pro`.
+
+Sessions have repeatedly "verified" a pinned model against that listing, concluded it was fake, and repinned working bundles onto `openai/gpt-5.4-image-2`, which **rejects the transparency parameters this pipeline sends**. The check looks rigorous and returns the wrong answer, so it produces confident, harmful edits.
+
+The only authoritative test is a live request, and it costs about $0.01:
+
+```bash
+scripts/with_openrouter_key.sh python3 scripts/generate_candidates.py --verify-model openai/gpt-image-2
+```
+
+Run that before changing any `model` value in an `imagegen.json` or in `KNOWN_MODELS`. A pin outside `KNOWN_MODELS` is now refused locally with this same warning, so a bad pin fails on a cheap read instead of at the provider mid-run.
+
 For generated or visibly changed art, stop at candidate packets until the human approves a specific option. A broad response such as "go", "continue", or "looks good" only authorizes the next generation step; it is not approval to promote generated art, normalize frames, export, or install unless the human explicitly approves the named candidate or variant. For deterministic cleanup that preserves visible art, such as clearing transparent RGB residue on already-approved frames, approval is not required.
 
 ## Core Workflow
@@ -245,7 +259,9 @@ Reference images, attached to generation calls and read when judging a derived c
 
 - `scripts/validate_source_bundle.py`: checks frame counts, dimensions, alpha, empty frames, safe padding, transparent RGB residue, and chroma fringe on true boundary pixels. Use `--fix-transparent-rgb` only for invisible RGB cleanup. Cyan fringe detection is opt-in via `--detect-cyan-fringe`, because Pet outlines are often blue or teal and their antialiased edges read as cyan.
 - `scripts/audit_spritesheet.py`: audits all 57 artwork cells for anatomy drift, asserts the 15 unused cells are transparent, ranks frames by suspicion, and renders `qa/final-audit.html`. `--repair` applies deterministic repairs and queues the rest; `--mode post-export` audits the written spritesheet; `--verify-verdicts` fails while any cell lacks an agent verdict.
-- `scripts/generate_candidates.py`: draws sprite frames through the External Image Provider, one frame per call, with the canonical base and previous frame as references. Enforces `--max-images` and `--max-cost-usd`.
+- `scripts/generate_candidates.py`: draws sprite frames through the External Image Provider, one frame per call, with the canonical base and previous frame as references. Enforces `--max-images` and `--max-cost-usd`, refuses a `model` pin outside `KNOWN_MODELS`, and answers `--verify-model <id>` with a live request when a model id is in doubt.
+- `scripts/with_openrouter_key.sh`: resolves `OPENROUTER_API_KEY` from the macOS login keychain and execs the given command with it set in that child only. Use it for every provider call rather than exporting the key in a shell profile. A missing keychain item is an error, never a fallback.
+- `scripts/eval_providers.py`: measures image models on reference-conditioned generation — cost, duration, mechanical QA, silhouette test — and writes a review page for the naming and blend judgements that stay human. Run it rather than trusting a model list or a price that has aged.
 - `scripts/export_geist_pet.py`: validates, requires an approved final audit for these exact frames, composes `1536x1872` Geist atlas output, writes exported `pet.json`, writes `qa/contact-sheet.png`, and optionally installs into `${GEIST_HOME:-$HOME}/.geist/pets/<id>/`.
 - `scripts/render_candidate_review_html.py`: renders `qa/<sprite-action>-review.html` from candidate packets with moving sprite previews, choose buttons, and copy-prompt buttons for human validation. It auto-builds `animated-preview.webp` from `contact-sheet.png` for known Geist animation states when an animated preview is missing.
 
