@@ -11,19 +11,20 @@ from typing import Any
 
 from PIL import Image
 
-CELL_WIDTH = 192
-CELL_HEIGHT = 208
-ROW_SPECS = [
-    ("idle", 0, 6),
-    ("running-right", 1, 8),
-    ("running-left", 2, 8),
-    ("waving", 3, 4),
-    ("jumping", 4, 5),
-    ("failed", 5, 8),
-    ("waiting", 6, 6),
-    ("running", 7, 6),
-    ("review", 8, 6),
-]
+from geist_grid import CELL_HEIGHT, CELL_WIDTH, FRAME_COUNTS, ROW_SPECS, FrameGrid
+from geist_pixels import (
+    ALPHA_THRESHOLD,
+    OPAQUE_THRESHOLD,
+    alpha_bbox,
+    boundary_mask,
+    clear_transparent_rgb,
+    transparent_rgb_residue,
+)
+
+# Chroma residue is a semi-transparent green or cyan halo at the matte boundary.
+# A designed Pet outline may be any colour, but it is solid, so opacity excludes it.
+FRINGE_MIN_PIXELS = 8
+FRINGE_MIN_RATIO = 0.03
 
 
 @dataclass
@@ -42,86 +43,59 @@ class Finding:
         }
 
 
-def png_files(path: Path) -> list[Path]:
-    return sorted(p for p in path.iterdir() if p.is_file() and p.suffix.lower() == ".png")
+def is_green_fringe(red: int, green: int, blue: int) -> bool:
+    """Green matte residue: bright green that dominates both other channels."""
+    return green >= 180 and red <= 90 and green > blue * 1.25
 
 
-def rel(path: Path, root: Path) -> str:
-    try:
-        return str(path.relative_to(root))
-    except ValueError:
-        return str(path)
+def is_cyan_fringe(red: int, green: int, blue: int) -> bool:
+    """Near-pure cyan matte residue.
+
+    Deliberately narrow. Geist Pets are frequently drawn with blue or teal
+    outlines, and the antialiased edge of such an outline reads as cyan-ish —
+    rgb(0,128,192) is a real measured example. Only near-pure cyan with green
+    and blue in balance is matte residue, so this stays opt-in per bundle.
+    """
+    return red <= 60 and green >= 200 and blue >= 200 and abs(green - blue) <= 40
 
 
-def alpha_bbox(rgba: Image.Image, alpha_threshold: int) -> tuple[int, int, int, int] | None:
-    alpha = rgba.getchannel("A")
-    mask = alpha.point(lambda value: 255 if value > alpha_threshold else 0)
-    return mask.getbbox()
+def fringe_counts(rgba: Image.Image, alpha_threshold: int, detect_cyan: bool = False) -> tuple[int, int]:
+    """Count chroma fringe among genuine boundary pixels.
 
+    Boundary means visible and touching a non-visible pixel. Counting every
+    semi-transparent pixel instead inflates the denominator and hides fringe.
+    """
+    boundary = boundary_mask(rgba, alpha_threshold).tobytes()
+    pixels = rgba.tobytes()
 
-def has_transparent_rgb_residue(rgba: Image.Image) -> int:
-    count = 0
-    data = rgba.tobytes()
-    for index in range(0, len(data), 4):
-        red = data[index]
-        green = data[index + 1]
-        blue = data[index + 2]
-        alpha = data[index + 3]
-        if alpha == 0 and (red or green or blue):
-            count += 1
-    return count
-
-
-def clear_transparent_rgb(rgba: Image.Image) -> Image.Image:
-    data = bytearray(rgba.tobytes())
-    for index in range(0, len(data), 4):
-        if data[index + 3] == 0:
-            data[index] = 0
-            data[index + 1] = 0
-            data[index + 2] = 0
-    return Image.frombytes("RGBA", rgba.size, bytes(data))
-
-
-def is_green_or_cyan_fringe(red: int, green: int, blue: int) -> bool:
-    green_fringe = green >= 180 and red <= 90 and green > blue * 1.25
-    cyan_fringe = False
-    return green_fringe or cyan_fringe
-
-
-def edge_fringe_count(rgba: Image.Image, alpha_threshold: int) -> tuple[int, int]:
-    width, height = rgba.size
-    pixels = rgba.load()
-    fringe = 0
     edge = 0
-    for y in range(height):
-        for x in range(width):
-            red, green, blue, alpha = pixels[x, y]
-            if alpha <= alpha_threshold:
-                continue
-            # Designed Pet outlines may be cyan/blue and fully opaque. Chroma residue
-            # is usually semi-transparent antialiasing at the matte boundary.
-            if alpha >= 245:
-                continue
-            boundary = True
-            if not boundary:
-                continue
-            edge += 1
-            if is_green_or_cyan_fringe(red, green, blue):
-                fringe += 1
+    fringe = 0
+    for index, on_boundary in enumerate(boundary):
+        if not on_boundary:
+            continue
+        base = index * 4
+        if pixels[base + 3] >= OPAQUE_THRESHOLD:
+            continue
+        edge += 1
+        red, green, blue = pixels[base], pixels[base + 1], pixels[base + 2]
+        if is_green_fringe(red, green, blue) or (detect_cyan and is_cyan_fringe(red, green, blue)):
+            fringe += 1
     return fringe, edge
 
 
 def validate_frame(
     frame_path: Path,
-    root: Path,
+    grid: FrameGrid,
     findings: list[Finding],
     *,
     safe_padding: int,
     alpha_threshold: int,
     fix_transparent_rgb: bool,
+    detect_cyan: bool,
 ) -> dict[str, Any]:
+    label = grid.rel(frame_path)
     frame_result: dict[str, Any] = {
-        "path": rel(frame_path, root),
+        "path": label,
         "ok": True,
         "bbox": None,
         "transparent_rgb_residue_pixels": 0,
@@ -133,14 +107,12 @@ def validate_frame(
             has_alpha = opened.mode in {"RGBA", "LA"} or "transparency" in opened.info
             rgba = opened.convert("RGBA")
     except Exception as exc:  # noqa: BLE001
-        findings.append(Finding("error", "unreadable_png", rel(frame_path, root), str(exc)))
+        findings.append(Finding("error", "unreadable_png", label, str(exc)))
         frame_result["ok"] = False
         return frame_result
 
     if not has_alpha:
-        findings.append(
-            Finding("error", "missing_alpha", rel(frame_path, root), "frame must be a PNG with alpha")
-        )
+        findings.append(Finding("error", "missing_alpha", label, "frame must be a PNG with alpha"))
         frame_result["ok"] = False
 
     if rgba.size != (CELL_WIDTH, CELL_HEIGHT):
@@ -148,7 +120,7 @@ def validate_frame(
             Finding(
                 "error",
                 "wrong_dimensions",
-                rel(frame_path, root),
+                label,
                 f"frame is {rgba.width}x{rgba.height}; expected {CELL_WIDTH}x{CELL_HEIGHT}",
             )
         )
@@ -157,7 +129,7 @@ def validate_frame(
     bbox = alpha_bbox(rgba, alpha_threshold)
     frame_result["bbox"] = list(bbox) if bbox else None
     if bbox is None:
-        findings.append(Finding("error", "empty_frame", rel(frame_path, root), "frame has no visible pixels"))
+        findings.append(Finding("error", "empty_frame", label, "frame has no visible pixels"))
         frame_result["ok"] = False
     else:
         left, top, right, bottom = bbox
@@ -171,39 +143,38 @@ def validate_frame(
                 Finding(
                     "error",
                     "unsafe_bounds",
-                    rel(frame_path, root),
+                    label,
                     f"visible pixels bbox {bbox} violates {safe_padding}px safe padding",
                 )
             )
             frame_result["ok"] = False
 
-    residue = has_transparent_rgb_residue(rgba)
+    residue = transparent_rgb_residue(rgba)
     frame_result["transparent_rgb_residue_pixels"] = residue
     if residue:
-        severity = "warning" if fix_transparent_rgb else "error"
         findings.append(
             Finding(
-                severity,
+                "warning" if fix_transparent_rgb else "error",
                 "transparent_rgb_residue",
-                rel(frame_path, root),
+                label,
                 f"{residue} fully transparent pixels retain nonzero RGB values",
             )
         )
-        if not fix_transparent_rgb:
-            frame_result["ok"] = False
-        else:
+        if fix_transparent_rgb:
             clear_transparent_rgb(rgba).save(frame_path)
+        else:
+            frame_result["ok"] = False
 
-    fringe, edge = edge_fringe_count(rgba, alpha_threshold)
+    fringe, edge = fringe_counts(rgba, alpha_threshold, detect_cyan)
     frame_result["edge_fringe_pixels"] = fringe
     frame_result["edge_pixels"] = edge
-    if fringe >= 8 and edge and fringe / edge >= 0.03:
+    if fringe >= FRINGE_MIN_PIXELS and edge and fringe / edge >= FRINGE_MIN_RATIO:
         findings.append(
             Finding(
                 "error",
                 "green_cyan_fringe",
-                rel(frame_path, root),
-                f"{fringe}/{edge} boundary pixels look like green/cyan fringe",
+                label,
+                f"{fringe}/{edge} boundary pixels look like chroma fringe",
             )
         )
         frame_result["ok"] = False
@@ -215,11 +186,12 @@ def validate_bundle(
     bundle: Path,
     *,
     safe_padding: int,
-    alpha_threshold: int,
-    fix_transparent_rgb: bool,
+    alpha_threshold: int = ALPHA_THRESHOLD,
+    fix_transparent_rgb: bool = False,
+    detect_cyan: bool = False,
 ) -> dict[str, Any]:
     findings: list[Finding] = []
-    frames_root = bundle / "frames"
+    grid = FrameGrid(bundle)
     frame_results: dict[str, list[dict[str, Any]]] = {}
 
     if not (bundle / "pet.json").is_file():
@@ -237,35 +209,35 @@ def validate_bundle(
                 "frame generation and repair should use a canonical base image",
             )
         )
-    if not frames_root.is_dir():
+    if not grid.frames_root.is_dir():
         findings.append(Finding("error", "missing_frames_root", "frames", "source bundle needs frames/"))
     else:
         for state, _row, frame_count in ROW_SPECS:
-            state_dir = frames_root / state
-            state_key = rel(state_dir, bundle)
-            if not state_dir.is_dir():
+            state_key = grid.rel(grid.state_dir(state))
+            if not grid.state_dir(state).is_dir():
                 findings.append(Finding("error", "missing_state_dir", state_key, f"missing {state} frames"))
                 continue
-            files = png_files(state_dir)
-            if len(files) != frame_count:
+            present = grid.all_frame_paths(state)
+            if len(present) != frame_count:
                 findings.append(
                     Finding(
                         "error",
                         "wrong_frame_count",
                         state_key,
-                        f"{state} needs exactly {frame_count} PNG frames; found {len(files)}",
+                        f"{state} needs exactly {frame_count} PNG frames; found {len(present)}",
                     )
                 )
             frame_results[state] = [
                 validate_frame(
                     frame,
-                    bundle,
+                    grid,
                     findings,
                     safe_padding=safe_padding,
                     alpha_threshold=alpha_threshold,
                     fix_transparent_rgb=fix_transparent_rgb,
+                    detect_cyan=detect_cyan,
                 )
-                for frame in files[:frame_count]
+                for frame in grid.frame_paths(state)
             ]
 
     errors = [finding.as_dict() for finding in findings if finding.severity == "error"]
@@ -292,11 +264,16 @@ def main() -> None:
     parser.add_argument("bundle", help="Path to PetName.pet source bundle")
     parser.add_argument("--json-out", help="Write validation JSON to this path")
     parser.add_argument("--safe-padding", type=int, default=4)
-    parser.add_argument("--alpha-threshold", type=int, default=8)
+    parser.add_argument("--alpha-threshold", type=int, default=ALPHA_THRESHOLD)
     parser.add_argument(
         "--fix-transparent-rgb",
         action="store_true",
         help="Zero RGB channels for fully transparent pixels in-place",
+    )
+    parser.add_argument(
+        "--detect-cyan-fringe",
+        action="store_true",
+        help="Also flag near-pure cyan matte residue; off by default because Pet outlines are often blue or teal",
     )
     args = parser.parse_args()
 
@@ -306,6 +283,7 @@ def main() -> None:
         safe_padding=args.safe_padding,
         alpha_threshold=args.alpha_threshold,
         fix_transparent_rgb=args.fix_transparent_rgb,
+        detect_cyan=args.detect_cyan_fringe,
     )
     output = json.dumps(result, indent=2)
     if args.json_out:
@@ -318,3 +296,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# Frame counts stay importable for callers that only need the contract.
+__all__ = ["FRAME_COUNTS", "ROW_SPECS", "CELL_WIDTH", "CELL_HEIGHT", "validate_bundle"]

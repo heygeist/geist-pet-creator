@@ -9,9 +9,12 @@ Capture:
 - Pet name and one-sentence description
 - Personality and state behavior
 - Visual references
+- Source, when the Pet is derived from something already recognizable — a character, cast, mascot, brand figure, or known object — plus the cues the human expects to survive
 - Required features that must never drift
 - Forbidden changes
 - Target style and readability constraints
+
+A derived Pet changes what happens next: read [identity-blend.md](identity-blend.md) before writing the character bible, and again before the first generation call.
 
 ## Character Bible
 
@@ -23,12 +26,55 @@ Write `character-bible.md` before generating frames. Include:
 - Props and accessories: side, shape, colors, attachment points
 - Motion personality: how this Pet idles, asks, works, fails, and reviews
 - Avoidances: marks, effects, styles, objects, or expressions that would break identity
+- **Identity Blend** (derived Pets only): the source, its ranked cues, how each was translated, and which were dropped
+- **Part Manifest**: every part, how many times it may appear, its side, and its attachment point
+
+### Writing the Part Manifest
+
+The Part Manifest is what turns "the hand looks wrong" into "the hand appears twice". Read the table format in [contract.md](contract.md) § Part Manifest Contract, then fill it from the approved canonical base.
+
+Two judgements decide each row:
+
+- **The low bound is about poses that hide the part.** A wing behind a side-on body is correct art, so a wing that can hide gets `1-2`, not `2`. Set the low bound by asking which states legitimately conceal the part.
+- **The high bound is about drift.** Image generation duplicates limbs, and the high bound is what catches it. Keep the high bound at the true count and mark `Never duplicated` on any part that must never exceed it.
+
+Set the manifest before generating frames. A manifest written afterwards tends to describe the frames that exist rather than the Pet that was intended.
+
+### Writing the Identity Blend
+
+A derived Pet carries a second table, `## Identity Blend`, above the Part Manifest. Read [identity-blend.md](identity-blend.md) for the table shape and the cue budget, then fill it before the canonical base exists.
+
+Three judgements decide the table:
+
+- **Rank decides what gets protected.** The crown cue — hair or headwear silhouette — is what a viewer reads first at `192x208`, so it is rank 1 in almost every Pet. A cue ranked below the prop is a cue you will lose during animation, and losing it should be a decision rather than a surprise.
+- **Translation is where the house form wins.** Write the Geist form of the cue, not the source's form of it. "Three broad rounded toy sword shapes attached behind the body" is a translation; "three katana" is a request for the source's art.
+- **Dropped cues need their reason recorded.** A cue dropped for the house form, for the sprite scale, or for competing with the Mango heart will come back during repair unless the rejection is written down.
+
+Countable cues get Part Manifest rows too, with the count that makes drift visible: `sword shape | 3 | back | body | Never duplicated`.
 
 ## Canonical Base
 
 Create `sources/canonical-base.png` as a full-body alpha or clean-background reference. It is not enough for the base to look nice; it must be simple enough to preserve across all animation states at `192x208`.
 
 Generate multiple base variants as candidate packets first, using image generation for new visible art. The agent must pre-screen each candidate, show the passing options with their exact prompts, and ask the human to choose one candidate id before copying it to `sources/canonical-base.png`.
+
+For a derived Pet, attach two images to every base call and name both roles in the prompt: Image 1 the identity reference, Image 2 the house-style reference. The skill ships the house-style image at `$SKILL_DIR/assets/geist-house-style.jpg`; copy it into the bundle as `sources/references/geist-house-style.jpg` so the packet stays reproducible. Keep those roles in that order for the whole bundle, and state in the prompt which one wins on conflict. Pre-screen the result with the naming, silhouette, and heart tests from [identity-blend.md](identity-blend.md) before it reaches the human.
+
+The shipped galleries under `assets/` show the cue budget spent three different ways, plus one counter-example. Read [../assets/README.md](../assets/README.md) before writing identity locks for a source you have not drawn before, and attach the closest gallery as a quality target when its shape matches the job.
+
+### Concept Gallery Route
+
+When the human names a cast, crew, roster, or franchise rather than one Pet, choose the Pet from a gallery first:
+
+1. Create a concept bundle, `<Thing>Concepts.pet`.
+2. Generate one gallery image rather than one image per character: an invisible grid on warm off-white paper, one complete centered mascot per cell, equal scale and baseline, no dividers, no text beyond optional cell labels. Six go 3x2, ten go 5x2, twelve go 4x3.
+3. Write one numbered identity-lock paragraph per cell, as physical description, in the exact row-major order the grid is read in.
+4. Pre-screen cell by cell — the sheet passes only if every cell passes — then render `qa/canonical-base-review.html` and ask the human to choose.
+5. Crop each chosen cell into its own `<Name>.pet` bundle as `sources/references/selected-<cue>.png`.
+
+A gallery cell is a concept, not a canonical base. Each chosen cell re-enters the `canonical-base` gate as its own sprite-scale candidate, with the crop as Image 1, before anything is written to `sources/canonical-base.png`.
+
+When a gallery reads generic, run a V2 round that keeps the same row-major families and layout and strengthens the identity locks themselves. Adding an accessory to a cell that failed the naming test rarely fixes it; a stronger crown cue usually does.
 
 ## Sprite Action Variant Review
 
@@ -175,7 +221,9 @@ Only approved candidates may be normalized into `frames/` or promoted as `source
 
 Generate high resolution first when useful, but only normalized `192x208` alpha PNGs go into `frames/`.
 
-Use `$imagegen` / the built-in image generation capability for visual generation. Attach the canonical base and any relevant references to every frame or state batch. Each generation returns a candidate packet, not a finished source frame. Prompts should be concise and state-specific:
+Two modes draw the art. **Built-in Image Generation** is the default: use `$imagegen` / the built-in capability directly. **External Image Provider** takes over when the bundle holds `imagegen.json`, and `scripts/generate_candidates.py` makes the calls and writes the packet. Read [image-providers.md](image-providers.md) before using that mode. Both modes feed the same approval gates.
+
+Attach the canonical base and any relevant references to every frame or state batch. For a derived Pet, keep the house-style reference attached as well, and restate the two or three highest-ranked identity cues in the prompt by their physical description — those are the cues an animation state is most likely to lose. Each generation returns a candidate packet, not a finished source frame. Prompts should be concise and state-specific:
 
 ```text
 Create variant A for the Geist Pet "Rainy Geist" in the `waiting` sprite action.

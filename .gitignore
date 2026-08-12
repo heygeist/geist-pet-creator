@@ -5,3 +5,9 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 
+
+# Provider eval output: generated, large (24MB), and reproducible with
+# scripts/eval_providers.py. The measured results that matter are written into
+# references/image-providers.md instead.
+provider-eval*/
+provider-eval*.log

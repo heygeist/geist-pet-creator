@@ -1,6 +1,6 @@
 ---
 name: geist-pet-creator
-description: Create, validate, repair, and export consistent Geist-compatible Pet source bundles from approved alpha PNG frames. Use when Codex needs to make or fix a Geist Pet, Pet source bundle, character bible, generated Pet candidates, sprite-frame QA, alpha PNG cleanup, human-in-the-loop art approval, Geist pet.json metadata, spritesheet.webp export, or local Geist Pet installation.
+description: Create, validate, repair, audit, and export consistent Geist-compatible Pet source bundles from approved alpha PNG frames. Use when Codex needs to make or fix a Geist Pet, Pet source bundle, character bible, Part Manifest, generated Pet candidates, sprite-frame QA, anatomy drift in a spritesheet, alpha PNG cleanup, human-in-the-loop art approval, an external image generator for Pet art, Geist pet.json metadata, spritesheet.webp export, or local Geist Pet installation. Also use when a Pet is derived from an existing character, cast, mascot, or franchise and its identity must be blended into the Geist house style, or when building a multi-character concept gallery to choose a Pet from.
 ---
 
 # Geist Pet Creator
@@ -21,12 +21,20 @@ SKILL_DIR=/absolute/path/to/geist-pet-creator
 - **Repair**: fix the smallest failing unit in an existing bundle, usually one frame or one state.
 - **Export/install**: validate an existing source bundle, export Geist assets, and install only when requested.
 
+## Image Generation Modes
+
+**Built-in Image Generation** is the default: draw with `$imagegen` / the built-in capability. **External Image Provider** takes over when the bundle holds `imagegen.json`, and `scripts/generate_candidates.py` makes the OpenRouter calls. A human may name a different model for a single run.
+
+The mode changes what draws the pixels. Approval gates, candidate packets, and subagent authority stay identical. When the built-in capability is unavailable, say so and stop rather than switching modes, because a silent switch makes the provenance in every candidate packet false.
+
+Read [references/image-providers.md](references/image-providers.md) before configuring or using the External Image Provider.
+
 For generated or visibly changed art, stop at candidate packets until the human approves a specific option. A broad response such as "go", "continue", or "looks good" only authorizes the next generation step; it is not approval to promote generated art, normalize frames, export, or install unless the human explicitly approves the named candidate or variant. For deterministic cleanup that preserves visible art, such as clearing transparent RGB residue on already-approved frames, approval is not required.
 
 ## Core Workflow
 
-1. Capture a Pet brief: name, personality, visual references, required props, forbidden changes, and target style.
-2. Read `references/contract.md`, then write `pet.json` and `character-bible.md` before generating animation frames.
+1. Capture a Pet brief: name, personality, visual references, required props, forbidden changes, and target style. When the Pet is derived from something already recognizable, capture the source and read [references/identity-blend.md](references/identity-blend.md) before anything else.
+2. Read `references/contract.md`, then write `pet.json` and `character-bible.md` before generating animation frames. `character-bible.md` must include a `## Part Manifest` table, because it is what every frame gets counted against later. A derived Pet also needs an `## Identity Blend` table, because it is what decides which source cues survive the house form.
 3. Generate or choose multiple canonical-base candidates as candidate packets under `sources/candidates/` using image generation for any new visible art. Pre-screen each packet, then render an HTML review page with prompts and choice controls before asking the human to choose one for `sources/canonical-base.png`.
 4. For every sprite action/state, generate multiple candidate variants with image generation before producing source frames. Exception: generate and approve `running-right` first, then create `running-left` as a deterministic horizontal flip of the approved `running-right` frames unless the human explicitly requests independent left-facing art. Pre-screen every variant, render an HTML review page with prompts and choice controls, and ask the human to choose which variant to use for that action.
 5. Normalize only the human-selected variant for each sprite action into `frames/<state>/<index>.png`.
@@ -38,12 +46,35 @@ python "$SKILL_DIR/scripts/validate_source_bundle.py" /absolute/path/PetName.pet
 ```
 
 7. Repair the smallest failing unit. Do not regenerate the whole Pet unless the canonical base or character bible is wrong.
-8. Export only after validation passes and, when available, the human has approved the final contact sheet:
+8. Audit every frame for anatomy drift, and let deterministic repairs run:
+
+```bash
+python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --repair
+```
+
+Work `repairs.generative_repair_queue` from `qa/final-audit.json`: regenerate each queued frame as a candidate packet, get it approved, promote it, then audit again. Repeat until the queue is empty or the frames reach their 2-pass limit. Report the frames that reached the limit as a character-bible or prompt problem rather than promoting a third attempt.
+
+9. Look at all 57 artwork cells on `qa/final-audit.html`, against the Part Manifest. Write a verdict for every cell into `qa/final-audit.json`, then prove none was skipped:
+
+```bash
+python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --verify-verdicts
+```
+
+10. Ask the human to approve the audit by its digest, and record that approval in `qa/approvals.json` with `approved_action: "final-audit"`.
+11. Export. It refuses without an approved audit for these exact frames:
 
 ```bash
 python "$SKILL_DIR/scripts/export_geist_pet.py" /absolute/path/PetName.pet \
   --output-dir /absolute/path/PetName.pet/final
 ```
+
+12. Audit the written spritesheet before the Pet reaches anyone, because the WebP re-encode can damage alpha:
+
+```bash
+python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --mode post-export
+```
+
+A clean post-export run needs no attention. Report a mismatch and re-export instead of delivering.
 
 Use `--install` only when the user wants the exported Pet installed into the local Geist catalog.
 
@@ -57,6 +88,7 @@ PetName.pet/
     canonical-base.png
     candidates/
     references/
+      geist-house-style.png    # required for a derived Pet
     raw/
   frames/
     idle/00.png ...
@@ -92,7 +124,9 @@ Required state frame counts:
 ## Human Approval Gates
 
 - Do not promote generated art into `sources/canonical-base.png` or `frames/` until a human approves it.
-- Treat the canonical base and every animation state as separate sprite actions that each need their own human validation. Required action approvals are: `canonical-base`, `idle`, `running-right`, `running-left`, `waving`, `jumping`, `failed`, `waiting`, `running`, and `review`.
+- Treat the canonical base and every animation state as separate sprite actions that each need their own human validation. Required action approvals are: `canonical-base`, `idle`, `running-right`, `running-left`, `waving`, `jumping`, `failed`, `waiting`, `running`, `review`, and `final-audit`.
+- `final-audit` is the last gate before export. It approves one exact set of pixels by `atlas_digest`, so changing any frame reopens it.
+- A concept gallery satisfies the `canonical-base` gate's variant requirement: its cells are the options, and the human chooses a cell id. It is still screened as one candidate, so it passes only if every cell passes. The chosen cell then returns through the same gate as a sprite-scale candidate before it becomes `sources/canonical-base.png`.
 - For each sprite action, provide at least 3 distinct candidate variants unless the human asks for a different count. Exception: `running-left` should normally be a single deterministic mirror candidate made from the approved `running-right` row, with its own review page and approval. Each variant must include the generated image or contact sheet, the exact prompt or deterministic operation used to create it, and a compact pre-screen summary.
 - For each approval gate, create an HTML review page at `qa/<sprite-action>-review.html` using `scripts/render_candidate_review_html.py`. For animation states, the page must render each candidate as a moving sprite preview, not only as a static contact sheet. The page must also show all passing candidates, exact prompts, pre-screen summaries, a **Choose** button, and a **Copy Prompt** button for each candidate.
 - Ask the human to choose one variant by candidate id before promoting that action. Do not infer approval from "go" or from approval of a different action.
@@ -110,11 +144,33 @@ Subagents may write candidate packets only. They must not promote frames, edit `
 
 Each subagent packet must include `contact-sheet.png`, `animated-preview.webp` when applicable, `prompt.md`, `inputs.json` when deterministic processing is used, `candidate-context.json`, and compact pre-screen notes. The main agent then gathers all packets, renders one combined review dashboard with animated previews, full-sheet scale/footprint comparisons, exact candidate IDs, and an approval checklist. Promote only the exact candidate IDs approved by the human after that combined review.
 
+## Character Identity Blend
+
+A **derived Pet** is built from something already recognizable: a character, a cast, a mascot, a brand figure, a known object or animal. It is neither a small copy of that source nor a plain Geist wearing a hat. It is a blend, and it carries two locks instead of one: the **house form** every Pet shares, and the 4-6 **identity cues** that make this source nameable.
+
+Resolve conflicts in this order, always:
+
+1. **House form invariants never yield** — one compact rounded legless floating body, a single thick Sky outline (`#2FB8EC`), Cream body area (`#FFF4E2`), two Ink dot eyes (`#20201C`), one tiny mouth, exactly one centered Mango heart (`#FF7A33`), tiny attached arm nubs, flat fills, props thick and rounded and attached, no floor or shadow, readable at `192x208`.
+2. **Identity cues yield only to the house form**, and outrank every style detail.
+3. **Style detail yields freely.**
+
+If a style simplification would erase a recognizable feature, keep the feature and simplify how it is drawn. If a recognizable feature would break a house-form invariant, keep the invariant and translate the feature.
+
+Rank the cues, strongest first: the crown cue (hair or headwear silhouette) does most of the naming, then one or two flat color blocks, then **exactly one** attached prop, then at most two face landmarks, then expression. Countable cues become Part Manifest rows so the anatomy audit can count them. Record all of it, including the cues you dropped and why, in the `## Identity Blend` table in `character-bible.md`.
+
+Attach two images to every derived generation call and name both in the prompt: Image 1 the identity reference, Image 2 the house-style reference at `$SKILL_DIR/assets/geist-house-style.jpg`. Copy that file into the bundle as `sources/references/geist-house-style.jpg` so the bundle stays reproducible. Write identity locks as physical description, never as the character's name — a name pulls the source's whole art style in with it.
+
+Every derived Pet fails in one of two directions, and the fixes are opposites. **Franchise copy** means the source style won: re-prompt from the house form outward. **Generic blob** means the house form won: strengthen the crown cue and the silhouette, and do not add props. Run the naming, silhouette, and heart tests from [references/identity-blend.md](references/identity-blend.md) before any derived candidate reaches a human.
+
+Three shipped galleries show the cue budget spent well and one shows it spent badly. Read [assets/README.md](assets/README.md) before writing identity locks for a new source.
+
+When the human names a cast, crew, or roster rather than one Pet, take the concept-gallery route: one gallery image with one mascot per cell on an invisible grid, one numbered identity-lock paragraph per cell in row-major order, human choice, then each chosen cell re-enters the normal `canonical-base` gate as its own sprite-scale candidate. A gallery cell is a concept, never a canonical base.
+
 ## Generation Rules
 
-- Treat `character-bible.md` and `sources/canonical-base.png` as the identity lock for every frame.
-- Use the built-in image generation capability (`$imagegen` / `image_gen`) for canonical-base candidates and sprite-action candidate art by default. The candidate's visible pose, expression, motion read, and frame artwork should come from generated imagery, not from scripted transforms alone.
-- Every `$imagegen` call must produce a candidate packet: generated file path, exact prompt, input images, target state/frame/action, identity invariants, pre-screen result, and human-facing approval summary.
+- Treat `character-bible.md` and `sources/canonical-base.png` as the identity lock for every frame. For a derived Pet, the `## Identity Blend` table is part of that lock and travels into every prompt alongside the Part Manifest.
+- Draw canonical-base candidates and sprite-action candidate art with the active image generation mode. The candidate's visible pose, expression, motion read, and frame artwork should come from generated imagery, not from scripted transforms alone.
+- Every generation call must produce a candidate packet: generated file path, exact prompt, input images, target state/frame/action, identity invariants, generation provenance, pre-screen result, and human-facing approval summary.
 - For each sprite action, vary candidates intentionally: for example subtle, energetic, and expressive motion reads. Keep all variants inside the character bible; do not create variants by changing identity, palette, props, or style.
 - Do not offer affine transforms, CSS/canvas motion, or code-distorted copies of the canonical base as final sprite-action candidates unless the human explicitly asks for deterministic prototyping. If used, label them as prototypes or archive them outside the active review set.
 - Use code for processing generated art: slicing contact sheets, removing chroma-key backgrounds, alpha cleanup, resizing to `192x208`, validating frames, exporting atlases, and rendering HTML review pages.
@@ -122,6 +178,7 @@ Each subagent packet must include `contact-sheet.png`, `animated-preview.webp` w
 - Directional movement states are not literal leg-running. `running-right` must read as moving/gliding right. `running-left` must normally be the same sprite cycle as `running-right` with each approved frame horizontally flipped, not independently regenerated. Use lateral movement, drift, glide, lean, translation, soft squash/stretch, or trailing side/body shapes. Do not prompt for or accept legs, feet, foot-step poses, walking, jogging, sprinting, shoes, knees, or running mechanics.
 - `running` means active task work, not foot-running.
 - Avoid detached effects, shadows, glows, motion trails, guide marks, white backgrounds, and chroma-key residue.
+- For derived Pets, never carry these across from the source: legs, feet, shoes, realistic hands or faces, real weapons and blades, franchise titles, official logos, exact emblems, kanji, readable letters or numbers, aura and energy effects, speed lines, scenery, or the source's own outline color and rendering style.
 - Use true alpha PNGs. Chroma-key extraction is a fallback, and desaturated edge cleanup must happen before a frame enters `frames/`.
 
 ## Validation And Repair
@@ -137,6 +194,16 @@ python "$SKILL_DIR/scripts/validate_source_bundle.py" /absolute/path/PetName.pet
 
 - For identity, layout, alpha-edge, or state-semantics failures, read `references/qa-rubric.md`, repair the single frame/state as a candidate packet, pre-screen it, and ask for approval before replacing the source frame.
 - After every repair, rerun validation. After export, inspect `qa/contact-sheet.png` for motion, row order, empty unused cells, and identity consistency.
+
+### Anatomy QA
+
+Anatomy drift is a frame disagreeing with the Part Manifest: a part missing, a part duplicated, or a part crossing the cell line. Every geometry check passes on a frame whose wing has vanished, so anatomy is settled by looking at all 57 artwork cells against the manifest. Read [references/qa-rubric.md](references/qa-rubric.md) § Anatomy QA for how to read the evidence.
+
+Suspicion scores rank which frames to look at first. A frame scoring zero has been found unremarkable by six measurements, which is not the same as correct — and the anchor frame scores zero by construction.
+
+Repair splits by whether the pixels already exist. Deterministic repair moves or clears existing pixels and writes in place after backing up to `sources/raw/repair-backups/`. Generative repair creates pixels, so it produces a candidate packet and waits for human approval like any other generated art. A frame gets at most 2 passes; after that, fix the character bible or the prompt.
+
+Keep the flagged-frame count in your report even when repairs succeed, so a weak identity lock stays visible.
 
 ### Scale And Footprint QA
 
@@ -159,11 +226,31 @@ Share the HTML file path with the human. The page must render sprite-action cand
 ## References
 
 - Read [references/contract.md](references/contract.md) before creating, validating, exporting, or installing a bundle.
+- Read [references/identity-blend.md](references/identity-blend.md) before creating any Pet derived from an existing character, cast, mascot, or franchise, and before building a concept gallery.
 - Read [references/generation-workflow.md](references/generation-workflow.md) before writing a character bible, generating new art, or building candidate packets.
 - Read [references/qa-rubric.md](references/qa-rubric.md) before accepting, repairing, or visually reviewing frames.
+- Read [references/image-providers.md](references/image-providers.md) before configuring or using the External Image Provider.
+
+## Assets
+
+Reference images, attached to generation calls and read when judging a derived candidate. [assets/README.md](assets/README.md) reads each one cell by cell.
+
+- `assets/geist-house-style.jpg`: the house form lock — twelve original Geist Pets, no source character among them. Attach as Image 2 on every derived generation call, and copy into the bundle as `sources/references/geist-house-style.jpg`.
+- `assets/identity-cues-ranked.jpg`: how far a crown cue alone carries a read, and what a weak one costs.
+- `assets/identity-cues-crew.jpg`: the one-prop budget, countable cues, and species tabs for sources that are not human-shaped.
+- `assets/identity-cues-labeled.jpg`: the labeled-gallery convention, and how sparse a cue set can be and still name its source.
+- `assets/identity-cues-franchise-copy.jpg`: a counter-example showing the franchise-copy failure mode. Never attach it as a style target.
 
 ## Scripts
 
-- `scripts/validate_source_bundle.py`: checks frame counts, dimensions, alpha, empty frames, safe padding, transparent RGB residue, and green/cyan edge fringe. Use `--fix-transparent-rgb` only for invisible RGB cleanup.
-- `scripts/export_geist_pet.py`: validates, composes `1536x1872` Geist atlas output, writes exported `pet.json`, writes `qa/contact-sheet.png`, and optionally installs into `${GEIST_HOME:-$HOME}/.geist/pets/<id>/`.
+- `scripts/validate_source_bundle.py`: checks frame counts, dimensions, alpha, empty frames, safe padding, transparent RGB residue, and chroma fringe on true boundary pixels. Use `--fix-transparent-rgb` only for invisible RGB cleanup. Cyan fringe detection is opt-in via `--detect-cyan-fringe`, because Pet outlines are often blue or teal and their antialiased edges read as cyan.
+- `scripts/audit_spritesheet.py`: audits all 57 artwork cells for anatomy drift, asserts the 15 unused cells are transparent, ranks frames by suspicion, and renders `qa/final-audit.html`. `--repair` applies deterministic repairs and queues the rest; `--mode post-export` audits the written spritesheet; `--verify-verdicts` fails while any cell lacks an agent verdict.
+- `scripts/generate_candidates.py`: draws sprite frames through the External Image Provider, one frame per call, with the canonical base and previous frame as references. Enforces `--max-images` and `--max-cost-usd`.
+- `scripts/export_geist_pet.py`: validates, requires an approved final audit for these exact frames, composes `1536x1872` Geist atlas output, writes exported `pet.json`, writes `qa/contact-sheet.png`, and optionally installs into `${GEIST_HOME:-$HOME}/.geist/pets/<id>/`.
 - `scripts/render_candidate_review_html.py`: renders `qa/<sprite-action>-review.html` from candidate packets with moving sprite previews, choose buttons, and copy-prompt buttons for human validation. It auto-builds `animated-preview.webp` from `contact-sheet.png` for known Geist animation states when an animated preview is missing.
+
+Three modules sit behind those scripts and are imported, not run:
+
+- `scripts/geist_grid.py`: the atlas contract, and `FrameGrid`, which answers which file is frame N of a sprite action. Every finding names a path this module produced, so a finding always names a file that exists.
+- `scripts/geist_pixels.py`: alpha primitives and the alpha threshold.
+- `scripts/geist_manifest.py`: reads the Part Manifest and renders it into prompts, so generation and audit describe the same Pet.

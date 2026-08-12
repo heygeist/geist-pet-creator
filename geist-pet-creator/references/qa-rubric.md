@@ -14,13 +14,34 @@ Reject frames where any of these drift:
 
 The same Pet should be recognizable if frames are shuffled out of order.
 
+### Derived Pets
+
+A derived Pet is judged against both of its locks. Read [identity-blend.md](identity-blend.md) for the house form and the cue budget; this is how the result gets checked.
+
+Reject a candidate that fails either direction:
+
+- **Franchise copy** — the source's own outline color instead of Sky, original body proportions kept whole, a full figure with legs, the face drawn in the source's rendering style, or a Mango heart that is missing, tacked on, or floating outside the silhouette.
+- **Generic blob** — the source cannot be named from a `192x208` thumbnail, the cues collapsed into one hat and one color, several gallery cells are interchangeable, or identity survives only at full resolution.
+
+Three tests settle it, and all three run before the human sees the candidate:
+
+- **Naming test** — at `192x208`, someone who knows the source names it in about two seconds.
+- **Silhouette test** — filled solid black, the crown cue and prop shape still say who it is.
+- **Heart test** — with the Mango heart and Sky outline removed, what remains must not look like official art from the source.
+
+Also reject a derived candidate when a cue listed in the `## Identity Blend` table is absent without the pose hiding it, when a cue recorded as dropped has returned, when a second prop has appeared, or when a source name rather than a physical description was used in the prompt.
+
 ## Candidate Pre-Screen QA
 
 Before asking the human to review a generated candidate, the agent must check:
 
 - Generation source: new visible canonical-base or sprite-action art came from image generation, not code-only transforms, unless the human explicitly requested deterministic prototypes.
+- Anatomy: every part in the Part Manifest appears within its count range, on the stated side.
 - Target clarity: the candidate matches the requested base, state, frame, or repair target.
 - Identity: required traits from `character-bible.md` are visible and stable.
+- House form (derived Pets): every house-form invariant holds — legless rounded body, single Sky exterior outline, Cream body area, dot eyes, tiny mouth, exactly one centered Mango heart inside the silhouette, flat fills, attached props, no floor or shadow.
+- Identity read (derived Pets): the ranked cues in the `## Identity Blend` table are present, and the candidate passes the naming, silhouette, and heart tests.
+- Blend balance (derived Pets): the candidate is neither a franchise copy nor a generic blob.
 - Layout: whole Pet is inside the frame with safe padding and no copied guide marks.
 - Alpha or extraction readiness: background can be made transparent cleanly; no obvious fringe or residue.
 - State semantics: pose reads as the requested Geist state.
@@ -41,6 +62,46 @@ Reject the review packet before showing it to the human if:
 - The HTML review page is missing for a generated-art approval gate, unless the human explicitly requested plain-text review.
 - The review page does not render an animation-state candidate as a moving sprite preview.
 - The active candidates are only scripted transforms of approved art and the human expected image-generated sprite art.
+- A derived Pet has no `## Identity Blend` table in `character-bible.md`, or the packet's `inputs.json` does not carry both the identity reference and the house-style reference.
+- A concept gallery is shown with any cell unscreened. A gallery is one candidate; it passes only if every cell passes.
+
+## Anatomy QA
+
+Anatomy drift is a frame disagreeing with the Part Manifest. It comes in three shapes:
+
+- **Missing part** — a part the manifest requires is absent, and the pose does not hide it.
+- **Duplicated part** — a part appears more times than its high bound. A hand, wing, or arm drawn twice is the common case.
+- **Cell bleed** — visible pixels reach a cell edge, so part of the Pet crosses into the next cell.
+
+Geometry checks stay silent on the first two. A frame with a missing wing has the correct size, one component, correct padding, and clean alpha. So anatomy is judged by looking at every frame, against the Part Manifest in `character-bible.md`.
+
+Audit every one of the 57 artwork cells. Record a verdict for each in `qa/final-audit.json`, then confirm none is missing:
+
+```bash
+python "$SKILL_DIR/scripts/audit_spritesheet.py" /absolute/path/PetName.pet --verify-verdicts
+```
+
+### Reading the audit evidence
+
+`audit_spritesheet.py` measures each frame against its state's anchor frame and ranks the state by suspicion. Suspicion points attention. A frame scoring zero has only been found unremarkable by six measurements, which is a different thing from correct.
+
+Two limits are worth holding in mind while reading a report:
+
+- The anchor frame is compared against itself, so its score is structurally zero and says nothing about its artwork. The anchor is as likely to be the wrong frame as any other.
+- A defect shared by every frame of a state moves no relative signal at all. Only the Part Manifest catches that one.
+
+Hovering a frame on `qa/final-audit.html` shows what it gained (red) and lost (blue) against its anchor. A part that vanished between frames shows up as a solid blue mass; a part that appeared shows up as a solid red one.
+
+### Repairing anatomy drift
+
+Repair runs automatically and splits by whether the pixels already exist:
+
+- **Deterministic repair** moves or clears existing pixels: transparent RGB residue, detached fragments under 2% of the body, and a body shifted back inside safe padding. It writes in place after copying the original to `sources/raw/repair-backups/`.
+- **Generative repair** creates pixels, because a missing wing cannot be recovered from a file that lacks it. It produces a candidate packet and waits for the human to approve it, exactly like any other generated art.
+
+A frame gets at most 2 repair passes. A frame that fails twice has a prompt problem or a Part Manifest problem, so fix the character bible or the prompt rather than the frame.
+
+Keep the flagged-frame count visible even after repairs succeed. A Pet flagging 15 of 57 frames is telling you the identity lock is weak, and repairing 15 frames hides that.
 
 ## Layout QA
 
