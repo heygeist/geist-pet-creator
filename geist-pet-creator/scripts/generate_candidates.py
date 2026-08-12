@@ -1,10 +1,23 @@
 #!/usr/bin/env python3
-"""Generate Pet sprite frames through the External Image Provider (OpenRouter).
+"""Draw Pet art through the External Image Provider (OpenRouter), at every phase.
 
-One frame, one call. Contact sheets have to be sliced, and slicing is the only
-way a part of the Pet lands in the next cell, so this script never makes one.
-Every call carries the canonical base and the previous frame as references, so
-the identity lock travels with the request.
+`--action` picks the phase, and the phases do not work alike:
+
+  concept-sheet   one call, many concepts on a grid, no canonical base yet
+  canonical-base  the identity lock itself, at sprite scale
+  <state>         source frames, one call each
+
+One frame, one call. A frame strip has to be sliced, and slicing is the only way
+a part of the Pet lands in the next cell, so no frame is ever drawn as a strip.
+Every frame call carries the canonical base and the previous frame as references,
+so the identity lock travels with the request.
+
+A concept sheet is deliberately the exception. It is a grid and it does get cut
+up, but a cell never becomes a frame -- it becomes Image 1 of a canonical-base
+call, with the canonical-base gate in front of it. A clipped crop shows up as a
+poor reference; the same slip in a frame strip would reach the spritesheet. The
+grid is also the whole point: cells drawn in one call share scale, weight and
+lighting, and cells drawn separately do not.
 
 One transform, one run. Scale is decided once and applied unchanged to every
 frame, so a pose never decides how big the Pet is.
@@ -33,6 +46,14 @@ from typing import Any
 from PIL import Image
 
 from geist_grid import CELL_HEIGHT, CELL_WIDTH, FRAME_COUNTS
+from geist_house import (
+    HOUSE_FORM,
+    MIN_PASSING_CELLS,
+    NEVER_TRANSFERS,
+    cell_id,
+    house_style_path,
+    layout_for,
+)
 from geist_manifest import read_manifest
 from geist_pixels import alpha_bbox, clear_transparent_rgb, data_uri
 
@@ -141,6 +162,23 @@ CHROMA_KEY = (0, 255, 0)
 KEY_TOLERANCE = 72
 
 SECRET_PATTERN = re.compile(r"(sk-[A-Za-z0-9_\-]{16,}|[A-Za-z0-9_\-]{40,})")
+
+CONCEPT_SHEET = "concept-sheet"
+CANONICAL_BASE = "canonical-base"
+PRE_FRAME_ACTIONS = (CONCEPT_SHEET, CANONICAL_BASE)
+ACTIONS = (*PRE_FRAME_ACTIONS, *sorted(FRAME_COUNTS))
+
+# Ceilings sized per action, because an eight-frame state and a one-call sheet
+# are not the same accident. A sheet run under the state ceiling has no real
+# guard: a mistyped flag would keep drawing until something else noticed.
+#
+# `None` for the image cap means "derive it from --variants", since a
+# canonical-base run scales with how many options were asked for.
+ACTION_CEILINGS: dict[str, tuple[int | None, float]] = {
+    CONCEPT_SHEET: (1, 0.10),
+    CANONICAL_BASE: (None, 0.25),
+}
+FRAME_CEILINGS = (24, 3.0)
 
 
 # --------------------------------------------------------------------------- #
@@ -528,13 +566,39 @@ def key_out_chroma(image: Image.Image) -> Image.Image:
     return Image.frombytes("RGBA", image.size, bytes(out))
 
 
+def opaque(config: ProviderConfig, aspect_ratio: str | None = None) -> ProviderConfig:
+    """The same config, asking for an ordinary opaque image.
+
+    A concept sheet wants warm off-white paper: the negative space between cells
+    is what keeps the mascots readable, and the cells become reference images
+    rather than frames, so there is nothing that needs alpha.
+    """
+    return ProviderConfig(
+        provider=config.provider,
+        model=config.model,
+        output_format=config.output_format,
+        background=None,
+        resolution=config.resolution,
+        aspect_ratio=aspect_ratio or config.aspect_ratio,
+        quality=config.quality,
+        extra=config.extra,
+    )
+
+
 def generate_frame(
     config: ProviderConfig,
     prompt: str,
     references: list[str],
     guard: SpendGuard,
+    require_alpha: bool = True,
 ) -> tuple[Image.Image, dict[str, Any]]:
-    """Draw one frame on the provider canvas. Placement happens later, once."""
+    """Draw one image on the provider canvas. Placement happens later, once.
+
+    `require_alpha` is False only for a concept sheet, which asked for paper.
+    Running the transparency check on it would see an opaque image, conclude the
+    provider ignored a parameter that was never sent, and spend a second call
+    keying out a background the sheet is supposed to have.
+    """
 
     def once(active: ProviderConfig, text: str) -> tuple[Image.Image, float]:
         guard.check()
@@ -568,7 +632,9 @@ def generate_frame(
         image, cost = once(config, prompt)
         alpha_path = "params-dropped"
 
-    if not alpha_is_real(image):
+    if not require_alpha:
+        alpha_path = "opaque by request"
+    elif not alpha_is_real(image):
         # The provider ignored `background: transparent`, or never accepted it,
         # so ask for a flat chroma background and key it out here instead.
         image, cost = once(config, prompt + CHROMA_SUFFIX)
@@ -608,6 +674,255 @@ def build_prompt(bundle: Path, state: str, index: int, frame_count: int, variant
         f"no text.{manifest.prompt_block()}\n"
         f"{extra}"
     ).strip()
+
+
+def read_locks(path: Path) -> list[str]:
+    """One identity lock per cell, in row-major order.
+
+    Accepts a JSON array of strings, or of objects carrying a `text` field, so a
+    file written for the review page can be handed straight to the generator.
+    Order is the contract: element 4 describes `cell-04`, and nothing downstream
+    re-sorts it.
+    """
+    if not path.is_file():
+        raise SystemExit(f"--locks-file {path} does not exist")
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as error:
+        raise SystemExit(f"--locks-file {path} is not valid JSON: {error}") from error
+    if not isinstance(raw, list) or not raw:
+        raise SystemExit(f"--locks-file {path} must hold a non-empty JSON array")
+
+    locks: list[str] = []
+    for position, entry in enumerate(raw, start=1):
+        text = entry.get("text") if isinstance(entry, dict) else entry
+        if not isinstance(text, str) or not text.strip():
+            raise SystemExit(f"--locks-file {path} entry {position} has no usable text")
+        locks.append(text.strip())
+    return locks
+
+
+def build_sheet_prompt(locks: list[str], columns: int, rows: int, derived: bool, extra: str) -> str:
+    """The concept-sheet prompt.
+
+    Identity locks are numbered and row-major because that numbering is the only
+    thing tying a human's "I choose cell-04" to the concept they meant. The order
+    is stated twice on purpose -- once as a layout instruction, once as the
+    numbering of the locks themselves.
+    """
+    numbered = "\n".join(f"  {position}. {text}" for position, text in enumerate(locks, start=1))
+    if derived:
+        roles = (
+            "Image 1 is the identity reference. Image 2 is the house-style reference. "
+            "Image 2 wins on any conflict. Do not edit or reproduce either image."
+        )
+    else:
+        roles = (
+            "Image 1 is the house-style reference and wins on any conflict. "
+            "Do not edit or reproduce it."
+        )
+
+    return (
+        f"Use case: stylized-concept\n"
+        f"Asset type: concept sheet for choosing a Geist Pet\n"
+        f"Input images: {roles}\n"
+        f"Primary request: Draw {len(locks)} different Geist Pet mascot concepts, exactly one per "
+        f"cell, on an invisible {columns}-column by {rows}-row grid read left to right, top to "
+        f"bottom. Translate each concept into a compact rounded non-human Geist companion, never "
+        f"a miniature figure of a source character.\n"
+        f"Shared Geist identity: {HOUSE_FORM}\n"
+        f"Identity locks, one per cell in that exact order:\n{numbered}\n"
+        f"Scene/backdrop: plain warm off-white paper; invisible grid; generous negative space "
+        f"between cells; no dividers, no rules, no frames, no cell borders\n"
+        f"Style/medium: flat colour fills, even outline weight, no gradients, no texture, no "
+        f"shadows, no gloss, no screentone, no painterly marks, no 3D\n"
+        f"Composition/framing: exactly one centred full-body mascot per cell, equal visual scale "
+        f"and equal baseline across every cell, ample padding inside each cell, nothing cropped, "
+        f"no mascot crossing into a neighbouring cell, front or soft three-quarter view\n"
+        f"Constraints: every mascot keeps the shared Geist identity above; cells may differ in "
+        f"silhouette, headwear, one attached prop and colour accents, and may differ in nothing "
+        f"else\n"
+        f"Avoid: any text, letters, numbers, labels, captions or watermarks anywhere on the "
+        f"image; {NEVER_TRANSFERS}\n"
+        f"{extra}"
+    ).strip()
+
+
+def build_base_prompt(bundle: Path, variant_intent: str, from_cell: bool, derived: bool, extra: str) -> str:
+    """The canonical-base prompt: one Pet, at sprite scale, as the identity lock."""
+    manifest = read_manifest(bundle / "character-bible.md")
+    if from_cell:
+        subject = (
+            "Image 1 is an approved concept cell for this Pet. Redraw that exact character at "
+            "sprite scale, keeping its silhouette, headwear, props, colours and expression."
+        )
+    elif derived:
+        subject = (
+            "Image 1 is the identity reference. Translate it into a Geist companion rather than "
+            "drawing a miniature figure of it."
+        )
+    else:
+        subject = "Invent the Pet described below as a Geist companion."
+
+    house_role = "Image 2 is the house-style reference and wins on any conflict."
+    return (
+        f"Use case: stylized-concept\n"
+        f"Asset type: canonical base for a Geist Pet -- the identity lock every later frame is "
+        f"drawn against\n"
+        f"Input images: {subject} {house_role} Do not edit or reproduce either image.\n"
+        f"Shared Geist identity: {HOUSE_FORM}\n"
+        f"Variant intent: {variant_intent}\n"
+        f"Composition/framing: one centred full-body character, front or soft three-quarter view, "
+        f"whole body inside the frame with clear margin on all four sides, transparent "
+        f"background, one character only, no shadow, no ground marks, no detached effects, "
+        f"no text.\n"
+        f"Keep it simple enough to survive redrawing in nine animation states at 192x208: a base "
+        f"that only reads at full resolution will lose its identity by the third state."
+        f"{manifest.prompt_block()}\n"
+        f"Avoid: {NEVER_TRANSFERS}\n"
+        f"{extra}"
+    ).strip()
+
+
+def write_sheet_packet(
+    bundle: Path,
+    candidate_id: str,
+    sheet: Image.Image,
+    locks: list[str],
+    columns: int,
+    rows: int,
+    aspect_ratio: str,
+    prompt: str,
+    provenance: list[dict[str, Any]],
+    input_images: list[dict[str, str]],
+) -> Path:
+    """Write the concept-sheet packet.
+
+    Per-cell verdicts start `pending` rather than absent, so a sheet that reaches
+    a human without being pre-screened is visibly unscreened instead of quietly
+    looking fine. `grid` is what the cropper reads to cut cells, so it records
+    what was actually requested.
+    """
+    packet = bundle / "sources" / "candidates" / candidate_id
+    packet.mkdir(parents=True, exist_ok=True)
+    sheet.save(packet / "candidate.png")
+
+    (packet / "prompt.md").write_text(prompt + "\n", encoding="utf-8")
+    (packet / "inputs.json").write_text(
+        json.dumps({"input_images": input_images, "mode": "External Image Provider"}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    cells = [
+        {
+            "cell_id": cell_id(position),
+            "status": "pending",
+            "checks": {},
+            "notes": "",
+        }
+        for position in range(1, len(locks) + 1)
+    ]
+    ids = ", ".join(cell["cell_id"] for cell in cells)
+    (packet / "candidate-context.json").write_text(
+        json.dumps(
+            {
+                "candidate_id": candidate_id,
+                "target": {
+                    "kind": "concept-sheet",
+                    "destination": f"sources/candidates/{candidate_id}/cells/",
+                },
+                "generated_file": f"sources/candidates/{candidate_id}/candidate.png",
+                "prompt_file": f"sources/candidates/{candidate_id}/prompt.md",
+                "prompt_text": prompt,
+                "generation_mode": "External Image Provider",
+                "grid": {
+                    "columns": columns,
+                    "rows": rows,
+                    "cell_count": len(locks),
+                    "aspect_ratio": aspect_ratio,
+                },
+                "identity_locks": [
+                    {"cell_id": cell_id(position), "text": text}
+                    for position, text in enumerate(locks, start=1)
+                ],
+                "provenance": provenance,
+                "agent_pre_screen": {"status": "pending", "cells": cells},
+                "human_review": {
+                    "status": "pending",
+                    "question": f"Choose one or more cells by id from the concept sheet: {ids}.",
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return packet
+
+
+def write_base_packet(
+    bundle: Path,
+    candidate_id: str,
+    raw: Image.Image,
+    sprite: Image.Image,
+    transform: CellTransform,
+    prompt: str,
+    provenance: dict[str, Any],
+    input_images: list[dict[str, str]],
+    variant_intent: str,
+) -> Path:
+    """Write one canonical-base candidate.
+
+    Both scales are kept. `candidate.png` is what the human judges and what gets
+    promoted; `sprite-scale.png` is the same art at 192x208, which is the size
+    the naming test actually has to survive.
+    """
+    packet = bundle / "sources" / "candidates" / candidate_id
+    packet.mkdir(parents=True, exist_ok=True)
+    raw.save(packet / "candidate.png")
+    sprite.save(packet / "sprite-scale.png")
+    sprite.save(packet / "contact-sheet.png")
+
+    (packet / "prompt.md").write_text(prompt + "\n", encoding="utf-8")
+    (packet / "inputs.json").write_text(
+        json.dumps(
+            {
+                "input_images": input_images,
+                "mode": "External Image Provider",
+                "cell_transform": transform.as_dict(),
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (packet / "candidate-context.json").write_text(
+        json.dumps(
+            {
+                "candidate_id": candidate_id,
+                "target": {
+                    "kind": "canonical-base",
+                    "destination": "sources/canonical-base.png",
+                },
+                "generated_file": f"sources/candidates/{candidate_id}/candidate.png",
+                "prompt_file": f"sources/candidates/{candidate_id}/prompt.md",
+                "prompt_text": prompt,
+                "generation_mode": "External Image Provider",
+                "cell_transform": transform.as_dict(),
+                "provenance": [provenance],
+                "variant_intent": variant_intent,
+                "agent_pre_screen": {"status": "pending", "checks": {}, "notes": ""},
+                "human_review": {
+                    "status": "pending",
+                    "question": "Choose one canonical-base candidate for sources/canonical-base.png.",
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return packet
 
 
 def write_packet(
@@ -695,6 +1010,141 @@ def parse_frame_range(spec: str | None, frame_count: int) -> list[int]:
     return [index for index in sorted(set(wanted)) if 0 <= index < frame_count]
 
 
+def parse_grid(spec: str | None, cells: int) -> tuple[int, int, str]:
+    """The grid for this sheet: the table's, unless the caller overrode it."""
+    columns, rows, aspect_ratio = layout_for(cells)
+    if not spec:
+        return columns, rows, aspect_ratio
+    try:
+        left, right = spec.lower().split("x", 1)
+        columns, rows = int(left), int(right)
+    except ValueError as error:
+        raise SystemExit(f"--grid takes COLUMNSxROWS, for example 3x2; got '{spec}'") from error
+    if columns * rows < cells:
+        raise SystemExit(f"--grid {spec} has {columns * rows} cells, too few for {cells} concepts")
+    return columns, rows, aspect_ratio
+
+
+def run_concept_sheet(args: argparse.Namespace, bundle: Path, config: ProviderConfig, guard: SpendGuard) -> dict[str, Any]:
+    """One call, many concepts, no canonical base.
+
+    This runs before an identity lock exists, so the house-style reference is the
+    only thing defending the house form. A derived sheet adds the source as
+    Image 1; an original cast sends no Image 1 at all, because there is no source
+    to hold on to.
+    """
+    locks = read_locks(Path(args.locks_file).expanduser().resolve())
+    columns, rows, aspect_ratio = parse_grid(args.grid, len(locks))
+    if args.cells and args.cells != len(locks):
+        raise SystemExit(
+            f"--cells {args.cells} disagrees with --locks-file, which holds {len(locks)} locks. "
+            f"The lock list is the cell list; drop --cells or fix the file."
+        )
+
+    input_images: list[dict[str, str]] = []
+    references: list[str] = []
+    derived = bool(args.identity_image)
+    if derived:
+        identity = Path(args.identity_image).expanduser().resolve()
+        if not identity.is_file():
+            raise SystemExit(f"--identity-image {identity} does not exist")
+        references.append(image_reference(identity))
+        input_images.append({"path": str(identity), "role": "identity reference"})
+
+    house = house_style_path(bundle)
+    references.append(image_reference(house))
+    input_images.append({"path": str(house), "role": "house-style reference"})
+
+    prompt = build_sheet_prompt(locks, columns, rows, derived, args.extra_prompt)
+    sheet, record = generate_frame(
+        opaque(config, aspect_ratio), prompt, references, guard, require_alpha=False
+    )
+    record["reference_count"] = len(references)
+
+    candidate_id = args.candidate_id or "concept-sheet-01"
+    packet = write_sheet_packet(
+        bundle, candidate_id, sheet, locks, columns, rows, aspect_ratio, prompt, [record], input_images
+    )
+    return {
+        "action": CONCEPT_SHEET,
+        "candidate_id": candidate_id,
+        "packet": str(packet),
+        "grid": {"columns": columns, "rows": rows, "cell_count": len(locks), "aspect_ratio": aspect_ratio},
+        "sheet_size": list(sheet.size),
+        "derived": derived,
+        "next": (
+            f"pre-screen every cell and write its verdict into candidate-context.json, then render "
+            f"qa/concept-sheet-review.html and ask the human to choose cell ids. Redraw the sheet "
+            f"only if fewer than {MIN_PASSING_CELLS} cells pass."
+        ),
+    }
+
+
+def run_canonical_base(args: argparse.Namespace, bundle: Path, config: ProviderConfig, guard: SpendGuard) -> dict[str, Any]:
+    """The identity lock itself. No canonical base is attached, because this is it."""
+    from_cell = bool(args.cell_image)
+    input_images: list[dict[str, str]] = []
+    references: list[str] = []
+
+    if from_cell:
+        cell = Path(args.cell_image)
+        cell = cell if cell.is_absolute() else (bundle / cell)
+        cell = cell.expanduser().resolve()
+        if not cell.is_file():
+            raise SystemExit(f"--cell-image {cell} does not exist; crop it with crop_gallery_cells.py first")
+        references.append(image_reference(cell))
+        input_images.append({"path": str(cell), "role": "approved concept cell"})
+    elif args.identity_image:
+        identity = Path(args.identity_image).expanduser().resolve()
+        if not identity.is_file():
+            raise SystemExit(f"--identity-image {identity} does not exist")
+        references.append(image_reference(identity))
+        input_images.append({"path": str(identity), "role": "identity reference"})
+
+    house = house_style_path(bundle)
+    references.append(image_reference(house))
+    input_images.append({"path": str(house), "role": "house-style reference"})
+
+    packets: list[str] = []
+    candidate_ids: list[str] = []
+    misfits: list[dict[str, Any]] = []
+    for offset in range(args.variants):
+        letter = chr(ord("a") + offset)
+        intent = args.variant_intent if args.variants == 1 else f"{args.variant_intent} (variant {letter.upper()})"
+        prompt = build_base_prompt(bundle, intent, from_cell, bool(args.identity_image), args.extra_prompt)
+        raw, record = generate_frame(config, prompt, references, guard)
+
+        # Each base variant is its own character, so each gets its own transform.
+        # The shared-transform rule exists to stop one animation run's poses from
+        # rescaling each other; it has nothing to say across separate candidates.
+        transform = CellTransform.from_reference(raw, args.safe_padding)
+        sprite = transform.apply(raw)
+        fit = transform.fit_report(sprite, args.safe_padding)
+        if not fit["fits"]:
+            misfits.append({"candidate": f"canonical-base-{letter}", **fit})
+
+        record["reference_count"] = len(references)
+        record["fits_safe_padding"] = fit["fits"]
+        candidate_id = f"canonical-base-{letter}"
+        packet = write_base_packet(
+            bundle, candidate_id, raw, sprite, transform, prompt, record, input_images, intent
+        )
+        candidate_ids.append(candidate_id)
+        packets.append(str(packet))
+
+    return {
+        "action": CANONICAL_BASE,
+        "candidate_ids": candidate_ids,
+        "packets": packets,
+        "from_approved_cell": from_cell,
+        "candidates_outside_safe_padding": misfits,
+        "next": (
+            "pre-screen each candidate, then render qa/canonical-base-review.html and ask the "
+            "human to choose one id before copying it to sources/canonical-base.png"
+        ),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("bundle", nargs="?", help="Path to PetName.pet source bundle")
@@ -702,23 +1152,41 @@ def main() -> None:
                         help="Settle whether a model id actually works, with one live "
                              "request (~$0.01). The catalog listing is incomplete and "
                              "must not be used for this. Exits after reporting.")
-    parser.add_argument("--state", choices=sorted(FRAME_COUNTS), help="Sprite action to generate")
+    parser.add_argument("--action", choices=ACTIONS,
+                        help="Phase to draw: concept-sheet, canonical-base, or a sprite action")
+    parser.add_argument("--state", choices=sorted(FRAME_COUNTS),
+                        help="Deprecated alias for --action, kept so existing commands keep working")
     parser.add_argument("--variant", default="a", help="Variant letter; becomes part of the candidate id")
     parser.add_argument("--variant-intent", default="restrained, readable motion", help="How this variant should move")
     parser.add_argument("--frames", help="Frame indices to generate, e.g. 0-5 or 2,4; defaults to the whole state")
     parser.add_argument("--model", choices=KNOWN_MODELS, help="Override the model in imagegen.json")
-    parser.add_argument("--max-images", type=int, default=24, help="Hard ceiling on provider calls this run")
-    parser.add_argument("--max-cost-usd", type=float, default=3.0,
+    parser.add_argument("--max-images", type=int,
+                        help="Hard ceiling on provider calls this run; defaults per action")
+    parser.add_argument("--max-cost-usd", type=float,
                         help="Runaway-loop guardrail, not a spend control: a value this run "
-                             "passes to itself. Set near 2x a measured 57-frame pass -- the "
-                             "2026-08-12 eval put openai/gpt-image-2 at ~$1.33 a pass. The "
-                             "real ceiling is the credit limit on the OpenRouter key, which "
-                             "is enforced server-side and outside this process's reach.")
+                             "passes to itself. Defaults per action -- $3.00 for a sprite "
+                             "action, near 2x a measured 57-frame pass, since the 2026-08-12 "
+                             "eval put openai/gpt-image-2 at ~$1.33 a pass. The real ceiling "
+                             "is the credit limit on the OpenRouter key, which is enforced "
+                             "server-side and outside this process's reach.")
     parser.add_argument("--safe-padding", type=int, default=6)
-    parser.add_argument("--extra-prompt", default="", help="Appended to every frame prompt")
+    parser.add_argument("--extra-prompt", default="", help="Appended to every prompt")
     parser.add_argument("--base-url", help="Provider base URL. Defaults to OPENROUTER_BASE_URL, "
                         "then OpenRouter. Point at a broker or a local mock to keep the "
                         "credential out of this process.")
+
+    sheet_group = parser.add_argument_group("concept-sheet")
+    sheet_group.add_argument("--locks-file", help="JSON array of identity locks, one per cell, row-major")
+    sheet_group.add_argument("--cells", type=int, help="Cell count; must agree with --locks-file")
+    sheet_group.add_argument("--grid", help="Override the grid as COLUMNSxROWS, for example 3x2")
+    sheet_group.add_argument("--identity-image", help="Image 1 for a derived sheet or base; omit for an original cast")
+    sheet_group.add_argument("--candidate-id", help="Packet id; defaults to concept-sheet-01")
+
+    base_group = parser.add_argument_group("canonical-base")
+    base_group.add_argument("--cell-image", help="Approved concept cell to render at sprite scale, as Image 1")
+    base_group.add_argument("--variants", type=int,
+                            help="How many base candidates to draw; defaults to 1 after a sheet, 3 without one")
+
     args = parser.parse_args()
 
     set_base_url(args.base_url)
@@ -727,23 +1195,63 @@ def main() -> None:
         api_key()
         verify_model_live(args.verify_model)
         return
-    if not args.bundle or not args.state:
-        raise SystemExit("bundle and --state are required unless --verify-model is given")
+
+    if args.action and args.state and args.action != args.state:
+        raise SystemExit(f"--action {args.action} and --state {args.state} disagree; --state is just an alias")
+    action = args.action or args.state
+    if args.state and not args.action:
+        print("--state is deprecated; use --action instead", file=sys.stderr)
+    if not args.bundle or not action:
+        raise SystemExit("bundle and --action are required unless --verify-model is given")
 
     bundle = Path(args.bundle).expanduser().resolve()
-    frame_count = FRAME_COUNTS[args.state]
-    indices = parse_frame_range(args.frames, frame_count)
+
+    if action == CONCEPT_SHEET and not args.locks_file:
+        raise SystemExit(
+            "--action concept-sheet needs --locks-file: one identity lock per cell, row-major. "
+            "A sheet drawn without written locks has nothing tying cell-04 to a concept."
+        )
+    if args.variants is None:
+        # A sheet already showed the human their options and they already chose,
+        # so the base run just renders that choice at sprite scale. With no sheet,
+        # nothing has previewed this gate yet, so it owes the normal three.
+        args.variants = 1 if args.cell_image else 3
+    if args.variants < 1:
+        raise SystemExit("--variants must be at least 1")
+
+    default_images, default_cost = ACTION_CEILINGS.get(action, FRAME_CEILINGS)
+    if default_images is None:
+        default_images = args.variants * 2  # room for one transparency retry each
+    max_images = args.max_images if args.max_images is not None else default_images
+    max_cost = args.max_cost_usd if args.max_cost_usd is not None else default_cost
 
     config = load_config(bundle, args.model)
     api_key()  # fail before any work when the environment is not set up
-    guard = SpendGuard(args.max_images, args.max_cost_usd)
+    guard = SpendGuard(max_images, max_cost)
 
+    if action in PRE_FRAME_ACTIONS:
+        runner = run_concept_sheet if action == CONCEPT_SHEET else run_canonical_base
+        result = runner(args, bundle, config, guard)
+        print(
+            json.dumps(
+                {"ok": True, "mode": "External Image Provider", "model": config.model,
+                 **result, "spend": guard.as_dict()},
+                indent=2,
+            )
+        )
+        return
+
+    frame_count = FRAME_COUNTS[action]
+    indices = parse_frame_range(args.frames, frame_count)
+
+    # Only the frame path needs the identity lock on disk. The two actions above
+    # run before it exists -- one of them is what produces it.
     canonical = bundle / "sources" / "canonical-base.png"
     if not canonical.is_file():
         raise SystemExit("sources/canonical-base.png is the identity lock; approve one before generating frames")
     canonical_uri = image_reference(canonical)
 
-    candidate_id = f"{args.state}-{args.variant}"
+    candidate_id = f"{action}-{args.variant}"
     produced: list[tuple[int, Image.Image]] = []
     provenance: list[dict[str, Any]] = []
     transform: CellTransform | None = None
@@ -756,11 +1264,11 @@ def main() -> None:
         if previous is not None:
             references.append(data_uri(previous))
         else:
-            earlier = bundle / "frames" / args.state / f"{max(0, index - 1):02d}.png"
+            earlier = bundle / "frames" / action / f"{max(0, index - 1):02d}.png"
             if index > 0 and earlier.is_file():
                 references.append(image_reference(earlier))
 
-        prompt = build_prompt(bundle, args.state, index, frame_count, args.variant_intent, args.extra_prompt)
+        prompt = build_prompt(bundle, action, index, frame_count, args.variant_intent, args.extra_prompt)
         first_prompt = first_prompt or prompt
         raw, record = generate_frame(config, prompt, references, guard)
 
@@ -782,7 +1290,7 @@ def main() -> None:
 
     assert transform is not None
     packet = write_packet(
-        bundle, candidate_id, args.state, produced, first_prompt, provenance, transform, args.variant_intent
+        bundle, candidate_id, action, produced, first_prompt, provenance, transform, args.variant_intent
     )
 
     print(
@@ -790,9 +1298,10 @@ def main() -> None:
             {
                 "ok": True,
                 "mode": "External Image Provider",
+                "action": action,
                 "candidate_id": candidate_id,
                 "packet": str(packet),
-                "state": args.state,
+                "state": action,
                 "frames": [index for index, _image in produced],
                 "model": config.model,
                 "cell_transform": transform.as_dict(),
@@ -800,7 +1309,7 @@ def main() -> None:
                 "frames_outside_safe_padding": misfits,
                 "spend": guard.as_dict(),
                 "next": (
-                    f"pre-screen the packet, then render qa/{args.state}-review.html "
+                    f"pre-screen the packet, then render qa/{action}-review.html "
                     "and ask the human to choose a candidate id"
                 ),
             },

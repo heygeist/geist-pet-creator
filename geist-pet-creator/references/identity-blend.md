@@ -26,7 +26,7 @@ Two sentences carry it:
 > If a style simplification would erase a recognizable feature, keep the feature and simplify how it is drawn.
 > If a recognizable feature would break a house-form invariant, keep the invariant and translate the feature.
 
-Skipping the second sentence is how a gallery drifts back into looking like official franchise art with a heart pasted on.
+Skipping the second sentence is how a concept sheet drifts back into looking like official franchise art with a heart pasted on.
 
 ## House Form
 
@@ -113,12 +113,20 @@ The `Dropped` line is not optional. A cue that was considered and rejected tends
 
 Every derived generation call attaches at least two images, and the prompt names both:
 
-- **Image 1 — identity reference.** The source character, the identity moodboard, or the previously approved gallery being refined.
+- **Image 1 — identity reference.** The source character, the identity moodboard, the approved sheet cell being rendered at sprite scale, or the approved canonical base. Which one depends on the phase; see the table below.
 - **Image 2 — house-style reference.** `sources/references/geist-house-style.<ext>`.
 
 State which one wins on conflict, in the prompt itself. Store both under `sources/references/` and list them in the packet's `inputs.json`, so the candidate is reproducible.
 
-For a canonical-base refinement round, Image 1 becomes the approved gallery cell and Image 2 stays the house-style reference. Keep the roles in that order across a bundle; swapping them between calls changes which lock dominates and the drift is hard to trace afterwards.
+Image 1 changes as the bundle progresses. Image 2 never does. The three sets:
+
+| Phase | Image 1 | Image 2 | Also attached |
+| --- | --- | --- | --- |
+| `concept-sheet` | the identity reference, for a derived sheet only — an original cast sends no Image 1 | house-style reference | nothing; no canonical base exists yet |
+| `canonical-base` | the cropped sheet cell when a sheet ran, otherwise the identity reference | house-style reference | nothing |
+| animation states | `sources/canonical-base.png` | house-style reference | the previous frame of the same action |
+
+Keep the roles in that order across a bundle; swapping them between calls changes which lock dominates and the drift is hard to trace afterwards.
 
 ## Prompt Skeleton
 
@@ -158,19 +166,23 @@ None of these cross from the source into a Pet, whatever the source does with th
 
 The deliverable is an original Geist mascot that evokes something, not a reproduction of it. Prefer a descriptive mascot name for `pet.json` `id` and `displayName` — `silver-lightning-cub`, `Saiyan Hero` — over the source character's name.
 
-## Concept Gallery Route
+## Concept Sheet Route
 
-When the human names a cast, a crew, a roster, or a franchise rather than one Pet, generate a gallery first and let them pick from it.
+When the human brainstorms rather than naming one finished Pet, draw a sheet first and let them pick from it. Two shapes trigger it: **many characters** — a cast, a crew, a roster, a franchise — or **many design directions for one Pet**. The full route, including the grid table and the per-cell failure policy, is in [generation-workflow.md](generation-workflow.md) § Concept Sheet Route. What follows is what the route asks of a *blend*.
 
-1. Create a concept bundle, `<Thing>Concepts.pet`.
-2. Generate **one gallery image**, not one image per character: an invisible grid on warm off-white paper, one complete centered mascot per cell, equal scale and baseline, no dividers, no text beyond optional cell labels. Six characters go 3x2, ten go 5x2, twelve go 4x3.
-3. Write one numbered identity-lock paragraph per cell, in the exact row-major order the grid will be read in.
-4. Pre-screen the sheet cell by cell — a gallery passes only if every cell passes — then render `qa/canonical-base-review.html` and ask the human to choose.
-5. Crop each chosen cell into its own `<Name>.pet` bundle as `sources/references/selected-<cue>.png`.
+1. Create a staging bundle `<Thing>Concepts.pet` when the sheet spawns many Pets; write straight into `<Name>.pet` when it spawns one.
+2. Draw **one sheet image**, not one image per character: an invisible grid on warm off-white paper, one complete centered mascot per cell, equal scale and baseline, no dividers, no text. Six characters go 3x2, ten go 5x2, twelve go 4x3.
+3. Write one numbered identity-lock paragraph per cell, in the exact row-major order the grid will be read in. The paragraph number *is* the cell id: paragraph 4 describes `cell-04`.
+4. Pre-screen cell by cell and record a verdict per cell, then render `qa/concept-sheet-review.html` and ask the human to choose by cell id.
+5. Crop each chosen cell with `crop_gallery_cells.py` and carry it into its Pet bundle as `sources/references/selected-<cue>.png`.
 
-A gallery cell is a concept, not a canonical base. It still goes through the `canonical-base` gate as its own candidate, generated at sprite scale with the crop as Image 1, before anything is written to `sources/canonical-base.png`.
+**Every cell spends its own cue budget.** Four to six ranked cues per cell, one prop per cell, a crown cue that does the naming. A sheet is not a place to economise on identity locks — a vague paragraph produces the generic blob, and it produces it six times at once.
 
-**V2 refinement.** When a gallery reads generic, run a second round that keeps the same row-major families and the same layout, and *strengthens identity* rather than adding decoration. Rewrite the weak identity locks to be more specific and more physical. Adding a prop or an accessory to a cell that failed the naming test almost never fixes it; a stronger crown cue usually does.
+**The house form is the one thing cells share.** Cells may differ in silhouette, crown cue, prop, and palette accents; they may not differ in the invariants from the House Form table above. A sheet whose cells disagree about the outline weight or the heart has drifted toward franchise copy across the whole grid, which is what `assets/identity-cues-franchise-copy.jpg` looks like.
+
+A sheet cell is a concept, not a canonical base. It still goes through the `canonical-base` gate as its own candidate, generated at sprite scale with the crop as Image 1, before anything is written to `sources/canonical-base.png`.
+
+**V2 refinement.** When a sheet reads generic, run a second round that keeps the same row-major families and the same layout, and *strengthens identity* rather than adding decoration. Rewrite the weak identity locks to be more specific and more physical. Adding a prop or an accessory to a cell that failed the naming test almost never fixes it; a stronger crown cue usually does.
 
 ## Failure Modes
 
@@ -186,7 +198,7 @@ Fix: re-prompt from the house form outward, transplanting cues onto the Geist bo
 
 ### Generic blob — the house form won
 
-Symptoms: the character cannot be named from a thumbnail; the cues collapsed into one hat and one color; several gallery cells are interchangeable; identity carried only by detail visible at full resolution.
+Symptoms: the character cannot be named from a thumbnail; the cues collapsed into one hat and one color; several sheet cells are interchangeable; identity carried only by detail visible at full resolution.
 
 Fix: strengthen the crown cue and the silhouette. Do not add props — a second prop makes the sprite busier without making it more nameable.
 

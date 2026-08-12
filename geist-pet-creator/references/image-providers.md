@@ -2,13 +2,27 @@
 
 A Pet can be drawn two ways. Read this before configuring or using the External Image Provider.
 
-## Built-in Image Generation (default)
+## Choosing the mode
 
-The agent draws with its own image generation capability. This mode needs no configuration, no API key, and no network access beyond whatever the agent already has. Every Pet uses this mode unless a bundle says otherwise.
+Choose from **what the running agent can actually do**, once, at bundle setup. Record the choice in the bundle and never re-decide it.
+
+The choice is not a preference. An agent with no image capability cannot use the built-in mode, and pretending otherwise fails at the first draw call. An agent that has one does not need a key or a network round trip.
+
+## Built-in Image Generation
+
+The agent draws with its own image generation capability — Codex with `$imagegen`, or any agent that has one. This mode needs no configuration, no API key, and no network access beyond whatever the agent already has.
 
 ## External Image Provider
 
-The bundle draws through OpenRouter over HTTP. Turn it on by writing `imagegen.json` into the Pet source bundle:
+The bundle draws through OpenRouter over HTTP. Use it whenever the running agent has no image capability of its own. It covers **every** drawing phase, not just animation frames:
+
+| `--action` | Draws | Calls |
+| --- | --- | ---: |
+| `concept-sheet` | one brainstorm sheet, many concepts on a grid | 1 |
+| `canonical-base` | the identity lock, at sprite scale | `--variants` |
+| the nine animation states | source frames | one per frame |
+
+Turn it on by writing `imagegen.json` into the Pet source bundle:
 
 ```json
 {
@@ -19,7 +33,9 @@ The bundle draws through OpenRouter over HTTP. Turn it on by writing `imagegen.j
 }
 ```
 
-The presence of that file switches the mode. A human asking for a different model in a single run overrides `model` for that run only. The mode never switches on its own: when the built-in capability is unavailable, say so and stop, because a silent switch makes the provenance recorded in every candidate packet false.
+The presence of that file switches the mode. A human asking for a different model in a single run overrides `model` for that run only.
+
+**The mode never switches on its own, and never switches mid-bundle.** Once a bundle has drawn its first candidate, the recorded mode is fixed. Switching would make the provenance recorded in every earlier candidate packet false, and provenance is what someone reads months later to work out why the art went wrong. If the recorded mode becomes unavailable, say so and stop.
 
 ### The catalog listing is not proof
 
@@ -61,19 +77,43 @@ one of those prices was fiction. Availability and pricing drift; the fix is an i
 fresher table.
 
 ```
-scripts/eval_providers.py --out provider-eval --max-cost-usd 5
+scripts/eval_providers.py --out provider-eval --max-cost-usd 6
 ```
 
-That runs each contender over four cases, every one of them sending a reference image, because the
-skill does: 56 of a Pet's 57 frames are drawn with an approved identity lock attached. Three cases
-are identity-hold — an approved Pet's own art goes in and the model redraws that creature in a new
-pose — and one is creativity, sending only the house-style sheet plus a physical description of a
-source the model must invent a Pet for.
+Sheet cases only, when the question is about brainstorming rather than frames:
 
-It reports measured cost, measured duration, a mechanical QA verdict and a rendered silhouette test,
-then writes a review page for the naming test and blend verdict that stay human. Duration is
+```
+scripts/eval_providers.py --out concept-sheet-eval --max-cost-usd 6 \
+  --cases cast-derived-6 cast-original-6 variants-single-4 order-count-6 cast-derived-3 cast-derived-12
+```
+
+Every case sends a reference image, because the skill does: 56 of a Pet's 57 frames are drawn with
+an approved identity lock attached. Ten cases in three kinds:
+
+- **Identity hold** (3) — an approved Pet's own art goes in and the model redraws that creature in a
+  new pose.
+- **Creativity** (1) — only the house-style sheet plus a physical description of a source the model
+  must invent a Pet for.
+- **Concept sheet** (6) — one call returning many mascots on a grid.
+
+A single mascot is scored on whether its identity survived. A sheet is scored on whether its cells
+are **comparable**, because comparability is the only reason to draw them in one call rather than
+separately, and it is the one property that cannot be recovered afterwards. The sheet metrics are
+cell count, containment inside the cell rect, scale spread, baseline spread, and row-major order.
+
+Order gets its own case because it is the one fault nothing downstream can catch. The human clicks
+`cell-04` meaning the fourth identity lock they wrote; if the model put that concept elsewhere, they
+have chosen a Pet they did not want and nothing says so. `order-count-6` separates its cells by one
+machine-readable statistic — the dominant saturated hue of each body panel, stepping around the hue
+wheel in cell order — so a misplacement is arithmetic rather than a judgement call. Cyan is
+deliberately absent from that palette: the house Sky outline sits at about 197°, and a cyan body
+panel would be indistinguishable from the outline every Pet already has.
+
+The eval reports measured cost, measured duration, a mechanical QA verdict and a rendered silhouette
+test, then writes a review page for the naming test and blend verdict that stay human. Duration is
 reported because a full Pet is 57 frames, so a model that is lovely at 30s a frame costs half an
-hour a pass.
+hour a pass. Sheet costs are kept out of the 57-frame projection: a sheet is not a frame and does
+not cost like one.
 
 The full record, including per-case numbers, the human grading, the raw JSON and the method's
 known limitations, is in [measurements/2026-08-12-provider-eval.md](../measurements/2026-08-12-provider-eval.md).
@@ -177,14 +217,24 @@ left over from an earlier setup rides along to a third party after someone redir
 
 ## One frame, one call
 
-Every generation produces exactly one frame. Contact sheets have to be sliced, and slicing is the only mechanism by which a part of the Pet lands in the next cell — the defect the final audit exists to catch. Generating one frame per call removes that mechanism instead of auditing for it.
+Every generation that produces a **frame** produces exactly one. Contact sheets have to be sliced, and slicing is the only mechanism by which a part of the Pet lands in the next cell — the defect the final audit exists to catch. Generating one frame per call removes that mechanism instead of auditing for it.
 
-Each call carries the identity lock as references:
+Each frame call carries the identity lock as references:
 
 1. `sources/canonical-base.png`
 2. the previous frame of the same sprite action
 
 So frame 3 is drawn while looking at frame 2, and the sprite action stays coherent without a strip.
+
+### Why a concept sheet is allowed to be a grid
+
+A concept sheet is one call that returns many mascots on a grid, and it does get sliced. That is not a contradiction of the rule above, because the rule is about frames.
+
+**A sheet cell never becomes a frame.** It becomes Image 1 of a `canonical-base` call — a reference the next generation looks at, not pixels that land in `frames/` or in the atlas. A crop that clips a prop shows up as a poor reference, and the canonical-base gate is in front of it. The same slip in a frame strip would reach the spritesheet, which is why frames do not work this way.
+
+The containment risk is real but bounded, so it is measured rather than forbidden: pre-screen checks that no mascot crosses its grid rect, and `crop_gallery_cells.py` cuts to the recorded grid without trimming, so a bad crop is visible rather than silently tidied.
+
+Sheets earn the grid because the grid *is* the product: cells drawn in one call share scale, weight, and lighting, and cells drawn in separate calls do not. A brainstorm exists to be compared.
 
 ## One transform, one run
 
@@ -194,7 +244,7 @@ The transform is recorded in `candidate-context.json` under `cell_transform`. A 
 
 ```bash
 python "$SKILL_DIR/scripts/generate_candidates.py" /absolute/path/PetName.pet \
-  --state waiting --variant a --variant-intent "subtle polite lean" \
+  --action waiting --variant a --variant-intent "subtle polite lean" \
   --max-images 8 --max-cost-usd 1.00
 ```
 
@@ -202,8 +252,33 @@ Repair one frame by naming it:
 
 ```bash
 python "$SKILL_DIR/scripts/generate_candidates.py" /absolute/path/PetName.pet \
-  --state waving --variant repair1 --frames 2
+  --action waving --variant repair1 --frames 2
 ```
+
+`--state` still works as a deprecated alias for `--action`, so existing commands and scripts keep running.
+
+## The two pre-frame actions
+
+Both run before `sources/canonical-base.png` exists, so neither attaches it, and the canonical-base precondition does not apply to them.
+
+Draw a brainstorm sheet — one call, whatever the cell count:
+
+```bash
+python "$SKILL_DIR/scripts/generate_candidates.py" /absolute/path/ThingConcepts.pet \
+  --action concept-sheet --cells 6 --grid 3x2
+```
+
+It attaches the house-style reference as Image 2, and the identity reference as Image 1 only for a derived sheet. An original cast sends no Image 1: there is no source to hold.
+
+Render the identity lock at sprite scale:
+
+```bash
+python "$SKILL_DIR/scripts/generate_candidates.py" /absolute/path/PetName.pet \
+  --action canonical-base --variants 1 \
+  --cell-image sources/candidates/concept-sheet-01/cells/cell-04.png
+```
+
+`--variants` defaults to 1 when `--cell-image` names an approved sheet cell, because the sheet already showed the human their options. It defaults to 3 without one, which is the normal per-action minimum for a gate nothing has previewed.
 
 ## Transparency: request, verify, fall back
 
@@ -215,6 +290,8 @@ Providers vary in whether they honour `background: transparent`, and a provider 
 
 `candidate-context.json` records which path produced each frame under `provenance[].alpha_path`, so a Pet built through the fallback is visible as such later.
 
+None of this applies to `--action concept-sheet`. A sheet asks for opaque warm off-white paper on purpose — the negative space between cells is what keeps the mascots readable — so there is nothing to verify and nothing to fall back to. Cells become reference images, and a reference image does not need alpha.
+
 ## Spend guards
 
 Three variants across nine states at one call per frame is 171 calls. Nothing else in the pipeline notices that, so every run carries a ceiling:
@@ -222,7 +299,17 @@ Three variants across nine states at one call per frame is 171 calls. Nothing el
 - `--max-images` caps the number of provider calls.
 - `--max-cost-usd` caps spend, summed from `usage.cost` on each response.
 
-A run that reaches either ceiling stops and reports what it spent. The chroma-key fallback costs a second call, and it counts against both ceilings.
+The defaults are sized per action, because an 8-frame state and a one-call sheet are not the same accident:
+
+| `--action` | `--max-images` | `--max-cost-usd` | Transparency fallback |
+| --- | ---: | ---: | --- |
+| `concept-sheet` | 1 | $0.10 | none — the sheet is drawn on opaque warm off-white paper by design |
+| `canonical-base` | `--variants` x2 | $0.25 | possible, so the image cap leaves room for one retry per variant |
+| the nine animation states | 24 | $3.00 | possible |
+
+A one-call sheet under a $3.00 ceiling has no real guard, so a mistyped flag would keep drawing until something else noticed. Under $0.10 it stops immediately.
+
+A run that reaches either ceiling stops and reports what it spent. The chroma-key fallback costs a second call and counts against both ceilings, so any action that can fall back is capped with room for it. A concept sheet never falls back: it asks for paper, and paper is what it wants.
 
 **These are runaway-loop guardrails, not spend controls.** They are values the caller passes to
 itself, so they bound an accident — a loop that requests far more frames than anyone intended — and

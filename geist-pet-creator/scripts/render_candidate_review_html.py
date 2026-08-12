@@ -7,6 +7,7 @@ import argparse
 import html
 import json
 import math
+import os
 from pathlib import Path
 from typing import Any
 
@@ -44,9 +45,17 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def rel(path: Path, root: Path) -> str:
+    """A path the page can still resolve after the bundle moves.
+
+    `Path.relative_to` only walks downwards, and every asset a review page shows
+    lives in a sibling of `qa/`, so it always failed and fell back to an absolute
+    path. That works exactly until the bundle is copied to another machine, at
+    which point every image on the page 404s and the reason is invisible.
+    """
     try:
-        return str(path.relative_to(root))
+        return os.path.relpath(path, root)
     except ValueError:
+        # Different drives on Windows; nothing relative exists to return.
         return str(path)
 
 
@@ -427,10 +436,254 @@ def render_html(bundle: Path, action: str, candidates: list[dict[str, Any]], out
 """
 
 
+CONCEPT_SHEET = "concept-sheet"
+MIN_PASSING_CELLS = 3
+
+
+def sheet_cells(context: dict[str, Any]) -> list[dict[str, Any]]:
+    """Zip the grid, the identity locks and the per-cell verdicts into one list.
+
+    The three come from different places and are joined on `cell_id`, never on
+    list position, so a packet that is missing a lock or a verdict shows a gap
+    instead of silently shifting every later cell up by one.
+    """
+    grid = context.get("grid", {}) or {}
+    columns = int(grid.get("columns") or 1)
+    count = int(grid.get("cell_count") or 0)
+
+    locks = {
+        str(entry.get("cell_id")): str(entry.get("text", ""))
+        for entry in context.get("identity_locks", [])
+        if isinstance(entry, dict)
+    }
+    pre_screen = context.get("agent_pre_screen", {})
+    verdicts = {
+        str(entry.get("cell_id")): entry
+        for entry in (pre_screen.get("cells", []) if isinstance(pre_screen, dict) else [])
+        if isinstance(entry, dict)
+    }
+
+    cells: list[dict[str, Any]] = []
+    for position in range(1, count + 1):
+        identifier = f"cell-{position:02d}"
+        verdict = verdicts.get(identifier, {})
+        cells.append(
+            {
+                "id": identifier,
+                "row": (position - 1) // columns,
+                "column": (position - 1) % columns,
+                "lock": locks.get(identifier, ""),
+                "status": str(verdict.get("status", "pending")),
+                "notes": str(verdict.get("notes", "")),
+                "checks": verdict.get("checks", {}) if isinstance(verdict.get("checks"), dict) else {},
+            }
+        )
+    return cells
+
+
+def render_sheet_html(bundle: Path, candidate: dict[str, Any], output: Path) -> str:
+    context = candidate["context"]
+    candidate_id = candidate["id"]
+    grid = context.get("grid", {}) or {}
+    columns = int(grid.get("columns") or 1)
+    rows = int(grid.get("rows") or 1)
+    cells = sheet_cells(context)
+
+    sheet_path = candidate["preview"]
+    sheet_src = html_path(rel(sheet_path, output.parent)) if isinstance(sheet_path, Path) else ""
+    prompt = str(candidate["prompt"])
+
+    passing = [cell for cell in cells if cell["status"] == "pass"]
+    pending = [cell for cell in cells if cell["status"] == "pending"]
+    failing = [cell for cell in cells if cell["status"] == "fail"]
+
+    banners = []
+    if pending:
+        banners.append(
+            f"<div class=\"banner warn\"><b>{len(pending)} cell(s) not pre-screened.</b> "
+            "Write a verdict for every cell before asking for a choice — an unscreened sheet "
+            "looks exactly like a clean one.</div>"
+        )
+    if len(passing) < MIN_PASSING_CELLS and not pending:
+        banners.append(
+            f"<div class=\"banner stop\"><b>Only {len(passing)} cell(s) passed.</b> "
+            f"Below {MIN_PASSING_CELLS}, redraw the sheet rather than asking the human to pick "
+            "from what survived.</div>"
+        )
+
+    overlay = "".join(
+        f"<div class=\"cell {cell['status']}\" style=\""
+        f"left:{cell['column'] * 100 / columns:.4f}%;"
+        f"top:{cell['row'] * 100 / rows:.4f}%;"
+        f"width:{100 / columns:.4f}%;"
+        f"height:{100 / rows:.4f}%\" data-cell=\"{html.escape(cell['id'], quote=True)}\">"
+        f"<span class=\"badge\">{int(cell['id'].split('-')[1])}</span></div>"
+        for cell in cells
+    )
+
+    rows_html = ""
+    for cell in cells:
+        checks = "".join(
+            f"<span class=\"check\"><b>{html.escape(str(key))}</b>: {html.escape(str(value))}</span>"
+            for key, value in cell["checks"].items()
+        )
+        choosable = cell["status"] != "fail"
+        button = (
+            f"<button type=\"button\" class=\"pick\" data-cell=\"{html.escape(cell['id'], quote=True)}\">Choose</button>"
+            if choosable
+            else "<span class=\"blocked\">Not choosable</span>"
+        )
+        rows_html += f"""
+        <article class="cellcard {cell['status']}" id="card-{html.escape(cell['id'])}">
+          <header>
+            <h2>{html.escape(cell['id'])}</h2>
+            <span class="status {cell['status']}">{html.escape(cell['status'])}</span>
+          </header>
+          <p class="lock">{html.escape(cell['lock']) or "<em>no identity lock recorded</em>"}</p>
+          <div class="checks">{checks}</div>
+          {f'<p class="notes">{html.escape(cell["notes"])}</p>' if cell["notes"] else ""}
+          <footer>{button}</footer>
+        </article>
+        """
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geist Pet Concept Sheet: {html.escape(candidate_id)}</title>
+  <style>
+    :root {{ color-scheme: light; --ink:#172026; --muted:#58646d; --line:#d8dee3;
+             --paper:#f7f7f4; --panel:#fff; --accent:#0b8ed8; --accent-dark:#086ca5;
+             --bad:#c0392b; --warn:#a86a00; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin:0; font:14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color:var(--ink); background:var(--paper); }}
+    main {{ max-width:1180px; margin:0 auto; padding:24px; }}
+    h1 {{ margin:0 0 4px; font-size:24px; }}
+    p {{ margin:0; color:var(--muted); }}
+    .banner {{ padding:12px 14px; border-radius:8px; margin-bottom:12px; border:1px solid var(--line); }}
+    .banner.warn {{ background:#fff8e6; border-color:#e8cf94; color:var(--warn); }}
+    .banner.stop {{ background:#fdecea; border-color:#f0b3ac; color:var(--bad); }}
+    .sheet-wrap {{ position:relative; display:inline-block; max-width:100%;
+                   border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--panel); }}
+    .sheet-wrap img {{ display:block; max-width:100%; height:auto; }}
+    .cell {{ position:absolute; border:1px dashed rgba(11,142,216,.5); }}
+    .cell.fail {{ border:2px solid var(--bad); background:rgba(192,57,43,.14); }}
+    .cell.selected {{ border:3px solid var(--accent); background:rgba(11,142,216,.12); }}
+    .badge {{ position:absolute; top:6px; left:6px; min-width:22px; height:22px; padding:0 6px;
+              display:grid; place-items:center; border-radius:999px; background:var(--accent);
+              color:#fff; font-weight:700; font-size:12px; box-shadow:0 1px 3px rgba(0,0,0,.3); }}
+    .cell.fail .badge {{ background:var(--bad); }}
+    .decision {{ margin:16px 0; padding:12px; border:1px solid var(--line);
+                 background:var(--panel); border-radius:8px; }}
+    #selectedText {{ margin-top:8px; font-weight:700; color:var(--accent-dark); }}
+    .grid {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:18px; }}
+    .cellcard {{ border:1px solid var(--line); border-radius:8px; background:var(--panel); padding:14px; }}
+    .cellcard.fail {{ opacity:.62; }}
+    .cellcard.fail .lock {{ text-decoration:line-through; }}
+    .cellcard.selected {{ outline:3px solid var(--accent); }}
+    .cellcard header {{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }}
+    h2 {{ margin:0; font-size:17px; }}
+    .status {{ padding:3px 8px; border-radius:999px; font-weight:700; font-size:11px; text-transform:uppercase; }}
+    .status.pass {{ background:#e9f7ef; color:#14743a; }}
+    .status.fail {{ background:#fdecea; color:var(--bad); }}
+    .status.pending {{ background:#fff8e6; color:var(--warn); }}
+    .lock {{ color:var(--ink); }}
+    .notes {{ margin-top:8px; color:var(--bad); }}
+    .checks {{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }}
+    .check {{ padding:3px 7px; border:1px solid var(--line); border-radius:999px; background:#fafafa; font-size:12px; }}
+    footer {{ margin-top:12px; }}
+    button {{ border:1px solid var(--accent-dark); border-radius:6px; background:var(--accent);
+              color:#fff; padding:8px 12px; font-weight:700; cursor:pointer; }}
+    button.ghost {{ background:#fff; color:var(--ink); border-color:var(--line); }}
+    .blocked {{ color:var(--bad); font-weight:700; }}
+    pre {{ white-space:pre-wrap; overflow-wrap:anywhere; margin:0; padding:10px; border:1px solid var(--line);
+           border-radius:6px; background:#f8fafb; }}
+    section.prompt {{ margin-top:18px; }}
+    h3 {{ font-size:13px; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Concept Sheet: {html.escape(candidate_id)}</h1>
+    <p>{columns}x{rows} grid, {len(cells)} cells, read left to right and top to bottom.
+       {len(passing)} passed, {len(failing)} failed, {len(pending)} unscreened.</p>
+    {"".join(banners)}
+    <div class="sheet-wrap">
+      {"<img src=\"" + sheet_src + "\" alt=\"concept sheet\">" if sheet_src else "<div>No sheet image found</div>"}
+      {overlay}
+    </div>
+    <aside class="decision">
+      <b>Decision Needed</b>
+      <p>Click the cells you want, then send the copied sentence back to Codex.
+         A cell is a concept, not a canonical base — each one you pick still gets
+         redrawn at sprite scale and approved before it becomes an identity lock.</p>
+      <div id="selectedText">No cell selected.</div>
+      <p style="margin-top:10px"><button type="button" class="ghost" id="clear">Clear selection</button></p>
+    </aside>
+    <section class="grid">{rows_html}</section>
+    <section class="prompt">
+      <h3>Prompt</h3>
+      <pre id="sheet-prompt">{html.escape(prompt)}</pre>
+      <p style="margin-top:10px"><button type="button" class="ghost" id="copyPrompt">Copy Prompt</button></p>
+    </section>
+  </main>
+  <script>
+    const chosen = new Set();
+    async function copyText(text) {{
+      try {{ await navigator.clipboard.writeText(text); return true; }}
+      catch (error) {{
+        const area = document.createElement('textarea');
+        area.value = text; document.body.appendChild(area); area.select();
+        const ok = document.execCommand('copy'); area.remove(); return ok;
+      }}
+    }}
+    function sentence() {{
+      const ids = [...chosen].sort();
+      if (!ids.length) return '';
+      if (ids.length === 1) return `I choose ${{ids[0]}} from the concept sheet.`;
+      const last = ids.pop();
+      return `I choose ${{ids.join(', ')}} and ${{last}} from the concept sheet.`;
+    }}
+    function paint() {{
+      document.querySelectorAll('.cell, .cellcard').forEach((node) => {{
+        const id = node.dataset.cell || node.id.replace('card-', '');
+        node.classList.toggle('selected', chosen.has(id));
+      }});
+      const text = sentence();
+      document.getElementById('selectedText').textContent = text || 'No cell selected.';
+      return text;
+    }}
+    async function toggle(id) {{
+      if (chosen.has(id)) chosen.delete(id); else chosen.add(id);
+      const text = paint();
+      if (text) {{
+        const ok = await copyText(text);
+        document.getElementById('selectedText').textContent = ok ? text + ' Copied.' : text;
+      }}
+    }}
+    document.querySelectorAll('button.pick').forEach((button) =>
+      button.addEventListener('click', () => toggle(button.dataset.cell)));
+    document.querySelectorAll('.cell:not(.fail)').forEach((cell) =>
+      cell.addEventListener('click', () => toggle(cell.dataset.cell)));
+    document.getElementById('clear').addEventListener('click', () => {{ chosen.clear(); paint(); }});
+    document.getElementById('copyPrompt').addEventListener('click', async (event) => {{
+      const ok = await copyText(document.getElementById('sheet-prompt').textContent);
+      event.target.textContent = ok ? 'Prompt Copied' : 'Copy Failed';
+      setTimeout(() => event.target.textContent = 'Copy Prompt', 1200);
+    }});
+  </script>
+</body>
+</html>
+"""
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("bundle", help="Path to PetName.pet source bundle")
-    parser.add_argument("--action", required=True, help="Sprite action/state to review")
+    parser.add_argument("--action", required=True,
+                        help="Sprite action/state to review, or concept-sheet for a brainstorm sheet")
     parser.add_argument("--output", help="HTML output path; defaults to <bundle>/qa/<action>-review.html")
     args = parser.parse_args()
 
@@ -440,6 +693,31 @@ def main() -> None:
     if not candidates:
         raise SystemExit(f"No candidate packets found for action {args.action!r}")
     output.parent.mkdir(parents=True, exist_ok=True)
+
+    if args.action == CONCEPT_SHEET:
+        # A sheet is one candidate holding many options, so the page is the sheet
+        # rather than a row of cards. Newest packet wins when a V2 round has run.
+        candidate = candidates[-1]
+        output.write_text(render_sheet_html(bundle, candidate, output), encoding="utf-8")
+        cells = sheet_cells(candidate["context"])
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "action": args.action,
+                    "output": str(output),
+                    "candidate_id": candidate["id"],
+                    "cells": {
+                        "pass": [c["id"] for c in cells if c["status"] == "pass"],
+                        "fail": [c["id"] for c in cells if c["status"] == "fail"],
+                        "pending": [c["id"] for c in cells if c["status"] == "pending"],
+                    },
+                },
+                indent=2,
+            )
+        )
+        return
+
     output.write_text(render_html(bundle, args.action, candidates, output), encoding="utf-8")
     print(json.dumps({"ok": True, "action": args.action, "output": str(output), "candidates": [c["id"] for c in candidates]}, indent=2))
 

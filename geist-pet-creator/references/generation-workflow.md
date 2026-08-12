@@ -56,25 +56,84 @@ Countable cues get Part Manifest rows too, with the count that makes drift visib
 
 Create `sources/canonical-base.png` as a full-body alpha or clean-background reference. It is not enough for the base to look nice; it must be simple enough to preserve across all animation states at `192x208`.
 
-Generate multiple base variants as candidate packets first, using image generation for new visible art. The agent must pre-screen each candidate, show the passing options with their exact prompts, and ask the human to choose one candidate id before copying it to `sources/canonical-base.png`.
+Generate base variants as candidate packets first, using image generation for new visible art. The agent must pre-screen each candidate, show the passing options with their exact prompts, and ask the human to choose one candidate id before copying it to `sources/canonical-base.png`.
+
+How many variants depends on whether a concept sheet ran:
+
+- **A sheet ran.** One variant. The sheet already presented the options and the human already chose; this call renders the chosen cell at sprite scale. Raise the count only when that render loses the identity.
+- **No sheet ran.** Three variants, the normal per-action minimum, because nothing has shown the human options yet.
 
 For a derived Pet, attach two images to every base call and name both roles in the prompt: Image 1 the identity reference, Image 2 the house-style reference. The skill ships the house-style image at `$SKILL_DIR/assets/geist-house-style.jpg`; copy it into the bundle as `sources/references/geist-house-style.jpg` so the packet stays reproducible. Keep those roles in that order for the whole bundle, and state in the prompt which one wins on conflict. Pre-screen the result with the naming, silhouette, and heart tests from [identity-blend.md](identity-blend.md) before it reaches the human.
 
 The shipped galleries under `assets/` show the cue budget spent three different ways, plus one counter-example. Read [../assets/README.md](../assets/README.md) before writing identity locks for a source you have not drawn before, and attach the closest gallery as a quality target when its shape matches the job.
 
-### Concept Gallery Route
+### Concept Sheet Route
 
-When the human names a cast, crew, roster, or franchise rather than one Pet, choose the Pet from a gallery first:
+The route fires on a **brainstorm**, in either of two shapes:
 
-1. Create a concept bundle, `<Thing>Concepts.pet`.
-2. Generate one gallery image rather than one image per character: an invisible grid on warm off-white paper, one complete centered mascot per cell, equal scale and baseline, no dividers, no text beyond optional cell labels. Six go 3x2, ten go 5x2, twelve go 4x3.
-3. Write one numbered identity-lock paragraph per cell, as physical description, in the exact row-major order the grid is read in.
-4. Pre-screen cell by cell — the sheet passes only if every cell passes — then render `qa/canonical-base-review.html` and ask the human to choose.
-5. Crop each chosen cell into its own `<Name>.pet` bundle as `sources/references/selected-<cue>.png`.
+- **Multiple characters** — a cast, a crew, a roster, a franchise.
+- **Multiple design directions for one Pet** — "brainstorm some variants", "show me a few takes on this".
 
-A gallery cell is a concept, not a canonical base. Each chosen cell re-enters the `canonical-base` gate as its own sprite-scale candidate, with the crop as Image 1, before anything is written to `sources/canonical-base.png`.
+It does not fire for a request naming one Pet with one direction. It never fires for sprite-action variants: those stay separate candidate packets, because animation approval needs a moving preview per variant and a grid of contact sheets is strictly worse than what the per-action review already gives.
 
-When a gallery reads generic, run a V2 round that keeps the same row-major families and layout and strengthens the identity locks themselves. Adding an accessory to a cell that failed the naming test rarely fixes it; a stronger crown cue usually does.
+Draw **one image**, not one image per concept. One call, an invisible grid, one complete centered mascot per cell, equal scale and baseline, warm off-white paper, no dividers, no text. Cells drawn in the same call share scale, weight, and lighting, so they can be compared; cells drawn in separate calls cannot, and comparability is the entire reason the sheet exists.
+
+#### Grid and aspect ratio
+
+Set `aspect_ratio` to match the grid on every sheet call. A square request for a 5x2 grid letterboxes the cells and shrinks every mascot inside them.
+
+| Cells | Grid | Aspect ratio |
+| ---: | --- | --- |
+| 3 | 3x1 | 3:1 |
+| 4 | 2x2 | 1:1 |
+| 5 | 3x2, one cell left empty | 3:2 |
+| 6 | 3x2 | 3:2 |
+| 8 | 4x2 | 2:1 |
+| 9 | 3x3 | 1:1 |
+| 10 | 5x2 | 5:2 |
+| 12 | 4x3 | 4:3 |
+
+Twelve is the cap. Split anything larger across two sheets: a cell too small to name is not a concept, it is a smudge. Measured 2026-08-12, twelve cells held on both models tried, at 384x384 a cell — see [../measurements/2026-08-12-concept-sheet-smoke.md](../measurements/2026-08-12-concept-sheet-smoke.md).
+
+**Do not assume the model puts its rows where the even grid says.** One model drew its first row 20 pixels past the even-thirds boundary, and cutting there would have shaved the bottom of every mascot in that row. `crop_gallery_cells.py` snaps to the gutters between the drawn rows for this reason; it warns and falls back to the even grid when it cannot read them.
+
+#### Steps
+
+1. **Decide where the sheet lives, by fan-out.** Many characters get a staging bundle, `<Thing>Concepts.pet`, because one sheet spawns many Pets. One character's variants go straight into the target `<Name>.pet` — a staging bundle for a single Pet is overhead with nothing to justify it. Either way the packet is `sources/candidates/concept-sheet-01/`.
+2. **Write one numbered identity-lock paragraph per cell**, as physical description, in the exact row-major order the grid is read in. Never a character's name.
+3. **Draw the sheet.** One call. Under the External Image Provider that is `--action concept-sheet`.
+4. **Pre-screen every cell and record a verdict for each**, into `cells[]` in `candidate-context.json`.
+5. **Render `qa/concept-sheet-review.html`** with `render_candidate_review_html.py --action concept-sheet`.
+6. **Ask the human to choose by cell id.**
+7. **Crop the chosen cells** with `crop_gallery_cells.py`, then carry each crop into the `canonical-base` gate as Image 1.
+
+#### What may vary between cells
+
+Cells are allowed to differ in silhouette, crown cue, prop choice, and palette accents. That is what a brainstorm is.
+
+The house-form invariants never vary between cells: one compact rounded legless floating body, one thick Sky outline, Cream body area, two Ink dot eyes, one tiny mouth, exactly one centered Mango heart, tiny attached arm nubs, flat fills, no floor or shadow. A sheet whose cells disagree about the house form is not a set of options, it is a set of mistakes.
+
+This licence ends at `canonical-base` approval. From there on, sprite-action variants vary motion only.
+
+#### When a cell fails pre-screen
+
+Do not throw the sheet away for one bad cell. Mark the cell `fail` with a short note; the review page strikes it out and makes it unchoosable, and `crop_gallery_cells.py` refuses to crop it.
+
+Redraw the whole sheet only when **fewer than 3 cells pass**, or when the failing cell is a character the human named by name. One weak cell among strong ones is information about that identity lock, not a reason to spend another call.
+
+#### Cell ids and labels
+
+Cells are numbered row-major from 1, and addressed as `cell-04`. The identity-lock paragraphs are already numbered row-major, so the paragraph number and the cell id are the same number — no translation layer, and nothing to get out of step.
+
+**Never bake cell numbers into the generated image.** Image generators render text unreliably, and a baked label lands inside the crop when the cell becomes Image 1 for the next call. The review page draws the numbered overlay instead.
+
+#### A cell is a concept
+
+A sheet cell is a concept, not a canonical base. Each chosen cell re-enters the `canonical-base` gate as its own sprite-scale candidate, with the crop as Image 1, before anything is written to `sources/canonical-base.png`. A 300px crop from a shared sheet cannot be the identity lock that all 57 frames are counted against.
+
+#### V2 refinement
+
+When a sheet reads generic, run a second round that keeps the same row-major families and the same layout, and strengthens the identity locks themselves. Adding an accessory to a cell that failed the naming test rarely fixes it; a stronger crown cue usually does.
 
 ## Sprite Action Variant Review
 
@@ -173,15 +232,64 @@ qa/<sprite-action>-review.html
 
 If a candidate fails pre-screening, set `agent_pre_screen.status` to `fail`, write short failure notes, and do not ask the human unless the failure is subtle and the human explicitly wants to compare variants.
 
+### Concept Sheet Packets
+
+A concept sheet is one image holding many options, so its packet carries per-cell data the per-action shape has nowhere to put. Same envelope, three additions — `grid`, `cells`, and `identity_locks`:
+
+```json
+{
+  "candidate_id": "concept-sheet-01",
+  "target": {
+    "kind": "concept-sheet",
+    "destination": "sources/candidates/concept-sheet-01/cells/"
+  },
+  "generated_file": "sources/candidates/concept-sheet-01/candidate.png",
+  "grid": {
+    "columns": 3,
+    "rows": 2,
+    "cell_count": 6,
+    "aspect_ratio": "3:2"
+  },
+  "identity_locks": [
+    { "cell_id": "cell-01", "text": "Broad woven straw brim, messy black crest, tiny stitch scar below the left eye..." },
+    { "cell_id": "cell-02", "text": "Three broad rounded moss crest spikes, one thick dark-green crown band..." }
+  ],
+  "agent_pre_screen": {
+    "status": "pass",
+    "cells": [
+      {
+        "cell_id": "cell-01",
+        "status": "pass",
+        "checks": { "identity": "pass", "house_form": "pass", "containment": "pass", "scale": "pass" },
+        "notes": "Names in under two seconds at thumbnail scale."
+      },
+      {
+        "cell_id": "cell-02",
+        "status": "fail",
+        "checks": { "identity": "pass", "house_form": "fail", "containment": "pass", "scale": "pass" },
+        "notes": "Heart drifted off centre and reads as a badge. Not choosable."
+      }
+    ]
+  },
+  "human_review": {
+    "status": "pending",
+    "question": "Choose one or more cells by id from the concept sheet: cell-01, cell-03, cell-04, cell-05, cell-06."
+  }
+}
+```
+
+The rolled-up `agent_pre_screen.status` is `pass` when **3 or more cells pass**, and `fail` below that — a sheet with two usable options is not worth a human's attention, so redraw it instead. `grid` is what `crop_gallery_cells.py` reads to cut the cells, so it must describe the grid that was actually requested. `identity_locks` is machine-readable so the review page can put each lock beside its overlay number without parsing `prompt.md`; the prose prompt stays the source of truth in `prompt.md`.
+
 ## Human-In-The-Loop Review
 
 Use human approval at these gates:
 
 1. Character bible approval before base generation when the brief is ambiguous.
-2. Canonical base variant choice before generating state frames.
-3. Per-action variant choice before writing each state to `frames/`.
-4. Repair approval when a regenerated frame changes expression, pose, prop placement, or silhouette.
-5. Final contact-sheet approval before export, install, or delivery when the user is available.
+2. Concept sheet cell choice, when the brainstorm route fired. Conditional — it never replaces the gate below.
+3. Canonical base variant choice before generating state frames.
+4. Per-action variant choice before writing each state to `frames/`.
+5. Repair approval when a regenerated frame changes expression, pose, prop placement, or silhouette.
+6. Final contact-sheet approval before export, install, or delivery when the user is available.
 
 When asking for approval, render and show an HTML review page:
 

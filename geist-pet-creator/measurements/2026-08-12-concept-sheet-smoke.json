@@ -1,0 +1,637 @@
+{
+  "cases": [
+    {
+      "id": "order-count-6",
+      "kind": "concept-sheet",
+      "references": [
+        "/Users/samithiwat/Desktop/work/geist/geist-pet-creator/geist-pet-creator/assets/geist-house-style.jpg"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: concept sheet for choosing a Geist Pet\nInput images: Image 1 is the house-style reference and wins on any conflict. Do not edit or reproduce it.\nPrimary request: Draw 6 different Geist Pet mascot concepts, exactly one per cell, on an invisible 3-column by 2-row grid read left to right, top to bottom. Translate each concept into a compact rounded non-human Geist companion, never a miniature figure of a source character.\nShared Geist identity: One compact rounded legless floating body with a single thick sky-blue outline of even weight, a cream body area, two small ink dot eyes, one tiny simple mouth, exactly one centred orange heart physically inside the silhouette, tiny attached rounded arm nubs, flat colour fills with very few interior lines, props thick and short and rounded and physically attached, no legs, no feet, no knees, no shoes, no floor plane, no cast shadow, no detached effect, and the whole character readable at 192x208.\nIdentity locks, one per cell in that exact order:\n  1. Flat red body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably red.\n  2. Flat orange body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably orange.\n  3. Flat yellow-green body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably yellow-green.\n  4. Flat green body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably green.\n  5. Flat indigo body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably indigo.\n  6. Flat magenta body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably magenta.\nScene/backdrop: plain warm off-white paper; invisible grid; generous negative space between cells; no dividers, no rules, no frames, no cell borders\nStyle/medium: flat colour fills, even outline weight, no gradients, no texture, no shadows, no gloss, no screentone, no painterly marks, no 3D\nComposition/framing: exactly one centred full-body mascot per cell, equal visual scale and equal baseline across every cell, ample padding inside each cell, nothing cropped, no mascot crossing into a neighbouring cell, front or soft three-quarter view\nConstraints: every mascot keeps the shared Geist identity above; cells may differ in silhouette, headwear, one attached prop and colour accents, and may differ in nothing else\nAvoid: any text, letters, numbers, labels, captions or watermarks anywhere on the image; legs, feet, knees, shoes, realistic hands, fingers, noses, realistic faces, muscular build, real weapons, blades and edges, blood, franchise titles, official logos, exact emblems, kanji, readable letters or numbers, watermarks, aura, energy effects, speed lines, impact marks, scenery, floor planes, cast shadows, detached props, floating accessories, extra characters, gradients, screentone, painterly texture, glossy 3D, and black exterior outlines",
+      "cues": "6 cells, 3x2",
+      "difficulty": "row-major order, read mechanically from body hue",
+      "grid": {
+        "columns": 3,
+        "rows": 2,
+        "cell_count": 6,
+        "aspect_ratio": "3:2"
+      },
+      "locks": [
+        "Flat red body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably red.",
+        "Flat orange body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably orange.",
+        "Flat yellow-green body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably yellow-green.",
+        "Flat green body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably green.",
+        "Flat indigo body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably indigo.",
+        "Flat magenta body panel filling most of the body area, plain rounded dome with no crest, no prop, calm dot eyes. The body panel is clearly and unmistakably magenta."
+      ],
+      "order_hues": [
+        [
+          0,
+          "red"
+        ],
+        [
+          40,
+          "orange"
+        ],
+        [
+          80,
+          "yellow-green"
+        ],
+        [
+          130,
+          "green"
+        ],
+        [
+          265,
+          "indigo"
+        ],
+        [
+          310,
+          "magenta"
+        ]
+      ]
+    },
+    {
+      "id": "cast-derived-12",
+      "kind": "concept-sheet",
+      "references": [
+        "/Users/samithiwat/Desktop/work/geist/pet-design/DragonBallConcepts.pet/sources/canonical-base.png",
+        "/Users/samithiwat/Desktop/work/geist/geist-pet-creator/geist-pet-creator/assets/geist-house-style.jpg"
+      ],
+      "prompt": "Use case: stylized-concept\nAsset type: concept sheet for choosing a Geist Pet\nInput images: Image 1 is the identity reference. Image 2 is the house-style reference. Image 2 wins on any conflict. Do not edit or reproduce either image.\nPrimary request: Draw 12 different Geist Pet mascot concepts, exactly one per cell, on an invisible 4-column by 3-row grid read left to right, top to bottom. Translate each concept into a compact rounded non-human Geist companion, never a miniature figure of a source character.\nShared Geist identity: One compact rounded legless floating body with a single thick sky-blue outline of even weight, a cream body area, two small ink dot eyes, one tiny simple mouth, exactly one centred orange heart physically inside the silhouette, tiny attached rounded arm nubs, flat colour fills with very few interior lines, props thick and short and rounded and physically attached, no legs, no feet, no knees, no shoes, no floor plane, no cast shadow, no detached effect, and the whole character readable at 192x208.\nIdentity locks, one per cell in that exact order:\n  1. Tall spiked black crest with a sharp widow's peak, flat navy-and-white chest panels with thin gold trim, narrowed dot eyes and a short flat mouth, no prop.\n  2. Round soft orange crest with three blunt forward spikes, flat orange body panel with a wide blue sash band, wide open dot eyes, one thick rounded staff attached at the side.\n  3. Smooth bald dome with six small ink dots in two rows across the crown, flat orange and yellow robe panels, calm level dot eyes, no prop.\n  4. Twin blunt antenna tabs curving back from the crown, flat pale green body tint, one thick rounded halo ring attached above the dome, gentle upturned mouth.\n  5. Wide flat mushroom-shaped lavender crest, flat purple body panel with a white collar block, half-lidded dot eyes, one thick rounded fan prop attached at the side.\n  6. Short bristled teal crest with one thick forward horn tab, flat teal and cream body blocks, one round cheek dot on each side, no prop.\n  7. Tall spiked black crest with a sharp widow's peak, flat navy-and-white chest panels with thin gold trim, narrowed dot eyes and a short flat mouth, no prop.\n  8. Round soft orange crest with three blunt forward spikes, flat orange body panel with a wide blue sash band, wide open dot eyes, one thick rounded staff attached at the side.\n  9. Smooth bald dome with six small ink dots in two rows across the crown, flat orange and yellow robe panels, calm level dot eyes, no prop.\n  10. Twin blunt antenna tabs curving back from the crown, flat pale green body tint, one thick rounded halo ring attached above the dome, gentle upturned mouth.\n  11. Wide flat mushroom-shaped lavender crest, flat purple body panel with a white collar block, half-lidded dot eyes, one thick rounded fan prop attached at the side.\n  12. Short bristled teal crest with one thick forward horn tab, flat teal and cream body blocks, one round cheek dot on each side, no prop.\nScene/backdrop: plain warm off-white paper; invisible grid; generous negative space between cells; no dividers, no rules, no frames, no cell borders\nStyle/medium: flat colour fills, even outline weight, no gradients, no texture, no shadows, no gloss, no screentone, no painterly marks, no 3D\nComposition/framing: exactly one centred full-body mascot per cell, equal visual scale and equal baseline across every cell, ample padding inside each cell, nothing cropped, no mascot crossing into a neighbouring cell, front or soft three-quarter view\nConstraints: every mascot keeps the shared Geist identity above; cells may differ in silhouette, headwear, one attached prop and colour accents, and may differ in nothing else\nAvoid: any text, letters, numbers, labels, captions or watermarks anywhere on the image; legs, feet, knees, shoes, realistic hands, fingers, noses, realistic faces, muscular build, real weapons, blades and edges, blood, franchise titles, official logos, exact emblems, kanji, readable letters or numbers, watermarks, aura, energy effects, speed lines, impact marks, scenery, floor planes, cast shadows, detached props, floating accessories, extra characters, gradients, screentone, painterly texture, glossy 3D, and black exterior outlines",
+      "cues": "12 cells, 4x3",
+      "difficulty": "stress: where cell fidelity breaks, and whether the 12-cell cap holds",
+      "grid": {
+        "columns": 4,
+        "rows": 3,
+        "cell_count": 12,
+        "aspect_ratio": "4:3"
+      },
+      "locks": [
+        "Tall spiked black crest with a sharp widow's peak, flat navy-and-white chest panels with thin gold trim, narrowed dot eyes and a short flat mouth, no prop.",
+        "Round soft orange crest with three blunt forward spikes, flat orange body panel with a wide blue sash band, wide open dot eyes, one thick rounded staff attached at the side.",
+        "Smooth bald dome with six small ink dots in two rows across the crown, flat orange and yellow robe panels, calm level dot eyes, no prop.",
+        "Twin blunt antenna tabs curving back from the crown, flat pale green body tint, one thick rounded halo ring attached above the dome, gentle upturned mouth.",
+        "Wide flat mushroom-shaped lavender crest, flat purple body panel with a white collar block, half-lidded dot eyes, one thick rounded fan prop attached at the side.",
+        "Short bristled teal crest with one thick forward horn tab, flat teal and cream body blocks, one round cheek dot on each side, no prop.",
+        "Tall spiked black crest with a sharp widow's peak, flat navy-and-white chest panels with thin gold trim, narrowed dot eyes and a short flat mouth, no prop.",
+        "Round soft orange crest with three blunt forward spikes, flat orange body panel with a wide blue sash band, wide open dot eyes, one thick rounded staff attached at the side.",
+        "Smooth bald dome with six small ink dots in two rows across the crown, flat orange and yellow robe panels, calm level dot eyes, no prop.",
+        "Twin blunt antenna tabs curving back from the crown, flat pale green body tint, one thick rounded halo ring attached above the dome, gentle upturned mouth.",
+        "Wide flat mushroom-shaped lavender crest, flat purple body panel with a white collar block, half-lidded dot eyes, one thick rounded fan prop attached at the side.",
+        "Short bristled teal crest with one thick forward horn tab, flat teal and cream body blocks, one round cheek dot on each side, no prop."
+      ],
+      "order_hues": null
+    }
+  ],
+  "calls": 4,
+  "cost_usd": 0.152399,
+  "stopped_early": null,
+  "summary": [
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "returned": "2/2",
+      "mechanical_pass": "1/2",
+      "median_s": 6.0,
+      "total_cost_usd": 0.069534,
+      "median_cost_usd": 0.0,
+      "projected_pass_usd": 0.0,
+      "median_sheet_usd": 0.034767,
+      "sheets_comparable": "1/2",
+      "sheets_order_held": 0,
+      "alpha_paths": [
+        "opaque by request"
+      ],
+      "errors": []
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "returned": "2/2",
+      "mechanical_pass": "0/2",
+      "median_s": 51.61,
+      "total_cost_usd": 0.082865,
+      "median_cost_usd": 0.0,
+      "projected_pass_usd": 0.0,
+      "median_sheet_usd": 0.041432,
+      "sheets_comparable": "0/2",
+      "sheets_order_held": 0,
+      "alpha_paths": [
+        "opaque by request"
+      ],
+      "errors": []
+    }
+  ],
+  "attempts": [
+    {
+      "model": "openai/gpt-image-2",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 48.7,
+      "cost_usd": 0.048311,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1024
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "baselines spread over 15% of cell height",
+        "row-major order broken at cell-06"
+      ],
+      "sheet": {
+        "paper": [
+          253,
+          251,
+          244
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0272,
+        "baseline_spread": 0.1543,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4017,
+            "height_fraction": 0.6367,
+            "baseline_fraction": 0.8691
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3905,
+            "height_fraction": 0.6348,
+            "baseline_fraction": 0.8691
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3892,
+            "height_fraction": 0.6367,
+            "baseline_fraction": 0.8711
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3881,
+            "height_fraction": 0.6309,
+            "baseline_fraction": 0.7168
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4235,
+            "height_fraction": 0.6797,
+            "baseline_fraction": 0.7168
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3857,
+            "height_fraction": 0.6289,
+            "baseline_fraction": 0.7168
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5,
+              "reads_as_cell": 1
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 35,
+              "reads_as_cell": 2
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 65,
+              "reads_as_cell": 3
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 145,
+              "reads_as_cell": 4
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235,
+              "reads_as_cell": 5
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 335,
+              "reads_as_cell": 1
+            }
+          ],
+          "misplaced": [
+            "cell-06"
+          ]
+        }
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "order-count-6",
+      "ok": true,
+      "error": null,
+      "duration_s": 7.92,
+      "cost_usd": 0.034066,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1264,
+        848
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "row-major order broken at cell-03, cell-06"
+      ],
+      "sheet": {
+        "paper": [
+          247,
+          243,
+          231
+        ],
+        "cells_drawn": 6,
+        "cells_expected": 6,
+        "cells_crossing": [],
+        "scale_cv": 0.0046,
+        "baseline_spread": 0.0684,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4155,
+            "height_fraction": 0.6203,
+            "baseline_fraction": 0.8373
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4145,
+            "height_fraction": 0.6203,
+            "baseline_fraction": 0.8373
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4155,
+            "height_fraction": 0.6203,
+            "baseline_fraction": 0.8373
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4186,
+            "height_fraction": 0.625,
+            "baseline_fraction": 0.7689
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4207,
+            "height_fraction": 0.6274,
+            "baseline_fraction": 0.7689
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4201,
+            "height_fraction": 0.625,
+            "baseline_fraction": 0.7689
+          }
+        ],
+        "order": {
+          "placement": [
+            {
+              "cell_id": "cell-01",
+              "expected": "red",
+              "observed_hue": 5,
+              "reads_as_cell": 1
+            },
+            {
+              "cell_id": "cell-02",
+              "expected": "orange",
+              "observed_hue": 25,
+              "reads_as_cell": 2
+            },
+            {
+              "cell_id": "cell-03",
+              "expected": "yellow-green",
+              "observed_hue": 55,
+              "reads_as_cell": 2
+            },
+            {
+              "cell_id": "cell-04",
+              "expected": "green",
+              "observed_hue": 125,
+              "reads_as_cell": 4
+            },
+            {
+              "cell_id": "cell-05",
+              "expected": "indigo",
+              "observed_hue": 235,
+              "reads_as_cell": 5
+            },
+            {
+              "cell_id": "cell-06",
+              "expected": "magenta",
+              "observed_hue": 335,
+              "reads_as_cell": 1
+            }
+          ],
+          "misplaced": [
+            "cell-03",
+            "cell-06"
+          ]
+        }
+      }
+    },
+    {
+      "model": "openai/gpt-image-2",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 54.52,
+      "cost_usd": 0.034554,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1536,
+        1152
+      ],
+      "mechanical_pass": false,
+      "reasons": [
+        "crosses its cell: cell-01, cell-02, cell-03, cell-04, cell-05, cell-06, cell-07, cell-08",
+        "baselines spread over 17% of cell height"
+      ],
+      "sheet": {
+        "paper": [
+          250,
+          249,
+          244
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [
+          "cell-01",
+          "cell-02",
+          "cell-03",
+          "cell-04",
+          "cell-05",
+          "cell-06",
+          "cell-07",
+          "cell-08"
+        ],
+        "scale_cv": 0.1318,
+        "baseline_spread": 0.1719,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6475,
+            "height_fraction": 0.8516,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6002,
+            "height_fraction": 0.7708,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.4736,
+            "height_fraction": 0.6589,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.5203,
+            "height_fraction": 0.7266,
+            "baseline_fraction": 1.0
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.8019,
+            "height_fraction": 0.9714,
+            "baseline_fraction": 0.9714
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.6693,
+            "height_fraction": 0.9661,
+            "baseline_fraction": 0.9661
+          },
+          {
+            "cell_id": "cell-07",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7061,
+            "height_fraction": 0.9896,
+            "baseline_fraction": 0.9896
+          },
+          {
+            "cell_id": "cell-08",
+            "occupied": true,
+            "contained": false,
+            "coverage": 0.7324,
+            "height_fraction": 0.9766,
+            "baseline_fraction": 0.9766
+          },
+          {
+            "cell_id": "cell-09",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5297,
+            "height_fraction": 0.737,
+            "baseline_fraction": 0.8281
+          },
+          {
+            "cell_id": "cell-10",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5455,
+            "height_fraction": 0.7786,
+            "baseline_fraction": 0.8359
+          },
+          {
+            "cell_id": "cell-11",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.6263,
+            "height_fraction": 0.7708,
+            "baseline_fraction": 0.8516
+          },
+          {
+            "cell_id": "cell-12",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.5556,
+            "height_fraction": 0.8021,
+            "baseline_fraction": 0.849
+          }
+        ]
+      }
+    },
+    {
+      "model": "google/gemini-3.1-flash-lite-image",
+      "case": "cast-derived-12",
+      "ok": true,
+      "error": null,
+      "duration_s": 4.09,
+      "cost_usd": 0.035468,
+      "calls": 1,
+      "alpha_path": "opaque by request",
+      "size": [
+        1200,
+        896
+      ],
+      "mechanical_pass": true,
+      "reasons": [],
+      "sheet": {
+        "paper": [
+          247,
+          243,
+          234
+        ],
+        "cells_drawn": 12,
+        "cells_expected": 12,
+        "cells_crossing": [],
+        "scale_cv": 0.0824,
+        "baseline_spread": 0.087,
+        "cells": [
+          {
+            "cell_id": "cell-01",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4314,
+            "height_fraction": 0.7659,
+            "baseline_fraction": 0.8696
+          },
+          {
+            "cell_id": "cell-02",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4336,
+            "height_fraction": 0.6957,
+            "baseline_fraction": 0.8696
+          },
+          {
+            "cell_id": "cell-03",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3354,
+            "height_fraction": 0.5953,
+            "baseline_fraction": 0.8696
+          },
+          {
+            "cell_id": "cell-04",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3877,
+            "height_fraction": 0.6923,
+            "baseline_fraction": 0.8696
+          },
+          {
+            "cell_id": "cell-05",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4674,
+            "height_fraction": 0.6678,
+            "baseline_fraction": 0.8356
+          },
+          {
+            "cell_id": "cell-06",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3708,
+            "height_fraction": 0.6544,
+            "baseline_fraction": 0.8356
+          },
+          {
+            "cell_id": "cell-07",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4208,
+            "height_fraction": 0.7651,
+            "baseline_fraction": 0.8624
+          },
+          {
+            "cell_id": "cell-08",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4332,
+            "height_fraction": 0.6913,
+            "baseline_fraction": 0.8456
+          },
+          {
+            "cell_id": "cell-09",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3241,
+            "height_fraction": 0.5753,
+            "baseline_fraction": 0.7826
+          },
+          {
+            "cell_id": "cell-10",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3742,
+            "height_fraction": 0.6722,
+            "baseline_fraction": 0.7893
+          },
+          {
+            "cell_id": "cell-11",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.4088,
+            "height_fraction": 0.6321,
+            "baseline_fraction": 0.796
+          },
+          {
+            "cell_id": "cell-12",
+            "occupied": true,
+            "contained": true,
+            "coverage": 0.3636,
+            "height_fraction": 0.6455,
+            "baseline_fraction": 0.7893
+          }
+        ]
+      }
+    }
+  ]
+}
