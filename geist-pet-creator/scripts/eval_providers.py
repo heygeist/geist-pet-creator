@@ -63,6 +63,7 @@ from typing import Any
 
 from PIL import Image, ImageChops
 
+from crop_gallery_cells import resolve_rects
 from geist_house import HOUSE_FORM, cell_id, cell_rects, layout_for
 from geist_pixels import alpha_bbox, data_uri
 from generate_candidates import (
@@ -446,7 +447,18 @@ def sheet_score(
     columns, rows = int(grid["columns"]), int(grid["rows"])
     expected = int(grid["cell_count"])
     paper = paper_colour(image)
-    rects = cell_rects(image.width, image.height, columns, rows)
+    # Measure against the rects the CROPPER will cut on, not against an even grid
+    # nobody uses.
+    #
+    # Measured 2026-08-12: scoring containment on the even grid called 17 of
+    # openai/gpt-image-2's cells "crossing" across five sheets, and every one of
+    # them cropped clean once snapped to the drawn gutters. The model draws
+    # well-separated mascots on its own layout; the metric was reporting
+    # disagreement with an assumption and reporting it as damage. Correcting it
+    # moved five verdicts and reordered the table.
+    #
+    # A fault only counts if it survives the thing that repairs it.
+    rects, _method, _warning = resolve_rects(image, columns, rows)
 
     reasons: list[str] = []
     cells: list[dict[str, Any]] = []
