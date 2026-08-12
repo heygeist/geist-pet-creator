@@ -49,6 +49,13 @@ NEVER_TRANSFERS = (
 # legs" spends most of its weight on `legs`. The ban is the guardrail; the
 # target ahead of it is the steering.
 
+# The first sentence asks for something no provider offers. OpenAI documents the
+# opposite -- that a model "may occasionally struggle to maintain visual
+# consistency" -- and no image provider documents any frame-to-frame or
+# pixel-registration property at all. It stays because it costs nothing and may
+# help at the margin, but the guarantee lives in `geist_registration`, which
+# measures the frames that came back rather than trusting the ask. Asking was
+# what produced the 5.6% size pop measured on FarWatcher.
 FRAMING = (
     "Framing: draw the character at the same body size in every frame of this action, "
     "centred, with the whole body and every prop well inside the canvas and an even clear "
@@ -90,6 +97,45 @@ FLAT_FIELD = (
 # The states whose NAME pulls hardest towards legs. The word in the prompt is
 # what does the damage, so these are the ones that carry LEGLESS_MOTION.
 MOTION_STATES = frozenset({"running-right", "running-left", "running", "jumping"})
+
+# How far a state's body may travel from where the bundle says it rests, per
+# axis, in cell pixels: (horizontal, vertical). Anything past this is drift, and
+# `geist_registration` translates it back.
+#
+# Declared, never inferred. Every engine that solves this solves it the same way
+# -- Unity's per-axis Bake Into Pose, and the equivalents in Unreal, Godot and
+# Spine -- because no measurement can tell a jump arc from a body that wandered.
+# Measured 2026-08-12 on two shipped Pets: a `waiting` row drifting 5.5px with
+# nothing declaring that it may, and `jumping` arcs of 9px and 22px that must
+# survive. Both numbers come out of the same pixels, so only a declaration
+# separates them.
+#
+# A zero pins the axis: every frame lands on the bundle's anchor. That is not a
+# claim the Pet is rigid -- the body still squashes and stretches around a
+# pinned base, which is how sprite animation has always worked. A state that
+# wants a hover declares the hover here.
+STILL = (0, 0)
+MOTION_BUDGET: dict[str, tuple[int, int]] = {
+    "idle": STILL,
+    "waving": STILL,
+    "waiting": STILL,
+    "review": STILL,
+    "failed": STILL,
+    "running-right": (14, 0),  # lateral glide; measured span 9px
+    "running-left": (14, 0),
+    "running": (14, 0),
+    "jumping": (0, 26),  # the arc; measured 22px on KarateCrownGuardian
+}
+
+
+def motion_budget(state: str) -> tuple[int, int]:
+    """The travel allowance for a state, defaulting to pinned.
+
+    An unknown state pins rather than floats: a new state that nobody has
+    thought about should hold still and be visibly wrong, not wander and look
+    like art.
+    """
+    return MOTION_BUDGET.get(state, STILL)
 
 # Cell count -> (columns, rows, aspect ratio).
 #
