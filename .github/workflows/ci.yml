@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    name: Runtime (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Check repository and skill shape
+        run: python3 scripts/check_repository.py
+      - name: Bootstrap isolated Pillow runtime
+        env:
+          GEIST_PET_CREATOR_CACHE: ${{ runner.temp }}/geist-pet-creator-cache
+        run: |
+          python3 skills/geist-pet-creator/scripts/bootstrap_runtime.py install
+          PET_PYTHON="$(python3 skills/geist-pet-creator/scripts/bootstrap_runtime.py python)"
+          "$PET_PYTHON" -m compileall -q skills/geist-pet-creator/scripts
+          "$PET_PYTHON" -m unittest discover -s tests -v
+          python3 skills/geist-pet-creator/scripts/bootstrap_runtime.py remove --yes
+          if python3 skills/geist-pet-creator/scripts/bootstrap_runtime.py check; then
+            echo "runtime still reports ready after removal" >&2
+            exit 1
+          fi
+      - name: Audit pinned Python dependency
+        if: matrix.os == 'ubuntu-latest' && matrix.python == '3.13'
+        run: |
+          python3 -m pip install --disable-pip-version-check pip-audit==2.10.1
+          python3 -m pip_audit --no-deps --disable-pip \
+            -r skills/geist-pet-creator/requirements.txt
+
+  npx-discovery:
+    name: npx discovery (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Discover skill from repository root
+        run: npx --yes skills@latest add . --list
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

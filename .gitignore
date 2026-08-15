@@ -4,11 +4,8 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
-
-
-# Eval output: generated, large (24MB), and reproducible with
-# scripts/eval_providers.py. The measured results that matter are written into
-# measurements/<date>-<name>.md and its .json, which ARE tracked.
+# Local Pet and provider test output is not release evidence. Add only sanitized
+# summaries under evidence/ after checking rights, paths, prompts, and secrets.
 provider-eval*/
 provider-eval*.log
 concept-sheet-eval*/

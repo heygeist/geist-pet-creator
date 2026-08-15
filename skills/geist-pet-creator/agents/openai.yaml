@@ -1,0 +1,4 @@
+interface:
+  display_name: "Geist Pet Creator"
+  short_description: "Create and QA Geist-compatible Pets"
+  default_prompt: "Use $geist-pet-creator in Quick mode to create a Geist-compatible Pet from this brief. Explain any first-use Pillow setup, disclose external generation cost and uploads before requesting authority, stop for the canonical-base and final-audit gates, then export only after approval."
