@@ -243,6 +243,13 @@ def render_card(candidate: dict[str, Any], bundle: Path, output: Path, action: s
     pre_status = pre_screen.get("status", "unknown") if isinstance(pre_screen, dict) else "unknown"
     prompt_id = f"prompt-{candidate_id}"
     choice_text = f"I choose {candidate_id} for {action}."
+    if preview_src:
+        preview_html = (
+            f'<img src="{html.escape(preview_src, quote=True)}" '
+            f'alt="{html.escape(candidate_id, quote=True)} preview">'
+        )
+    else:
+        preview_html = '<div class="missing">No preview found</div>'
     return f"""
       <article class="candidate" id="{html.escape(candidate_id)}">
         <header>
@@ -253,7 +260,7 @@ def render_card(candidate: dict[str, Any], bundle: Path, output: Path, action: s
           <span class="status">{html.escape(str(pre_status))}</span>
         </header>
         <div class="preview-wrap">
-          {"<img src=\"" + preview_src + "\" alt=\"" + html.escape(candidate_id) + " preview\">" if preview_src else "<div class=\"missing\">No preview found</div>"}
+          {preview_html}
         </div>
         <dl>
           <div><dt>Target</dt><dd>{html.escape(str(destination))}</dd></div>
@@ -566,6 +573,9 @@ def render_sheet_html(bundle: Path, candidate: dict[str, Any], output: Path) -> 
             if choosable
             else "<span class=\"blocked\">Not choosable</span>"
         )
+        notes_html = (
+            f'<p class="notes">{html.escape(cell["notes"])}</p>' if cell["notes"] else ""
+        )
         rows_html += f"""
         <article class="cellcard {cell['status']}" id="card-{html.escape(cell['id'])}">
           <header>
@@ -574,10 +584,16 @@ def render_sheet_html(bundle: Path, candidate: dict[str, Any], output: Path) -> 
           </header>
           <p class="lock">{html.escape(cell['lock']) or "<em>no identity lock recorded</em>"}</p>
           <div class="checks">{checks}</div>
-          {f'<p class="notes">{html.escape(cell["notes"])}</p>' if cell["notes"] else ""}
+          {notes_html}
           <footer>{button}</footer>
         </article>
         """
+
+    sheet_html = (
+        f'<img src="{html.escape(sheet_src, quote=True)}" alt="concept sheet">'
+        if sheet_src
+        else "<div>No sheet image found</div>"
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -644,7 +660,7 @@ def render_sheet_html(bundle: Path, candidate: dict[str, Any], output: Path) -> 
        {len(passing)} passed, {len(failing)} failed, {len(pending)} unscreened.</p>
     {"".join(banners)}
     <div class="sheet-wrap">
-      {"<img src=\"" + sheet_src + "\" alt=\"concept sheet\">" if sheet_src else "<div>No sheet image found</div>"}
+      {sheet_html}
       {overlay}
     </div>
     <aside class="decision">
