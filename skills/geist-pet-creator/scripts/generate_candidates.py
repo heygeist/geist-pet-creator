@@ -331,7 +331,7 @@ Do NOT "verify" a model id against GET /api/v1/models and repin on the result.
 That listing is INCOMPLETE. Measured 2026-08-12: openai/gpt-image-2,
 qwen/qwen-image-3-pro and x-ai/grok-imagine-image-2.0 are all absent from it,
 authenticated and unauthenticated, and all three answer real requests.
-openai/gpt-image-2 is this skill's default and draws frames for ~$0.023 each.
+openai/gpt-image-2 is this skill's measured default.
 
 This mistake has been made repeatedly, and it makes things worse: sessions have
 repinned working bundles onto openai/gpt-5.4-image-2, which rejects the
@@ -343,7 +343,8 @@ The only test that settles whether a model works is a live request:
     with_openrouter_key.sh <isolated-python> generate_candidates.py \\
         --verify-model MODEL_ID
 
-It costs about $0.01 and answers definitively. Use it before changing any pin.
+It is billable and answers definitively. Obtain authority for the total test-run
+ceiling before using it or changing any pin.
 """
 
 
@@ -387,7 +388,7 @@ def verify_model_live(model: str) -> None:
     probe.record(cost, note="--verify-model probe")
 
     listed = model in KNOWN_MODELS
-    print(f"{model}: REACHABLE. cost ${cost:.5f}.")
+    print(f"{model}: REACHABLE. total test-run cost ${cost:.5f}.")
     print(f"  in KNOWN_MODELS: {listed}")
     if not listed:
         print("  It works but is not pinned as known. Add it to KNOWN_MODELS if you want it,")
@@ -809,7 +810,6 @@ def generate_frame(
         # with the request about which background was asked for.
         "background_instruction": text[len(prompt):].strip(),
         "credential_source": credential_source(),
-        "usage_cost_usd": round(cost, 6),
         "run_cost_usd": round(guard.cost, 6),
         "images_this_run": guard.images,
     }
@@ -1454,7 +1454,7 @@ def main() -> None:
     parser.add_argument("bundle", nargs="?", help="Path to PetName.pet source bundle")
     parser.add_argument("--verify-model", metavar="MODEL_ID",
                         help="Settle whether a model id actually works, with one live "
-                             "request (~$0.01). The catalog listing is incomplete and "
+                             "billable request. The catalog listing is incomplete and "
                              "must not be used for this. Exits after reporting.")
     parser.add_argument("--action", choices=ACTIONS,
                         help="Phase to draw: concept-sheet, canonical-base, or a sprite action")
@@ -1467,13 +1467,10 @@ def main() -> None:
     parser.add_argument("--max-images", type=int,
                         help="Hard ceiling on provider calls this run; defaults per action")
     parser.add_argument("--max-cost-usd", type=float,
-                        help="Runaway-loop guardrail, not a spend control: a value this run "
-                             "passes to itself. Defaults per action -- $3.00 for a sprite "
-                             "action, near 2x a measured 57-frame pass, since the 2026-08-12 "
-                             "eval put openai/gpt-image-2 at ~$1.33 a pass across TWO billed "
-                             "calls per frame, which ALPHA_PATHS now halves to ~$0.67. The real ceiling "
-                             "is the credit limit on the OpenRouter key, which is enforced "
-                             "server-side and outside this process's reach.")
+                        help="Runaway-loop guardrail, not a spend control. Defaults per action; "
+                             "obtain authority for the total run ceiling before calling the "
+                             "provider. The provider-side credit limit remains the final hard "
+                             "ceiling outside this process.")
     parser.add_argument("--mode", choices=MODES, default=MODE_SUPERVISED,
                         help="Decision mode this action belongs to. 'supervised' means a human picks "
                              "the candidate; 'auto' means Quick or Full Automation picks it. Recorded on "

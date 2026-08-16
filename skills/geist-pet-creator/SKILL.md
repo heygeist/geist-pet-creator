@@ -81,15 +81,19 @@ installation. Full Automation requires explicit decision authority such as
 
 ## Guard external spending and data transfer
 
-Before every external-provider run, show all of the following and wait for
-explicit approval unless the user already granted authority with equal or
-stricter ceilings for this run:
+Before every external-provider run, show one concise run summary with all of the
+following and wait for explicit approval unless the user already granted
+authority with equal or stricter ceilings for this run:
 
 - provider and endpoint;
 - exact model;
 - images requested and cumulative images in this build pass;
-- `--max-images` and `--max-cost-usd`;
+- total estimated cost when known, `--max-images`, and the total
+  `--max-cost-usd` ceiling;
 - which local reference images and prompt content will be uploaded.
+
+Do not itemize or require a per-image price breakdown. Obtain authority against
+the total run ceiling.
 
 Quick and Full Automation allow at most **64 generated images per normal complete
 pass**, including base options and retries. Maintain the cumulative count from

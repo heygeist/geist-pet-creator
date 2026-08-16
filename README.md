@@ -92,11 +92,12 @@ bundle-local `imagegen.json`:
 }
 ```
 
-Before any external request, the skill reports the provider, model, request
-count, and cost ceiling, then requires explicit spending authority. Quick mode
-caps a complete default generation pass at 64 images. Every run also has hard
-`--max-images` and `--max-cost-usd` limits, and failed runs can resume from the
-local ledger.
+Before any external request, the skill gives one concise run summary: provider,
+model, request count, total estimated cost when known, total cost ceiling, and
+uploads. It does not itemize a per-image price. The skill then requires explicit
+authority for that run ceiling. Quick mode caps a complete default generation
+pass at 64 images. Every run also has hard `--max-images` and
+`--max-cost-usd` limits, and failed runs can resume from the local ledger.
 
 API keys are read only from the environment. They are rejected from Pet bundle
 configuration and are not written to logs, reports, or exported files.

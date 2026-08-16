@@ -15,7 +15,7 @@ visible:
   --images 7 --unpriced --mode auto
 ```
 
-Unpriced means the client reported no per-image charge; it does not mean free.
+Unpriced means the client reported no price; it does not mean free.
 
 ## External provider
 
@@ -34,12 +34,14 @@ The key comes only from `OPENROUTER_API_KEY`. The generator refuses fields named
 like credentials and values shaped like secrets. The endpoint comes from
 `OPENROUTER_BASE_URL` or `--base-url`, never from a shared bundle.
 
-Before a request, disclose and obtain authority for:
+Before a request, give one concise run summary and obtain authority for:
 
 1. provider, endpoint, and model;
 2. requested and cumulative image counts;
-3. maximum images and US-dollar cost;
+3. total estimated cost when known, maximum images, and total US-dollar ceiling;
 4. prompts and local reference images that will be uploaded.
+
+Do not itemize a per-image price. Approval applies to the total run ceiling.
 
 Always pass `--max-images` and `--max-cost-usd`. They stop runaway work but do
 not replace user consent or a provider-side credit limit.
@@ -52,8 +54,8 @@ stayed unchanged.
 
 Do not infer that a model is unavailable because it is absent from a catalog
 listing. A live request is the authoritative compatibility check, and it is
-billable. Disclose the provider, model, one-request estimate/ceiling, and uploaded
-test prompt; obtain authority before running:
+billable. Disclose the provider, model, total test-run ceiling, and uploaded test
+prompt; obtain authority before running:
 
 ```bash
 "$SKILL_DIR/scripts/with_openrouter_key.sh" "$PET_PYTHON" \
