@@ -32,14 +32,22 @@ from geist_grid import (
     cell_box,
 )
 from geist_manifest import PartManifest, read_manifest
-from geist_pixels import ALPHA_THRESHOLD, alpha_bbox, alpha_mask, clear_transparent_rgb, data_uri
+from geist_pixels import (
+    ALPHA_THRESHOLD,
+    MIN_COMPONENT_AREA,
+    alpha_bbox,
+    alpha_mask,
+    clear_transparent_rgb,
+    component_count,
+    data_uri,
+    ink_components,
+)
 import geist_registration as registration
 
 MAX_REPAIR_PASSES = 2
 # Lanczos resampling spreads an edge by roughly one pixel.
 RESAMPLE_BLEED = 1
 STRAY_COMPONENT_RATIO = 0.02
-MIN_COMPONENT_AREA = 12
 SUSPICION_FLAG = 45
 
 
@@ -75,51 +83,9 @@ class CellMeasurement:
         return [component["area"] for component in self.components]
 
 
-def components(mask: bytearray, width: int, height: int) -> list[dict[str, Any]]:
-    """4-connected components, largest first, tiny specks dropped."""
-    seen = bytearray(width * height)
-    found: list[dict[str, Any]] = []
-    for start in range(width * height):
-        if not mask[start] or seen[start]:
-            continue
-        stack = [start]
-        seen[start] = 1
-        pixels: list[int] = []
-        while stack:
-            index = stack.pop()
-            pixels.append(index)
-            x = index % width
-            y = index // width
-            if x > 0 and mask[index - 1] and not seen[index - 1]:
-                seen[index - 1] = 1
-                stack.append(index - 1)
-            if x < width - 1 and mask[index + 1] and not seen[index + 1]:
-                seen[index + 1] = 1
-                stack.append(index + 1)
-            if y > 0 and mask[index - width] and not seen[index - width]:
-                seen[index - width] = 1
-                stack.append(index - width)
-            if y < height - 1 and mask[index + width] and not seen[index + width]:
-                seen[index + width] = 1
-                stack.append(index + width)
-        if len(pixels) < MIN_COMPONENT_AREA:
-            continue
-        xs = [index % width for index in pixels]
-        ys = [index // width for index in pixels]
-        found.append(
-            {
-                "area": len(pixels),
-                "bbox": [min(xs), min(ys), max(xs) + 1, max(ys) + 1],
-                "pixels": pixels,
-            }
-        )
-    found.sort(key=lambda component: -component["area"])
-    return found
-
-
 def measure_cell(cell: Image.Image) -> CellMeasurement:
     mask = alpha_mask(cell)
-    found = components(mask, CELL_WIDTH, CELL_HEIGHT)
+    found = ink_components(mask, CELL_WIDTH, CELL_HEIGHT, MIN_COMPONENT_AREA)
     if not found:
         return CellMeasurement(empty=True, mask=mask)
 
@@ -186,7 +152,13 @@ def suspicion_score(signals: dict[str, Any]) -> int:
     score = 0.0
     score += min(40.0, signals["bbox_delta"] * 1.2)
     score += min(25.0, abs(signals["area_delta_ratio"]) * 100.0)
-    score += min(20.0, max(0, signals["component_count"] - 1) * 10.0)
+    # Against the canonical base's own component count where the bundle has one,
+    # and against a bare 1 where it does not. The literal 1 was the assumption
+    # this whole signal rested on, and it is wrong for any Pet whose parts
+    # genuinely detach -- a floating prop, a separated glyph the bible declares.
+    # A drift is a count that differs from the PET, not from one.
+    baseline = signals.get("component_baseline") or 1
+    score += min(20.0, abs(signals["component_count"] - baseline) * 10.0)
     score += min(20.0, signals["stray_ratio"] * 400.0)
     score += min(20.0, abs(signals["asymmetry_delta"]) * 120.0)
     score += min(25.0, signals["diff_ratio"] * 60.0)
@@ -297,6 +269,23 @@ def audit_atlas(
     cell_images: dict[str, Image.Image] = {}
     anchor_images: dict[str, Image.Image] = {}
 
+    # How many separate marks this Pet is legitimately made of, read from the
+    # identity lock rather than assumed to be one.
+    #
+    # This is the mechanical half of shape drift, the fourth kind of anatomy
+    # drift. The Part Manifest counts parts and cannot describe them, so a
+    # `failed` row that replaced a connected face glyph with separate eyes and a
+    # detached frown satisfied `mouth shape | 1` completely and was invisible to
+    # the audit. Counting ink components would have flagged that row at 3 against
+    # 1 everywhere else. It stays a signal rather than a hard error: only a hard
+    # error or a stray fragment buys paid art, and this is neither -- it is what
+    # points the human at the row worth looking at.
+    base_components = None
+    canonical = grid.bundle / "sources" / "canonical-base.png"
+    if canonical.is_file():
+        with Image.open(canonical) as opened:
+            base_components = component_count(opened.convert("RGBA"))
+
     for state, row, frame_count in ROW_SPECS:
         measured = []
         for column in range(8):
@@ -372,6 +361,10 @@ def audit_atlas(
                 "bbox_delta": max(abs(measurement.bbox[i] - anchor.bbox[i]) for i in range(4)),
                 "area_delta_ratio": round((measurement.area - anchor.area) / anchor.area, 4) if anchor.area else 0.0,
                 "component_count": measurement.component_count,
+                "component_baseline": base_components,
+                "components_vs_base": (
+                    measurement.component_count - base_components if base_components else None
+                ),
                 "component_areas": measurement.component_areas,
                 "stray_ratio": measurement.stray_ratio,
                 "asymmetry": measurement.asymmetry,
@@ -492,16 +485,26 @@ def render_audit_html(result: AuditResult, grid: FrameGrid, output: Path, pet_na
         rows = "".join(
             f"<tr><td>{html.escape(part['part'])}</td>"
             f"<td>{part['count_min']}–{part['count_max']}</td>"
+            f"<td>{html.escape(part.get('shape') or '—')}</td>"
             f"<td>{html.escape(part['side'])}</td>"
             f"<td>{html.escape(part['attachment'])}</td>"
             f"<td>{html.escape(part['notes'])}</td></tr>"
             for part in payload["part_manifest"]
         )
         parts_block = (
-            "<table class='manifest'><thead><tr><th>Part</th><th>Count</th><th>Side</th>"
+            "<table class='manifest'><thead><tr><th>Part</th><th>Count</th><th>Shape</th><th>Side</th>"
             f"<th>Attachment</th><th>Notes</th></tr></thead><tbody>{rows}</tbody></table>"
         )
+        # A described shape becomes its own checklist line. Counting is what the
+        # script can do; comparing a shape to a sentence is what the human is
+        # here for, and a checklist that only lists counts quietly says counting
+        # was the whole job.
         checklist_items = [f"{name} <span class='dim'>{count}</span>" for name, count in payload_checklist(payload)]
+        checklist_items += [
+            f"{html.escape(part['part'])} is still <span class='dim'>{html.escape(part['shape'])}</span>"
+            for part in payload["part_manifest"]
+            if part.get("shape")
+        ]
 
     checklist = "".join(f'<label><input type="checkbox"> {item}</label>' for item in checklist_items)
 
@@ -778,6 +781,18 @@ def register_states(grid: FrameGrid, safe_padding: int) -> dict[str, str]:
     cross-state consistency actually means, and it leaves a healthy bundle
     untouched.
 
+    Two sizes are settled here, not one, and they are different defects:
+
+      between states  the whole row is rescaled onto the bundle's shared size.
+      within a state  each frame is held to what `geist_house.SIZE_BUDGET`
+                      allows against the state's own median, which is how a body
+                      that ratchets frame to frame gets pinned without flattening
+                      the states where a size change is the pose.
+
+    The second runs first, because the shared rescale is derived from the state's
+    median and normalising the frames moves that median onto the middle of the
+    art rather than onto wherever the ratchet happened to leave it.
+
     Returns one note per changed frame, keyed the way `payload["frames"]` is, so
     a registered frame is not later mistaken for an unrepaired one.
     """
@@ -789,6 +804,7 @@ def register_states(grid: FrameGrid, safe_padding: int) -> dict[str, str]:
 
     loaded: dict[str, list[tuple[Any, Image.Image]]] = {}
     ratios: dict[str, float] = {}
+    within: dict[str, list[dict[str, object]]] = {}
     for state, _row, _count in ROW_SPECS:
         frames = []
         for path in grid.frame_paths(state):
@@ -798,11 +814,17 @@ def register_states(grid: FrameGrid, safe_padding: int) -> dict[str, str]:
                 frames.append((path, opened.convert("RGBA")))
         if not frames:
             continue
+        # Within-state size first: it changes the median the shared rescale below
+        # is measured from, so reading that median off un-normalised frames would
+        # set the whole bundle's size from a ratchet.
+        images, resized = registration.normalise_size([image for _path, image in frames], state)
+        frames = [(path, image) for (path, _old), image in zip(frames, images)]
         anchors = [registration.measure(image) for _path, image in frames]
         anchors = [anchor for anchor in anchors if anchor is not None]
         if not anchors:
             continue
         loaded[state] = frames
+        within[state] = resized
         ratios[state] = registration.size_ratio(anchors, target)
     if not ratios:
         return {}
@@ -812,6 +834,12 @@ def register_states(grid: FrameGrid, safe_padding: int) -> dict[str, str]:
     for state, frames in loaded.items():
         applied: list[str] = []
         images = [image for _path, image in frames]
+
+        if within[state]:
+            applied.append(
+                f"held {len(within[state])} frame(s) of {state} to its size budget of "
+                f"x{registration.size_budget_for(state):.2f}"
+            )
 
         factor = middle / ratios[state] if ratios[state] else 1.0
         if abs(factor - 1.0) > registration.SIZE_TOLERANCE:
@@ -1018,10 +1046,21 @@ def main() -> None:
 
     if args.repair:
         repairs = run_repairs(grid, result.payload, args.safe_padding)
-        if repairs["deterministic"]:
+        if repairs["deterministic"] or repairs["registered"]:
             # Repairs rewrote frames, so the audit above describes pixels that no
             # longer exist. Re-audit, or the digest would bind an approval to art
             # the bundle no longer contains and export could never open the gate.
+            #
+            # `registered` belongs in this test and was missing from it, which is
+            # the whole bug. `run_repairs` runs registration LAST and reports it
+            # under its own key, so a pass whose only change was registration --
+            # the common case, since registration touches a bundle that has
+            # nothing else wrong with it -- left a digest naming pixels that had
+            # just been rewritten. On FuseSprout that cost no money and something
+            # worse: export refused, and the human's approval had to be carried
+            # across with a before-and-after fingerprint to show it still covered
+            # the same art. A gate whose integrity is in question is expensive
+            # even when it is right.
             atlas, source = load_atlas(bundle, args.mode, args.atlas)
             result = audit_atlas(atlas, grid, manifest=manifest, safe_padding=args.safe_padding, source=source)
         result.payload["repairs"] = repairs

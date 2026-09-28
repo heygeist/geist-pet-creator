@@ -1,8 +1,24 @@
 #!/usr/bin/env python3
-"""The Part Manifest: what the Pet is made of, and how many of each.
+"""The Part Manifest: what the Pet is made of, how many of each, and what shape.
 
 The audit counts frames against this list, and generation prompts quote it. Both
 read it here, so a manifest the audit would reject can never reach a prompt.
+
+Counting was the whole contract until 2026-08-13, and counting is necessary and
+not sufficient. On `FuseSprout` the first `failed` draw replaced a connected face
+glyph with separate eyes and a detached frown, and dropped the mouth tab across
+all eight frames -- drift on the rank-2 identity cue, and $0.18 to redraw. **It
+satisfied the manifest completely**: the manifest said `mouth shape | 1`, and the
+drifted art had exactly one mouth. Counts go into the prompt and counts come back
+out of the audit, so a part that keeps its count while changing its shape was
+invisible to both.
+
+The skill defines anatomy drift as a part missing, duplicated, or crossing the
+cell line. Shape drift is a fourth kind. The optional `Shape` column is what a
+prompt can steer with; `geist_pixels.component_count` is what an audit can check
+without a human, and the two are deliberately separate -- a description the model
+never has to satisfy is decoration, and a check with nothing to check against
+only ever reports a number.
 """
 
 from __future__ import annotations
@@ -16,6 +32,12 @@ SECTION_PATTERN = re.compile(r"^##\s+Part Manifest\s*$(.*?)(?=^##\s|\Z)", re.M |
 COUNT_PATTERN = re.compile(r"^\s*(\d+)\s*(?:[-–]\s*(\d+))?\s*$")
 
 
+# The historic column order, used when a table has no readable header row. New
+# columns are found by NAME rather than by position, so adding one cannot shift
+# the meaning of a bible written before it existed.
+POSITIONAL_COLUMNS = ("part", "count", "side", "attachment", "notes")
+
+
 @dataclass
 class Part:
     name: str
@@ -24,6 +46,7 @@ class Part:
     side: str
     attachment: str
     notes: str
+    shape: str = ""
 
     @property
     def never_duplicated(self) -> bool:
@@ -41,6 +64,7 @@ class Part:
             "side": self.side,
             "attachment": self.attachment,
             "notes": self.notes,
+            "shape": self.shape,
             "never_duplicated": self.never_duplicated,
         }
 
@@ -56,15 +80,35 @@ class PartManifest:
     def as_dicts(self) -> list[dict[str, Any]]:
         return [part.as_dict() for part in self.parts]
 
+    @property
+    def shapes(self) -> list[Part]:
+        """The parts whose shape is described, and therefore lockable."""
+        return [part for part in self.parts if part.shape]
+
     def prompt_block(self) -> str:
-        """The manifest as prompt text, so generation and audit ask for the same Pet."""
+        """The manifest as prompt text, so generation and audit ask for the same Pet.
+
+        The shape sentences go in a block of their own, after the counts and
+        introduced as a lock rather than as a list. A shape folded into the count
+        line reads as a description of something already agreed; stated as its
+        own instruction it reads as a requirement, and the whole point of the
+        column is that a count the model already satisfies proved nothing.
+        """
         if not self.parts:
             return ""
         lines = [
             f"- {part.name}: {part.count_label} ({part.side})" + (", never duplicated" if part.never_duplicated else "")
             for part in self.parts
         ]
-        return "\nThis Pet is made of exactly these parts:\n" + "\n".join(lines)
+        block = "\nThis Pet is made of exactly these parts:\n" + "\n".join(lines)
+
+        described = self.shapes
+        if described:
+            block += (
+                "\nDraw these parts in exactly this shape, in every frame, whatever the pose:\n"
+                + "\n".join(f"- {part.name}: {part.shape}" for part in described)
+            )
+        return block
 
     def checklist(self) -> list[tuple[str, str]]:
         """Per-frame review items: (part name, expected count label)."""
@@ -85,14 +129,25 @@ def read_manifest(bible_path: Path) -> PartManifest:
         return PartManifest([], "character-bible.md has no `## Part Manifest` section")
 
     parts: list[Part] = []
+    columns: list[str] = list(POSITIONAL_COLUMNS)
     for line in section.group(1).splitlines():
         line = line.strip()
         if not line.startswith("|"):
             continue
         cells = [cell.strip() for cell in line.strip("|").split("|")]
-        if len(cells) < 2 or cells[0].lower() in {"part", ""} or set(cells[0]) <= {"-", ":", " "}:
+        if len(cells) < 2 or set(cells[0]) <= {"-", ":", " "}:
             continue
-        counts = COUNT_PATTERN.match(cells[1])
+        if cells[0].lower() == "part":
+            columns = _header(cells)
+            continue
+        if not cells[0]:
+            continue
+
+        def column(name: str) -> str:
+            index = columns.index(name) if name in columns else -1
+            return cells[index] if 0 <= index < len(cells) else ""
+
+        counts = COUNT_PATTERN.match(column("count"))
         if not counts:
             continue
         low = int(counts.group(1))
@@ -102,12 +157,30 @@ def read_manifest(bible_path: Path) -> PartManifest:
                 name=cells[0],
                 count_min=min(low, high),
                 count_max=max(low, high),
-                side=cells[2] if len(cells) > 2 else "",
-                attachment=cells[3] if len(cells) > 3 else "",
-                notes=cells[4] if len(cells) > 4 else "",
+                side=column("side"),
+                attachment=column("attachment"),
+                notes=column("notes"),
+                shape=column("shape"),
             )
         )
 
     if not parts:
         return PartManifest([], "`## Part Manifest` section has no readable table rows")
     return PartManifest(parts, None)
+
+
+def _header(cells: list[str]) -> list[str]:
+    """Map a header row onto the column names this module knows.
+
+    Read by name, never by position. A bible written before the `Shape` column
+    existed has no header entry for it and simply reports no shapes; one that
+    puts `Shape` between `Count` and `Side` is read correctly rather than having
+    its sides silently become shapes. Anything unrecognised keeps its own header
+    text, so it is skipped rather than mistaken for a column that matters.
+    """
+    known = ("part", "count", "side", "attachment", "notes", "shape")
+    mapped: list[str] = []
+    for cell in cells:
+        lowered = cell.strip().lower()
+        mapped.append(next((name for name in known if lowered.startswith(name)), lowered))
+    return mapped

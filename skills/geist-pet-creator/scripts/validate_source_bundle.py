@@ -231,6 +231,48 @@ def validate_frame(
     return frame_result
 
 
+# A pet.json description is the Pet's signature in words: silhouette and crown
+# cue, palette and face, prop and attachments, motion personality. A generic
+# one-liner that could fit any Geist fails, because the catalog copy is the only
+# thing that names the Pet where the spritesheet is not shown.
+DESCRIPTION_MIN_WORDS = 40
+DESCRIPTION_MIN_CHARS = 200
+
+
+def check_metadata_description(metadata_path: Path) -> list[Finding]:
+    """The description gate: detailed signature copy, never a generic one-liner."""
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as error:
+        return [Finding("error", "unreadable_pet_metadata", "pet.json", f"pet.json cannot be read: {error}")]
+    description = metadata.get("description", "")
+    if not isinstance(description, str) or not description.strip():
+        return [
+            Finding(
+                "error",
+                "missing_description",
+                "pet.json",
+                "pet.json needs a detailed description of this Pet's signature: silhouette and "
+                "crown cue, palette and face, prop, and motion personality. See contract.md § Pet Metadata.",
+            )
+        ]
+    words = len(description.split())
+    chars = len(description.strip())
+    if words < DESCRIPTION_MIN_WORDS or chars < DESCRIPTION_MIN_CHARS:
+        return [
+            Finding(
+                "error",
+                "generic_description",
+                "pet.json",
+                f"description is generic ({words} words, {chars} chars; needs at least "
+                f"{DESCRIPTION_MIN_WORDS} words and {DESCRIPTION_MIN_CHARS} chars). Rewrite it from the "
+                "approved canonical base: crown cue, palette, face, prop, and how it idles, "
+                "greets, works, and fails. See contract.md § Pet Metadata.",
+            )
+        ]
+    return []
+
+
 def validate_bundle(
     bundle: Path,
     *,
@@ -246,6 +288,8 @@ def validate_bundle(
 
     if not (bundle / "pet.json").is_file():
         findings.append(Finding("error", "missing_pet_metadata", "pet.json", "source bundle needs pet.json"))
+    else:
+        findings.extend(check_metadata_description(bundle / "pet.json"))
     if not (bundle / "character-bible.md").is_file():
         findings.append(
             Finding("warning", "missing_character_bible", "character-bible.md", "identity QA needs a character bible")

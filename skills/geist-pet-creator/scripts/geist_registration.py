@@ -18,9 +18,18 @@ Two defects came out of that, measured 2026-08-12 on shipped bundles:
            body swam under its own animation. On `KarateCrownGuardian` still
            states drifted up to 6px with nothing correcting it.
 
-Both are fixed the same way, and it is the way every sprite engine already does
-it: **one declared anchor for the whole character, and per-animation permission
-to leave it.** Unity's `Sprite.pivot`, Unreal's pivot and SpriteKit's
+A third one came out of the same blind spot and took a year longer to name,
+because it hides INSIDE a state rather than between two:
+
+  size      a body that ratchets frame to frame, because each frame is drawn
+            with the previous one attached as a reference. On `FuseSprout` four
+            states that should hold still spread 1.32x to 1.46x, and `failed`
+            and `jumping` spread 1.50x and 1.21x while being entirely correct.
+            `normalise_size` handles it, against `geist_house.SIZE_BUDGET`.
+
+All three are fixed the same way, and it is the way every sprite engine already
+does it: **one declared anchor for the whole character, and per-animation
+permission to leave it.** Unity's `Sprite.pivot`, Unreal's pivot and SpriteKit's
 `anchorPoint` are all authored constants; none is derived from artwork. The
 industry's "centre" is the centre of a fixed declared rect. This pipeline read
 it as the centre of this frame's alpha bbox, which is not a constant at all.
@@ -56,7 +65,7 @@ from dataclasses import dataclass
 from PIL import Image
 
 from geist_grid import CELL_HEIGHT, CELL_WIDTH
-from geist_house import motion_budget
+from geist_house import motion_budget, size_budget
 from geist_pixels import alpha_bbox, clear_transparent_rgb
 
 # Lanczos softens an edge by about a pixel and a soft pixel still counts as
@@ -68,6 +77,16 @@ RESAMPLE_BLEED = 1
 # quality, so this is deliberately above the noise and below the 5.6% that was
 # visible as a halo in a cross-state overlay.
 SIZE_TOLERANCE = 0.03
+
+# The same idea WITHIN a state, and deliberately three times tighter.
+#
+# These are not the same decision and the constant should not be shared. A state
+# sitting 3% from the ruler is a static difference between two rows nobody plays
+# side by side. A frame sitting 3% from its neighbours is a PULSE, played ten
+# times a second, and the eye is far better at seeing change than at seeing size.
+# Borrowing 0.03 here left a pinned state at 1.09x area spread where the
+# deterministic pass the report measured reached 1.01-1.03x.
+FRAME_SIZE_TOLERANCE = 0.01
 
 
 @dataclass(frozen=True)
@@ -286,6 +305,111 @@ def register(
     return out, notes
 
 
+def _resize_about_anchor(image: Image.Image, factor: float, anchor: Anchor) -> Image.Image:
+    """Rescale one finished cell and put its anchor back where it was.
+
+    Resizing a cell resizes the empty margin with it, so a naive resize moves the
+    body as well as sizing it. Both halves of the anchor are restored here --
+    bbox centre horizontally, base line vertically -- which is the same anchor
+    `register` uses, so the translation pass that follows finds the frame already
+    close and does not have to undo a shift this pass introduced.
+    """
+    scaled = image.resize(
+        (max(1, round(image.width * factor)), max(1, round(image.height * factor))),
+        Image.LANCZOS,
+    )
+    cell = Image.new("RGBA", (CELL_WIDTH, CELL_HEIGHT), (0, 0, 0, 0))
+    cell.paste(scaled, (round(anchor.x - anchor.x * factor), round(anchor.base - anchor.base * factor)))
+    return cell
+
+
+def normalise_size(
+    cells: list[Image.Image], state: str
+) -> tuple[list[Image.Image], list[dict[str, object]]]:
+    """Hold every frame of a state to the size its `SIZE_BUDGET` allows.
+
+    `state_scale` already gives a state ONE shared scale against the bundle's
+    ruler, deliberately, because for `failed` and `jumping` a size change between
+    frames is the artwork. That is the right answer to "is this state the right
+    size" and no answer at all to "does this state hold its size", which is a
+    different defect with a different cause: one frame per call with the previous
+    frame attached ratchets the body along the chain.
+
+    So this runs per frame, against the state's own median rather than against
+    the ruler, and what it is allowed to touch is declared rather than measured:
+
+      pinned    every frame is scaled onto the state's median area.
+      budgeted  frames are left as drawn, and only a frame outside the declared
+                spread is pulled back to the edge of it -- the same treatment
+                `register` gives a budgeted axis of travel, and for the same
+                reason. A `failed` row that deflates to 1.5x is the pose; one
+                that deflates to 4x is a defect, and only the second is touched.
+
+    Area is the measure, matching `Anchor.area` and `state_scale`, because a
+    bounding box grows when an arm goes up and this must not confuse a pose with
+    a size. Scaling is about the anchor, so a frame changes size without moving.
+    """
+    anchors = [measure(cell) for cell in cells]
+    live = [anchor for anchor in anchors if anchor is not None]
+    if len(live) < 2:
+        return cells, []
+
+    median_area = statistics.median(anchor.area for anchor in live)
+    if median_area <= 0:
+        return cells, []
+
+    # The budget is a spread -- largest over smallest -- so centred on the median
+    # it allows sqrt(budget) of area either way, and the linear factor is the
+    # square root of that again.
+    allowed = size_budget(state) ** 0.5
+
+    out: list[Image.Image] = []
+    notes: list[dict[str, object]] = []
+    for index, (cell, anchor) in enumerate(zip(cells, anchors)):
+        if anchor is None:
+            out.append(cell)
+            continue
+
+        ratio = anchor.area / median_area
+        if allowed <= 1.0:
+            target_ratio = 1.0  # pinned: every frame lands on the median
+        elif ratio > allowed:
+            target_ratio = allowed
+        elif ratio < 1.0 / allowed:
+            target_ratio = 1.0 / allowed
+        else:
+            out.append(cell)
+            continue
+
+        factor = (target_ratio / ratio) ** 0.5
+        if abs(factor - 1.0) <= FRAME_SIZE_TOLERANCE:
+            # Inside the noise. A resample costs edge quality, and below one
+            # percent the correction is smaller than the antialiasing it would
+            # disturb.
+            out.append(cell)
+            continue
+
+        out.append(clear_transparent_rgb(_resize_about_anchor(cell, factor, anchor)))
+        notes.append(
+            {
+                "frame": index,
+                "was": round(ratio, 4),
+                "now": round(target_ratio, 4),
+                "factor": round(factor, 4),
+            }
+        )
+    return out, notes
+
+
+def size_spread(cells: list[Image.Image]) -> float:
+    """Largest alpha area over smallest, in the unit `SIZE_BUDGET` is declared in."""
+    areas = [anchor.area for anchor in (measure(cell) for cell in cells) if anchor is not None]
+    areas = [area for area in areas if area > 0]
+    if len(areas) < 2:
+        return 1.0
+    return max(areas) / min(areas)
+
+
 def budget_for(state: str) -> tuple[int, int]:
     """The state's declared travel allowance, re-exported.
 
@@ -293,6 +417,11 @@ def budget_for(state: str) -> tuple[int, int]:
     with the rest of the house form; they ask the module that does the moving.
     """
     return motion_budget(state)
+
+
+def size_budget_for(state: str) -> float:
+    """The state's declared size allowance, re-exported alongside `budget_for`."""
+    return size_budget(state)
 
 
 def size_ratio(anchors: list[Anchor], target: Anchor) -> float:

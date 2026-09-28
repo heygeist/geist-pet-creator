@@ -10,7 +10,7 @@ Use this contract for source bundles created by `geist-pet-creator`.
 - Use **Pet Override** only when discussing app-specific Pet choices.
 - Use **part** for one named, countable, visible piece of the Pet: a body piece or an attached prop. A palette, a style, or a mood is not a part.
 - Use **Part Manifest** for the table in `character-bible.md` that lists every part and how many times it may appear.
-- Use **anatomy drift** for a frame that disagrees with the Part Manifest: a part missing, a part duplicated, or a part crossing the cell line.
+- Use **anatomy drift** for a frame that disagrees with the Part Manifest: a part missing, a part duplicated, a part crossing the cell line, or a part that keeps its count and changes its **shape**.
 - Use **derived Pet** for a Pet built from something already recognizable: a character, cast, mascot, brand figure, or known object or animal.
 - Use **house form** for the Geist visual language every Pet shares, whatever its source.
 - Use **identity cue** for one feature that makes a derived Pet's source nameable. A cue may or may not be a part.
@@ -68,12 +68,27 @@ Use `pet.json` in the source bundle:
 {
   "id": "rainy-geist",
   "displayName": "Rainy Geist",
-  "description": "A blue hooded spirit with an orange heart.",
+  "description": "Rainy Geist is a small round sky-blue hooded spirit with a scalloped rain-cloak hem, white cord ties, and a single centered Mango heart on its cream face. Its signature is the drooping cloud-soft hood with two rain-drop tabs that sway as it bobs, and wide ink dot eyes that glance sideways when it waits. It greets with an eager full-body lean, works with a focused forward hunch, and deflates into a sagging sad puddle when it fails.",
   "spritesheetPath": "spritesheet.webp"
 }
 ```
 
 The exporter writes a Geist-ready copy of this metadata beside the final spritesheet.
+
+`description` is the Pet's signature in words, not a label. It must be detailed enough that someone who has never seen the spritesheet can picture what makes this Pet itself: the silhouette and crown cue, the palette accents, the face landmarks, the attached prop, and the motion personality — how it idles, greets, works, and fails. A generic description that could fit any Geist fails the export gate.
+
+A description passes when it names all of these:
+
+- **Silhouette and crown cue** — the body shape and the headwear/hair feature that names the Pet at thumbnail scale.
+- **Palette and face** — the signature colors and the eye/mouth read.
+- **Prop and attachments** — the one attached prop and any cords, panels, or markings.
+- **Motion personality** — one clause per signature behavior: how it idles, greets, works, and fails.
+
+Too generic (fails): `"A blue hooded spirit with an orange heart."` — no crown cue, no face, no prop, no motion; it fits a dozen Pets.
+
+Detailed (passes): the Rainy Geist example above — hood shape, cord ties, heart placement, rain-drop tabs, eye behavior, and four state reads in one paragraph.
+
+Write the description from the approved canonical base and character bible, after `canonical-base` is approved and before export. Keep it to one paragraph of roughly 60-120 words: long enough to carry the signature, short enough to read in a catalog.
 
 ## Identity Blend Contract
 
@@ -116,17 +131,23 @@ Use this exact table shape:
 ```markdown
 ## Part Manifest
 
-| Part | Count | Side | Attachment | Notes |
-| --- | --- | --- | --- | --- |
-| head tuft spike | 3 | top | crown | Never duplicated |
-| wing | 1-2 | left, right | shoulder | one wing hides behind the body in side-on poses |
-| beak | 1 | center | face | Never duplicated |
-| eye | 2 | left, right | face | Never duplicated |
-| heart marking | 0-1 | center | chest | hidden when the body curls up |
-| body | 1 | center | root | Never duplicated |
+| Part | Count | Shape | Side | Attachment | Notes |
+| --- | --- | --- | --- | --- | --- |
+| head tuft spike | 3 | three tapered spikes joined at the base | top | crown | Never duplicated |
+| wing | 1-2 |  | left, right | shoulder | one wing hides behind the body in side-on poses |
+| beak | 1 | one short rounded wedge | center | face | Never duplicated |
+| eye | 2 | one solid ink dot each | left, right | face | Never duplicated |
+| heart marking | 0-1 |  | center | chest | hidden when the body curls up |
+| body | 1 |  | center | root | Never duplicated |
 ```
 
+Columns are read **by name from the header row**, so a manifest written before `Shape` existed still parses and a new column can be inserted anywhere without shifting the meaning of the others.
+
 `Count` is one number, or a `min-max` range. Use a range for a part that a pose can legitimately hide: the low bound covers occlusion, and the high bound still catches duplication. Write `Never duplicated` in `Notes` for a part that must never appear more often than its high bound, whatever the pose.
+
+`Shape` is optional, and it is the column that closes the fourth kind of drift. **Counting is necessary and not sufficient.** A `failed` row on FuseSprout replaced a connected face glyph with separate eyes and a detached frown, and dropped the mouth tab across all eight frames — drift on the rank-2 identity cue, $0.18 to redraw, and it **satisfied the manifest completely**: the manifest said `mouth shape | 1` and the drifted art had exactly one mouth. Counts go into the prompt and counts come back out of the audit, so a part that keeps its count while changing its shape was invisible to both.
+
+Fill `Shape` in for the parts a reviewer would name if the Pet came back wrong — the face glyph, the crown cue, the prop — and leave it empty for parts whose count is the whole story. What you write is rendered **verbatim into every frame prompt**, so write it as an instruction a model can draw from, not as a description of a picture it cannot see.
 
 A Pet source bundle with no `## Part Manifest` still audits, with a warning, against `sources/canonical-base.png`. Every bundle this skill creates gets a manifest.
 
@@ -177,7 +198,15 @@ Unused atlas cells after each state's final frame must remain fully transparent.
 
 Maintain `qa/approvals.json` when generated art is used. Every one of the ten sprite actions plus `final-audit` needs a decision record. Who made each decision depends on the decision mode, so every record carries `decided_by`, either `human` or `agent`.
 
-Two of those decisions must carry `decided_by: "human"` whatever the mode: `final-audit`, which export enforces in code, and `concept-sheet` when the brainstorm route fired. A `final-audit` record written with `decided_by: "agent"` is invalid — it claims a human approved pixels nobody looked at.
+**Write it with `scripts/geist_approvals.py`, never by hand.** This schema had two definitions and one reader, and the reader was the export gate — so the shape was only discoverable after an export had already refused. Two builds lost export attempts to it, one writing `{"approvals": [...]}` and one omitting `decision`. The module now owns both halves: `record_approval` writes exactly the fields below, `find_approval` is what the export gate reads, and neither can drift from the other.
+
+```bash
+python "$SKILL_DIR/scripts/geist_approvals.py" /absolute/path/PetName.pet \
+  --action waiting --candidate-id waiting-b --approved-for frames/waiting/ \
+  --source qa/waiting-review.html --decided-by human --note "..."
+```
+
+Two of those decisions must carry `decided_by: "human"` whatever the mode: `final-audit`, which export enforces in code, and `concept-sheet` when the brainstorm route fired. A `final-audit` record written with `decided_by: "agent"` is invalid — it claims a human approved pixels nobody looked at. The writer refuses to produce one and the gate refuses to open on one; a record that omits `decided_by` entirely is still accepted, because bundles predate the field.
 
 The `final-audit` approval carries an `atlas_digest`, so an approval cannot outlive the artwork it approved. Change one pixel of one frame and the digest changes, which reopens the gate:
 

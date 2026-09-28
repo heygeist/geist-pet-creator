@@ -34,6 +34,7 @@ import io
 import json
 import os
 import re
+import statistics
 import sys
 import time
 import urllib.error
@@ -47,6 +48,7 @@ from PIL import Image
 
 from geist_grid import CELL_HEIGHT, CELL_WIDTH, FRAME_COUNTS
 from geist_house import (
+    FAILED_MOOD,
     FLAT_FIELD,
     FRAMING,
     HOUSE_FORM,
@@ -55,12 +57,14 @@ from geist_house import (
     MIN_PASSING_CELLS,
     MOTION_STATES,
     NEVER_TRANSFERS,
+    SIGNATURE_MOTION,
+    SMOOTH_LOOP,
     cell_id,
     house_style_path,
     layout_for,
 )
 from geist_manifest import read_manifest
-from geist_pixels import alpha_bbox, clear_transparent_rgb, data_uri
+from geist_pixels import ALPHA_THRESHOLD, alpha_bbox, clear_transparent_rgb, component_count, data_uri
 import geist_registration as registration
 from geist_spend import KIND_VERIFY, MODE_SUPERVISED, MODES, SpendLedger
 
@@ -219,18 +223,57 @@ MOTION_HEADROOM = 0.08
 MIN_TRANSPARENT_FRACTION = 0.10
 MIN_CLEAR_BORDER_FRACTION = 0.90
 
-# How each alpha path asks for its background. Exactly one of these is appended
-# to every frame prompt, by generate_frame, so the prompt can never ask for a
-# transparent background and a green one in the same breath. Both carry
-# FLAT_FIELD: an unkeyed panel behind the character reads as art to the keyer
-# and cost a redraw on 2026-08-12.
-CHROMA_SUFFIX = (
-    f" Place the character on a background of pure green (#00FF00). {FLAT_FIELD} "
-    "Keep the green clear of the character and use no green in the character itself."
-)
-TRANSPARENT_SUFFIX = f" Use a fully transparent background. {FLAT_FIELD}"
-CHROMA_KEY = (0, 255, 0)
+# Backdrops a chroma run can ask for, and why there is more than one.
+#
+# `CHROMA_KEY` was pure green and nothing else, hardcoded, and nothing consulted
+# the Pet before choosing it. FuseSprout's body is #9FC351. Five of six `review`
+# frames keyed; the sixth came back opaque, took the state with it, and cost
+# $0.14. A green Pet, a magenta Pet or a blue one each carried a silent tax that
+# fired unpredictably, and when it fired it was a total loss -- the frame is not
+# recoverable, because the background is baked into the art.
+#
+# So the backdrop is chosen per bundle, from the canonical base, by picking the
+# candidate furthest from the colours the Pet actually uses. Blue and cyan are in
+# the table and will almost never win: the house form puts a thick sky-blue
+# outline on every Pet, so they score badly for all of them. They are here so
+# that the choice is made by measurement rather than by a table that quietly
+# encodes one assumption, which is the failure this replaces.
+KEY_COLOURS: dict[str, tuple[int, int, int]] = {
+    "green": (0, 255, 0),
+    "magenta": (255, 0, 255),
+    "blue": (0, 0, 255),
+    "cyan": (0, 255, 255),
+}
+GREEN_KEY = KEY_COLOURS["green"]
 KEY_TOLERANCE = 72
+
+# How much clearance a backdrop needs from the Pet's nearest colour before it is
+# safe. Sitting at exactly KEY_TOLERANCE means the key eats the body; this is the
+# margin above that, in the same |dR|+|dG|+|dB| units the keyer measures in.
+KEY_SAFE_MARGIN = 120
+
+
+def chroma_suffix(key: tuple[int, int, int]) -> str:
+    """The background instruction for one keying colour.
+
+    Exactly one background suffix is appended to every frame prompt, by
+    generate_frame, so a prompt can never ask for a transparent background and a
+    coloured one in the same breath. It carries FLAT_FIELD: an unkeyed panel
+    behind the character reads as art to the keyer and cost a redraw on
+    2026-08-12.
+    """
+    name = next((label for label, value in KEY_COLOURS.items() if value == key), "green")
+    hexcode = "#%02X%02X%02X" % key
+    return (
+        f" Place the character on a background of pure {name} ({hexcode}). {FLAT_FIELD} "
+        f"Keep the {name} clear of the character and use no {name} in the character itself."
+    )
+
+
+# Kept as a module constant because eval_providers.py measures the green path and
+# should keep measuring exactly what it always did.
+CHROMA_SUFFIX = chroma_suffix(GREEN_KEY)
+TRANSPARENT_SUFFIX = f" Use a fully transparent background. {FLAT_FIELD}"
 
 SECRET_PATTERN = re.compile(r"(sk-[A-Za-z0-9_\-]{16,}|[A-Za-z0-9_\-]{40,})")
 
@@ -667,23 +710,103 @@ def alpha_is_real(image: Image.Image) -> bool:
     return clear / len(border) >= MIN_CLEAR_BORDER_FRACTION
 
 
-def key_out_chroma(image: Image.Image) -> Image.Image:
+def is_key_fringe(pixel: tuple[int, int, int], key: tuple[int, int, int]) -> bool:
+    """Whether a pixel is the desaturated halo a chroma background leaves.
+
+    The test used to name green directly. It is the same test for any keying
+    colour once it is stated as what it always meant: a pixel belongs to the
+    fringe when every channel the key saturates is strong AND clearly beats every
+    channel the key leaves at zero. For green that is exactly the old
+    `green > 150 and green > red * 1.5 and green > blue * 1.5`.
+
+    It is a function rather than three lines inside the keyer because
+    `choose_chroma_key` has to ask the same question before spending anything.
+    This test, not the distance test, is what makes a backdrop dangerous: cyan
+    sits 137 away from the house form's sky-blue outline -- comfortably past the
+    72 tolerance -- and still erases it, because a sky blue is exactly "green and
+    blue both strong, red weak".
+    """
+    high = [channel for channel in range(3) if key[channel] >= 128]
+    low = [channel for channel in range(3) if key[channel] < 128]
+    if not high or not low:
+        return False
+    strongest = min(pixel[channel] for channel in high)
+    return strongest > 150 and all(strongest > pixel[channel] * 1.5 for channel in low)
+
+
+def key_out_chroma(image: Image.Image, key: tuple[int, int, int] = GREEN_KEY) -> Image.Image:
     """Remove a flat chroma background and the desaturated fringe it leaves."""
     rgb = image.convert("RGB")
     data = rgb.tobytes()
     out = bytearray(len(data) // 3 * 4)
-    key_r, key_g, key_b = CHROMA_KEY
+    key_r, key_g, key_b = key
     for index in range(0, len(data), 3):
-        red, green, blue = data[index], data[index + 1], data[index + 2]
+        pixel = (data[index], data[index + 1], data[index + 2])
+        red, green, blue = pixel
         distance = abs(red - key_r) + abs(green - key_g) + abs(blue - key_b)
         base = index // 3 * 4
-        if distance <= KEY_TOLERANCE or (green > 150 and green > red * 1.5 and green > blue * 1.5):
+        if distance <= KEY_TOLERANCE or is_key_fringe(pixel, key):
             continue  # stays fully transparent, RGB left at zero
         out[base] = red
         out[base + 1] = green
         out[base + 2] = blue
         out[base + 3] = 255
     return Image.frombytes("RGBA", image.size, bytes(out))
+
+
+def choose_chroma_key(canonical: Image.Image) -> dict[str, Any]:
+    """The backdrop furthest from this Pet's own colours, decided once per bundle.
+
+    Scores every candidate by the nearest visible pixel of the canonical base, in
+    the same |dR|+|dG|+|dB| units the keyer thresholds on, and takes the largest
+    of those minimums. That is the right statistic and not the obvious one: an
+    average distance would happily pick a backdrop the Pet only touches on its
+    outline, and the outline is the part whose loss is most visible.
+
+    Distance alone is not enough, because it is not the only way the keyer
+    deletes a pixel. A candidate that would catch ANY of the Pet's colours in its
+    fringe test is scored zero and cannot win, however far away it measures. Cyan
+    is the case that proves it: it sits 137 from the house form's sky-blue
+    outline, twice the 72 tolerance, and would erase that outline on every frame.
+
+    Colours are sampled from the base rather than declared in the character
+    bible, because the bible states intent and the provider draws what it draws.
+    The palette that matters is the one in the pixels every later frame is
+    counted against.
+    """
+    visible = canonical.convert("RGBA")
+    alpha = visible.getchannel("A")
+    rgb = visible.convert("RGB")
+    # Quantising to a 32-level cube collapses antialiasing and JPEG noise into
+    # the colours a human would name, and turns this into a few hundred
+    # comparisons rather than a few hundred thousand.
+    palette: set[tuple[int, int, int]] = set()
+    for (red, green, blue), opacity in zip(rgb.getdata(), alpha.getdata()):
+        if opacity > ALPHA_THRESHOLD:
+            palette.add((red // 32 * 32 + 16, green // 32 * 32 + 16, blue // 32 * 32 + 16))
+
+    scored: dict[str, int] = {}
+    for label, candidate in KEY_COLOURS.items():
+        if any(is_key_fringe(colour, candidate) for colour in palette):
+            scored[label] = 0
+            continue
+        scored[label] = min(
+            (
+                abs(red - candidate[0]) + abs(green - candidate[1]) + abs(blue - candidate[2])
+                for red, green, blue in palette
+            ),
+            default=765,
+        )
+
+    label = max(scored, key=lambda name: scored[name])
+    clearance = scored[label]
+    return {
+        "key": KEY_COLOURS[label],
+        "name": label,
+        "clearance": clearance,
+        "scores": scored,
+        "safe": clearance >= KEY_TOLERANCE + KEY_SAFE_MARGIN,
+    }
 
 
 def opaque(config: ProviderConfig, aspect_ratio: str | None = None) -> ProviderConfig:
@@ -731,6 +854,7 @@ def generate_frame(
     references: list[str],
     guard: SpendGuard,
     require_alpha: bool = True,
+    chroma_key: tuple[int, int, int] = GREEN_KEY,
 ) -> tuple[Image.Image, dict[str, Any]]:
     """Draw one image on the provider canvas. Placement happens later, once.
 
@@ -743,7 +867,13 @@ def generate_frame(
     Running the transparency check on it would see an opaque image, conclude the
     provider ignored a parameter that was never sent, and spend a second call
     keying out a background the sheet is supposed to have.
+
+    `chroma_key` is the backdrop `choose_chroma_key` picked for this bundle. It
+    defaults to green so that the two phases drawn before a canonical base exists
+    keep the behaviour they have always had -- there is no Pet to be the same
+    colour as yet.
     """
+    suffix = chroma_suffix(chroma_key)
 
     def once(active: ProviderConfig, text: str) -> tuple[Image.Image, float]:
         guard.check()
@@ -758,7 +888,7 @@ def generate_frame(
 
     if chroma_first:
         active = drop_transparency_params(config, keep_output_format=not bare)
-        text = prompt + CHROMA_SUFFIX
+        text = prompt + suffix
         alpha_path = "params-dropped+chroma-key" if bare else "chroma-key"
     elif not require_alpha:
         # The caller already asked for paper, so only the fields this model
@@ -789,13 +919,13 @@ def generate_frame(
         alpha_path = f"params-dropped+{alpha_path}"
 
     if chroma_first:
-        image = key_out_chroma(image)
+        image = key_out_chroma(image, chroma_key)
     elif require_alpha and not alpha_is_real(image):
         # An unknown model that ignored `background: transparent`, or a table
         # entry gone stale. Ask for a flat chroma field and key it out here.
-        text = prompt + CHROMA_SUFFIX
+        text = prompt + suffix
         image, cost = once(drop_transparency_params(active, keep_output_format=True), text)
-        image = key_out_chroma(image)
+        image = key_out_chroma(image, chroma_key)
         alpha_path = f"{alpha_path}+chroma-key"
 
     provenance = {
@@ -806,6 +936,9 @@ def generate_frame(
         "requested_output_format": active.output_format,
         "alpha_path": alpha_path,
         "alpha_path_source": "table" if declared else "probed",
+        # Beside alpha_path, because they are the same fact: how this frame got
+        # its transparency. A frame that keyed badly is diagnosed from the pair.
+        "chroma_key": list(chroma_key) if "chroma" in alpha_path else None,
         # What was actually sent, so prompt.md and the packet cannot disagree
         # with the request about which background was asked for.
         "background_instruction": text[len(prompt):].strip(),
@@ -833,12 +966,18 @@ def build_prompt(bundle: Path, state: str, index: int, frame_count: int, variant
     # Every state is legless, so every prompt says so. The four whose name pulls
     # towards legs get the longer version, which also says what to move instead.
     movement = LEGLESS_MOTION if state in MOTION_STATES else LEGLESS_BODY
+    # `failed` is sad in every frame; every other state carries its own mood in
+    # the variant intent, so only `failed` gets an imposed mood block.
+    mood = f"{FAILED_MOOD}\n" if state == "failed" else ""
     return (
         f"Draw frame {index} of {frame_count} for the `{state}` sprite action of this Pet.\n"
         f"The attached images are the identity lock: image 1 is the canonical base, "
         f"image 2 is the previous approved frame of this same action.\n"
         f"Keep the silhouette, proportions, palette, face landmarks, props and scale identical to them.\n"
         f"Motion read: {variant_intent}\n"
+        f"{mood}"
+        f"{SIGNATURE_MOTION}\n"
+        f"{SMOOTH_LOOP}\n"
         f"{movement}\n"
         f"{FRAMING}\n"
         f"One character only, and no text, letters or numbers anywhere."
@@ -1096,6 +1235,43 @@ def write_base_packet(
     return packet
 
 
+def stash_frame(
+    bundle: Path,
+    candidate_id: str,
+    index: int,
+    raw: Image.Image,
+    cell: Image.Image,
+    record: dict[str, Any],
+) -> None:
+    """Put one frame on disk the moment the provider answers for it.
+
+    Frames used to land only when `write_packet` ran, which is after the whole
+    state. Anything that stopped the run in between -- a ceiling, a Ctrl-C, an
+    agent killing the run to fix a defect it had just seen -- destroyed every
+    frame already drawn and billed. That cost 3 paid `failed` frames on
+    FarWatcher for nothing.
+
+    Both forms are kept, because they answer different questions. The cell is
+    what a reviewer looks at. The **raw** provider frame is what a resumed run
+    has to have: the final registration rebuilds every cell from the raws so the
+    art is resampled once rather than twice, and a cell cannot be un-fitted back
+    into one.
+
+    `provenance.jsonl` is appended per frame for the same reason `geist_spend`
+    appends a ledger line per call rather than per packet -- a run that dies
+    still has to be able to say what it bought.
+    """
+    packet = bundle / "sources" / "candidates" / candidate_id
+    frame_dir = packet / "frames"
+    raw_dir = packet / "raw"
+    frame_dir.mkdir(parents=True, exist_ok=True)
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    cell.save(frame_dir / f"{index:02d}.png")
+    raw.save(raw_dir / f"{index:02d}.png")
+    with (packet / "provenance.jsonl").open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record) + "\n")
+
+
 def write_packet(
     bundle: Path,
     candidate_id: str,
@@ -1178,20 +1354,68 @@ def write_packet(
 # state anyway, because nothing looked until the state was finished. Two frames
 # is enough to see clipping, an unkeyed background, and a body that changes
 # size, which are the three that repeat.
+#
+# The size check is the exception and no longer expires with this window. It is
+# the one check whose evidence only accumulates: a state cannot drift on frame 1
+# because there is nothing to drift from. `review` drifted to 1.46x across frames
+# 2-5 on FuseSprout with nothing stopping it, because the veto had already gone
+# quiet. Measuring is free; only drawing costs.
 PREFLIGHT_FRAMES = 2
 
-# How far a body's bbox area may drift from frame 0 before it stops being the
-# same character moving and starts being a different drawing.
-AREA_TOLERANCE = 0.35
+# How far past its declared `SIZE_BUDGET` a frame may sit, in LINEAR size against
+# the running median, before it stops being the same character moving and starts
+# being a different drawing.
+#
+# The veto is deliberately looser than the budget, because the budget is now
+# ENFORCED for free. `geist_registration.normalise_size` scales a stray frame
+# back onto the state median at no cost, so vetoing everything outside the budget
+# would burn a state to avoid a resample. What the slack marks is where a
+# resample stops being cheap: past it the correction is large enough to soften
+# the outline visibly, and the frame is better redrawn than rescued.
+#
+# 1.18 keeps the case this check was built on. A `waiting` repair came back at
+# 0.54x frame 0's bbox area -- 0.73 linear -- and was killed at frame 1, saving
+# four frames of spend. It is still killed here. The four states that drifted
+# 1.32x to 1.46x in AREA spread sit at about 1.10 linear against their median,
+# inside the slack, and are now silently normalised instead of redrawn: that is
+# the $0.33 the report priced.
+PREFLIGHT_SIZE_SLACK = 1.18
 
 
-def frame_problems(cell: Image.Image, fit: dict[str, Any], first_area: int) -> tuple[list[str], list[str]]:
+def size_allowance(state: str) -> float:
+    """The linear ratio to the running median at which pre-flight vetoes.
+
+    `SIZE_BUDGET` is declared as a SPREAD -- largest area over smallest -- so a
+    frame may sit `budget ** 0.25` from the median in linear size before it has
+    used the whole allowance, and the slack is what it may have on top.
+    """
+    return registration.size_budget_for(state) ** 0.25 * PREFLIGHT_SIZE_SLACK
+
+
+def frame_problems(
+    cell: Image.Image,
+    fit: dict[str, Any],
+    state: str,
+    areas: list[int],
+    base_components: int | None = None,
+) -> tuple[list[str], list[str], list[str]]:
     """Mechanical defects in one finished cell, split by how hard they stop a run.
 
-    Returns `(fatal, preflight)`. **Fatal** ends the state at whatever frame it
-    appears on. **Pre-flight** ends it only while the veto is still open, so a
-    marginal frame late in a state stays reportable and deterministically
-    repairable instead of throwing away the frames already paid for.
+    Returns `(fatal, preflight, standing)`. **Fatal** ends the state at whatever
+    frame it appears on. **Pre-flight** ends it only while the veto window is
+    still open, so a marginal frame late in a state stays reportable and
+    deterministically repairable instead of throwing away the frames already paid
+    for. **Standing** never expires: it is the band where the free repair would
+    itself damage the art, so a late frame there is not rescuable and the
+    remaining calls would buy nothing.
+
+    `areas` is every alpha area drawn so far in this state INCLUDING this cell,
+    and the ruler is their median. Frame 0 used to be the ruler, which
+    contradicted the principle `geist_registration` states in its own docstring
+    -- *a frame 0 is a pose; a median over the state is the Pet* -- and left the
+    generator registering against one thing and judging drift against another.
+    Alpha area rather than the bounding rectangle, for the same reason: a raised
+    arm adds a few percent of area and fifteen percent of bbox height.
 
     Nothing here needs a human or a provider call. What it cannot see is
     anatomy: a state that draws legs fits, keys out and holds its area
@@ -1199,6 +1423,7 @@ def frame_problems(cell: Image.Image, fit: dict[str, Any], first_area: int) -> t
     """
     fatal: list[str] = []
     preflight: list[str] = []
+    standing: list[str] = []
 
     # Fatal, because the background is baked into the art. On frame 0 it is
     # worse than one bad frame: alpha_bbox then covers the whole canvas, the
@@ -1209,13 +1434,34 @@ def frame_problems(cell: Image.Image, fit: dict[str, Any], first_area: int) -> t
 
     if not fit["fits"]:
         preflight.append(f"body reaches outside safe padding, bbox {fit.get('bbox')}")
-    bbox = alpha_bbox(cell)
-    area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) if bbox else 0
-    if first_area and area:
-        ratio = area / first_area
-        if not (1 - AREA_TOLERANCE) <= ratio <= (1 + AREA_TOLERANCE):
-            preflight.append(f"body area is {ratio:.2f}x frame 0, past the {AREA_TOLERANCE:.0%} tolerance")
-    return fatal, preflight
+
+    # A detached mark is an extra connected component, and that is the whole
+    # check. `running-right` frame 0 came back with 2-4 blue speed streaks
+    # floating beside the Pet; pre-flight passed it because streaks break no
+    # geometry and key out fine, and 13 frames across two states were drawn and
+    # discarded for $0.29 -- the largest single line of waste on FarWatcher. The
+    # prompt that caused it is fixed, but a prompt fix is not a check, and this
+    # runs on art that is already paid for.
+    if base_components:
+        found = component_count(cell)
+        if found > base_components:
+            preflight.append(
+                f"{found} separate marks in the cell against {base_components} in the canonical base: "
+                f"{found - base_components} floating beside the Pet"
+            )
+
+    if len(areas) >= 2:
+        median = statistics.median(areas)
+        area = areas[-1]
+        if median > 0 and area > 0:
+            linear = (area / median) ** 0.5
+            allowed = size_allowance(state)
+            if not (1 / allowed) <= linear <= allowed:
+                standing.append(
+                    f"body is {linear:.2f}x the state's running median size, past the "
+                    f"{allowed:.2f}x this state's SIZE_BUDGET allows"
+                )
+    return fatal, preflight, standing
 
 
 def parse_frame_range(spec: str | None, frame_count: int) -> list[int]:
@@ -1591,6 +1837,23 @@ def main() -> None:
         raise SystemExit("sources/canonical-base.png is the identity lock; approve one before generating frames")
     canonical_uri = image_reference(canonical)
 
+    # Two facts about this Pet, read once from the identity lock, that every
+    # frame of every state needs and that nothing used to ask for: which backdrop
+    # this Pet can safely be keyed off, and how many separate marks it is
+    # legitimately made of.
+    with Image.open(canonical) as opened:
+        base_image = opened.convert("RGBA")
+        chroma = choose_chroma_key(base_image)
+        base_components = component_count(base_image)
+    if not chroma["safe"] and ALPHA_PATHS.get(config.model) in {"chroma", "chroma-bare"}:
+        print(
+            f"warning: the best backdrop for this Pet is {chroma['name']}, and it is only "
+            f"{chroma['clearance']} from the Pet's nearest colour against a key tolerance of "
+            f"{KEY_TOLERANCE}. Frames may key out with holes in them. Consider a canonical base "
+            f"whose palette leaves more room, or a model with a native alpha path.",
+            file=sys.stderr,
+        )
+
     candidate_id = f"{action}-{args.variant}"
     ledger.candidate_id = candidate_id
     produced: list[tuple[int, Image.Image]] = []
@@ -1601,7 +1864,7 @@ def main() -> None:
     first_prompt = ""
     misfits: list[dict[str, Any]] = []
 
-    first_area = 0
+    areas: list[int] = []
     aborted: dict[str, Any] | None = None
 
     for position, index in enumerate(indices):
@@ -1609,14 +1872,24 @@ def main() -> None:
         references = [canonical_uri]
         if previous is not None:
             references.append(data_uri(previous))
-        else:
-            earlier = bundle / "frames" / action / f"{max(0, index - 1):02d}.png"
-            if index > 0 and earlier.is_file():
-                references.append(image_reference(earlier))
+        elif index > 0:
+            # The previous frame, wherever the previous frame actually is. A
+            # resumed run has no `previous` in memory, and its earlier frames are
+            # not in `frames/` either -- they are unapproved, sitting in this
+            # candidate's own packet where the interrupted run stashed them.
+            # Reading the packet first is what makes `--frames 3-7` continue a
+            # state rather than restart its identity chain from the base alone.
+            for earlier in (
+                bundle / "sources" / "candidates" / candidate_id / "frames" / f"{index - 1:02d}.png",
+                bundle / "frames" / action / f"{index - 1:02d}.png",
+            ):
+                if earlier.is_file():
+                    references.append(image_reference(earlier))
+                    break
 
         prompt = build_prompt(bundle, action, index, frame_count, args.variant_intent, args.extra_prompt)
         first_prompt = first_prompt or prompt
-        raw, record = generate_frame(config, prompt, references, guard)
+        raw, record = generate_frame(config, prompt, references, guard, chroma_key=chroma["key"])
 
         # A provisional transform, good enough to judge a frame by and thrown
         # away once the state is complete. It exists so the pre-flight veto below
@@ -1631,9 +1904,15 @@ def main() -> None:
         if not fit["fits"]:
             misfits.append({"frame": index, **fit})
 
-        bbox = alpha_bbox(cell)
-        if position == 0:
-            first_area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1]) if bbox else 0
+        # Measured on the RAW provider frame, not on the fitted cell. The cell
+        # was fitted by a provisional transform derived from frame 0, so a cell
+        # area is partly a statement about frame 0 -- which is the dependence
+        # this check exists to remove. The raw frame is what the provider
+        # actually drew, and it is also what the final registration rebuilds
+        # from, so drift is measured on the same pixels that will be corrected.
+        anchor = registration.measure(raw)
+        if anchor is not None:
+            areas.append(anchor.area)
 
         record["frame"] = index
         record["reference_count"] = len(references)
@@ -1642,12 +1921,25 @@ def main() -> None:
         produced.append((index, cell))
         previous = cell
 
+        # A frame lands on disk the moment the provider answers for it. It used
+        # to land when the whole state finished, so stopping a run to fix a
+        # defect threw away every frame already paid for -- 3 `failed` frames on
+        # FarWatcher, drawn, billed and never written. This is the same argument
+        # `geist_spend` already makes for appending a ledger line at the answer
+        # rather than at the packet: the art deserves what the receipt gets.
+        # The registered rewrite below replaces these; until it runs, the raw
+        # draw is what `--frames` can resume from.
+        stash_frame(bundle, candidate_id, index, raw, cell, record)
+
         # The veto, and the whole point of drawing in this order: a prompt that
         # cannot produce a usable frame costs two calls instead of eight.
-        fatal, preflight = frame_problems(cell, fit, first_area)
-        if fatal or (preflight and position < PREFLIGHT_FRAMES):
-            aborted = {"frame": index, "problems": fatal + preflight,
-                       "stopped_by": "fatal" if fatal else "pre-flight"}
+        fatal, preflight, standing = frame_problems(cell, fit, action, areas, base_components)
+        if fatal or standing or (preflight and position < PREFLIGHT_FRAMES):
+            aborted = {
+                "frame": index,
+                "problems": fatal + standing + preflight,
+                "stopped_by": "fatal" if fatal else ("size-budget" if standing else "pre-flight"),
+            }
             break
 
     assert transform is not None
@@ -1670,6 +1962,13 @@ def main() -> None:
             budget = registration.budget_for(action)
             offset_x, offset_y = registration.placement(anchors, target, scale, budget)
             cells = [registration.apply(raw, scale, offset_x, offset_y) for _index, raw in raws]
+            drawn_spread = registration.size_spread(cells)
+            # Size before position, because normalising a frame's size moves the
+            # pixels the translation is about to measure. `state_scale` above
+            # already decided how big this state is against the Pet; this decides
+            # whether the state holds that size across its own frames, which is a
+            # different question with a different cause and needed a second pass.
+            cells, resized = registration.normalise_size(cells, action)
             cells, moved = registration.register(cells, action, target)
             produced = [(index, cell) for (index, _raw), cell in zip(raws, cells)]
             transform = CellTransform(
@@ -1691,9 +1990,18 @@ def main() -> None:
                 "anchor_x": target.x,
                 "anchor_base": target.base,
                 "budget": {"horizontal": budget[0], "vertical": budget[1]},
+                "size_budget": registration.size_budget_for(action),
+                # As drawn, then as shipped. The pair is the evidence: a large
+                # first number and a small second one is this pass doing its job,
+                # and two large numbers on a budgeted state is the artwork.
+                "size_spread_drawn": round(drawn_spread, 4),
+                "size_spread_shipped": round(
+                    registration.size_spread([cell for _index, cell in produced]), 4
+                ),
                 "size_vs_canonical_base": round(
                     registration.size_ratio([a for a in final if a is not None], target), 4
                 ),
+                "frames_resized": resized,
                 "frames_moved": moved,
             }
 
@@ -1704,11 +2012,18 @@ def main() -> None:
     if aborted is not None:
         listed = "; ".join(aborted["problems"])
         next_step = (
-            f"pre-flight stopped this state at frame {aborted['frame']} of "
+            f"{aborted['stopped_by']} stopped this state at frame {aborted['frame']} of "
             f"{len(indices)}: {listed}. Fix the prompt or the canonical base and run the "
             f"state again -- the remaining {len(indices) - len(produced)} frames would have "
             f"carried the same defect. The frames drawn so far are in the packet as evidence."
         )
+        if aborted["stopped_by"] == "size-budget":
+            next_step += (
+                f" A size lock in --extra-prompt is not the fix: it was measured taking one "
+                f"state from 1.41x to 1.14x and the next to 0.54x. If `{action}` genuinely "
+                f"changes size, declare it in geist_house.SIZE_BUDGET and it is normalised "
+                f"for free instead."
+            )
     elif args.mode == MODE_SUPERVISED:
         next_step = (
             f"pre-screen the packet, then render qa/{action}-review.html "
@@ -1736,8 +2051,21 @@ def main() -> None:
                 "cell_transform": transform.as_dict(),
                 "registration": registered,
                 "alpha_paths": sorted({record["alpha_path"] for record in provenance}),
+                "chroma_key": {
+                    "name": chroma["name"],
+                    "rgb": list(chroma["key"]),
+                    "clearance_from_pet": chroma["clearance"],
+                    "safe": chroma["safe"],
+                    "scores": chroma["scores"],
+                },
+                "canonical_base_components": base_components,
                 "frames_outside_safe_padding": misfits,
-                "preflight": aborted or {"passed": True, "frames_checked": min(PREFLIGHT_FRAMES, len(produced))},
+                "preflight": aborted
+                or {
+                    "passed": True,
+                    "frames_checked": min(PREFLIGHT_FRAMES, len(produced)),
+                    "size_checked": len(produced),
+                },
                 "spend": guard.as_dict(),
                 "ledger": ledger.as_dict(),
                 "next": next_step,

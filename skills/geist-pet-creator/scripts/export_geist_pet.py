@@ -24,6 +24,7 @@ from geist_grid import (
     FrameGrid,
     cell_box,
 )
+from geist_approvals import FINAL_AUDIT, find_approval
 from geist_pixels import clear_transparent_rgb
 from validate_source_bundle import validate_bundle
 
@@ -63,39 +64,11 @@ def atlas_digest(atlas: Image.Image) -> str:
 def audit_approval(bundle: Path, digest: str) -> tuple[dict[str, Any] | None, str | None]:
     """The final-audit approval for these exact pixels, and why not when absent.
 
-    Returns `(entry, problem)`. `problem` is None when the file was read fine and
-    simply holds no matching approval — the ordinary case. It is a sentence when
-    the file could not be read at all.
-
-    Four different states used to collapse into one `None`: file absent, file
-    unparseable, file parseable but not a top-level list, and file correct with
-    no matching digest. The caller then reported the fourth for all four, which
-    sends a reader hunting for a missing approval that is sitting right there in
-    a file whose shape is wrong.
+    The schema now lives in `geist_approvals`, which both reads and writes it, so
+    the shape this gate requires has a definition an agent can reach before it
+    writes the file rather than only after the export refuses.
     """
-    approvals_path = bundle / "qa" / "approvals.json"
-    if not approvals_path.is_file():
-        return None, f"{approvals_path} does not exist"
-    try:
-        approvals = json.loads(approvals_path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError as error:
-        return None, f"{approvals_path} is not valid JSON: {error}"
-    if not isinstance(approvals, list):
-        return None, (
-            f"{approvals_path} holds a {type(approvals).__name__}, and this reader wants a "
-            f"top-level JSON array of decision records. The approval may well be in there; "
-            f"nothing can find it in this shape."
-        )
-    for entry in approvals:
-        if not isinstance(entry, dict):
-            continue
-        if (
-            entry.get("approved_action") == "final-audit"
-            and entry.get("decision") == "approved"
-            and entry.get("atlas_digest") == digest
-        ):
-            return entry, None
-    return None, None
+    return find_approval(bundle, FINAL_AUDIT, digest)
 
 
 def save_contact_sheet(atlas: Image.Image, output: Path) -> None:
@@ -174,10 +147,13 @@ def main() -> None:
             raise SystemExit(f"cannot read the approvals file, so the audit gate cannot open.\n  {unreadable}")
         raise SystemExit(
             "no approved final anatomy audit for these exact frames.\n"
-            f"  atlas digest: {digest[:12]}\n"
+            f"  atlas digest: {digest}\n"
             "  run: python audit_spritesheet.py <bundle> --repair\n"
-            "  then have the human approve qa/final-audit.html and record the approval in qa/approvals.json\n"
-            "  with approved_action=final-audit, decision=approved, and this atlas_digest."
+            "  then have the human approve qa/final-audit.html, and record it with:\n"
+            f"    python geist_approvals.py {bundle} --action final-audit \\\n"
+            f"      --atlas-digest {digest} --note '<what the human said>'\n"
+            "  Write that file through geist_approvals rather than by hand: it owns the schema, "
+            "and the two fields this gate matches on are not in SKILL.md's prose list."
         )
 
     png_path = output_dir / "spritesheet.png"

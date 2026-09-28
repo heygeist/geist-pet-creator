@@ -44,7 +44,9 @@ Before asking the human to review a generated candidate, the agent must check:
 - Blend balance (derived Pets): the candidate is neither a franchise copy nor a generic blob.
 - Layout: whole Pet is inside the frame with safe padding and no copied guide marks.
 - Alpha or extraction readiness: background can be made transparent cleanly; no obvious fringe or residue.
-- State semantics: pose reads as the requested Geist state.
+- State semantics: pose reads as the requested Geist state. For `failed`, every frame must read sad or negative — reject the row if any frame smiles, waves, bounces, or otherwise reads happy or neutral.
+- Signature motion: the face (eyes, mouth) and at least one other body part (arm nubs, crown cue, prop, palette accents) visibly change across the state's frames. A state carried by body translation alone, with a frozen face, is a reject.
+- Loop smoothness: adjacent frames progress continuously with no snap or pose jump, and the last frame flows back into the first.
 - Prompt compliance: no forbidden props, symbols, text, shadows, or detached effects.
 
 Reject clear failures before human review. Escalate borderline subjective choices with explicit risks instead of hiding uncertainty.
@@ -137,8 +139,11 @@ Reject frames with:
 
 Inspect previews after export:
 
-- First and last frames should loop without a jarring jump.
+- First and last frames must loop without a jarring jump: every state plays as a seamless cycle, so a snap at the wrap point is a defect in any row.
+- Motion must be smooth and continuous between adjacent frames — no teleporting parts, no expression that flips between frames, no limb that appears and vanishes.
+- Every state must animate the Pet's signature: the face (eyes, mouth) plus at least one other body part (arm nubs, crown cue, prop, palette accents) visibly move in a way that fits the state and the Pet's personality. Body translation alone is unfinished art.
 - `idle`, `waiting`, `running`, and `review` must show visible but restrained motion.
+- `failed` must read sad or negative in every frame — drooping, downturned, downcast, deflated. Any happy, celebratory, or neutral frame in the row fails the state.
 - Directional rows must face and travel the correct direction. By default, `running-left` should be a horizontal mirror of the approved `running-right` source frames; reject independently generated `running-left` art unless the human explicitly requested asymmetric directional art.
 - `running-right` and `running-left` must read as lateral movement/gliding, not leg-running, walking, feet, or foot-step poses.
 - `running` must read as task work, not jogging or sprinting.

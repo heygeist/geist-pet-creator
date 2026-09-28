@@ -22,6 +22,11 @@ ALPHA_THRESHOLD = 8
 # Above this alpha a pixel is solid, so it cannot be chroma-key antialiasing.
 OPAQUE_THRESHOLD = 245
 
+# Below this many pixels a blob is antialiasing noise rather than a mark. Shared
+# by everything that counts components, so a speck the audit ignores cannot be a
+# speck pre-flight vetoes on.
+MIN_COMPONENT_AREA = 12
+
 
 def solid(image: Image.Image, threshold: int = ALPHA_THRESHOLD) -> Image.Image:
     """An `L` image: 255 where the frame is visible, 0 where it is not."""
@@ -79,6 +84,71 @@ def transparent_rgb_residue(image: Image.Image) -> int:
         lambda value: 255 if value else 0
     )
     return count(ImageChops.multiply(transparent, coloured))
+
+
+def ink_components(
+    mask: bytearray, width: int, height: int, min_area: int = MIN_COMPONENT_AREA
+) -> list[dict[str, object]]:
+    """4-connected components of a 0/1 mask, largest first, tiny specks dropped.
+
+    This lives here rather than in the auditor because two callers now need it
+    and they need it for opposite reasons. The auditor counts components on
+    finished art to rank a frame's suspicion, after every call is paid for. The
+    generator counts them on frame 0, where the same number is worth money: a
+    detached mark is an extra component, and detached marks are the defect that
+    drew 13 frames across two states and kept none of them on 2026-08-12.
+
+    Entries carry their pixel indices as well as area and bbox, because the
+    auditor's stray-fragment repair erases them one pixel at a time.
+    """
+    seen = bytearray(width * height)
+    found: list[dict[str, object]] = []
+    for start in range(width * height):
+        if not mask[start] or seen[start]:
+            continue
+        stack = [start]
+        seen[start] = 1
+        pixels: list[int] = []
+        while stack:
+            index = stack.pop()
+            pixels.append(index)
+            x = index % width
+            y = index // width
+            if x > 0 and mask[index - 1] and not seen[index - 1]:
+                seen[index - 1] = 1
+                stack.append(index - 1)
+            if x < width - 1 and mask[index + 1] and not seen[index + 1]:
+                seen[index + 1] = 1
+                stack.append(index + 1)
+            if y > 0 and mask[index - width] and not seen[index - width]:
+                seen[index - width] = 1
+                stack.append(index - width)
+            if y < height - 1 and mask[index + width] and not seen[index + width]:
+                seen[index + width] = 1
+                stack.append(index + width)
+        if len(pixels) < min_area:
+            continue
+        xs = [index % width for index in pixels]
+        ys = [index // width for index in pixels]
+        found.append(
+            {
+                "area": len(pixels),
+                "bbox": [min(xs), min(ys), max(xs) + 1, max(ys) + 1],
+                "pixels": pixels,
+            }
+        )
+    found.sort(key=lambda component: -component["area"])
+    return found
+
+
+def component_count(image: Image.Image, min_area: int = MIN_COMPONENT_AREA) -> int:
+    """How many separate marks are visible in a frame.
+
+    A Pet is one component plus whatever its parts genuinely detach into. Any
+    number above what the canonical base shows is a floating mark: a speed line,
+    a spark, a dropped limb, or a face glyph that came back in pieces.
+    """
+    return len(ink_components(alpha_mask(image), image.width, image.height, min_area))
 
 
 def data_uri(image: Image.Image) -> str:

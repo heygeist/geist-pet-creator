@@ -65,6 +65,11 @@ def html_path(path: str) -> str:
 
 def normalize_frame(cell: Image.Image) -> Image.Image:
     rgba = cell.convert("RGBA")
+    # A contact sheet with real transparency has already had its chroma key
+    # removed. Running the legacy green-key heuristic again would erase valid
+    # green character details such as leaves. Only infer a green key for fully
+    # opaque source cells; otherwise trust the supplied alpha channel.
+    has_transparency = rgba.getchannel("A").getextrema()[0] < 255
     pixels = rgba.load()
     width, height = rgba.size
     for y in range(height):
@@ -72,9 +77,9 @@ def normalize_frame(cell: Image.Image) -> Image.Image:
             red, green, blue, alpha = pixels[x, y]
             is_green_key = green > 105 and green > red + 35 and green > blue + 35
             is_near_green_key = green > 150 and green > red + 18 and green > blue + 18
-            if is_green_key or is_near_green_key:
+            if alpha == 0:
                 pixels[x, y] = (0, 0, 0, 0)
-            elif alpha == 0:
+            elif not has_transparency and (is_green_key or is_near_green_key):
                 pixels[x, y] = (0, 0, 0, 0)
     return rgba.resize((192, 208), Image.Resampling.LANCZOS)
 
@@ -146,8 +151,12 @@ def discover_candidates(bundle: Path, action: str) -> list[dict[str, Any]]:
         target = context.get("target", {})
         state = target.get("state") or target.get("action") or target.get("kind")
         candidate_id = str(context.get("candidate_id", context_path.parent.name))
-        if action and state != action and not candidate_id.startswith(f"{action}-"):
-            continue
+        if action and state != action:
+            # A declared target state is authoritative. Prefix fallback exists
+            # only for older packets that omitted target.state; otherwise
+            # `running-right-a` leaks into the `running` review page.
+            if state is not None or not candidate_id.startswith(f"{action}-"):
+                continue
         candidate_dir = context_path.parent
         generated_file = context.get("generated_file")
         preview = ensure_animated_preview(bundle, candidate_dir, context, action)

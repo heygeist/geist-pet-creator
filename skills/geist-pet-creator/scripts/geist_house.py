@@ -94,6 +94,41 @@ FLAT_FIELD = (
     "or cast shadow."
 )
 
+# Every frame prompt carries this, because a state that only bobs its body reads
+# as the same Pet wearing different labels. The signature is what makes `waiting`
+# unmistakably THIS Pet waiting: its face landmarks, crown cue, prop and palette
+# accents all take part in the motion. A frame where only the body's vertical
+# position changed is a pre-screen reject, not a restrained variant.
+SIGNATURE_MOTION = (
+    "Expression: animate the face and the character's signature parts in every frame, not "
+    "just the body's position. The eyes, mouth, arm nubs, crown cue, prop and palette "
+    "accents each move in a way that fits this state and fits this Pet's personality: "
+    "eyes narrow, widen, glance or blink; the mouth opens, flattens or curves; arm nubs "
+    "lift, droop or gesture; the crown cue and prop sway, perk or wilt with the motion. "
+    "At least the face and one other body part must visibly change across the frames of "
+    "this action. A state carried by body translation alone is unfinished art."
+)
+
+# Every multi-frame state loops in the app, so the last frame must flow back into
+# the first. A cycle whose ends disagree pops once per loop, forever.
+SMOOTH_LOOP = (
+    "Loop: this action plays as a seamless repeating cycle, so keep the motion smooth "
+    "and continuous across frames and make the last frame flow naturally back into the "
+    "first with no snap, pop or pose jump at the wrap point."
+)
+
+# The `failed` state reads sad, deflated and negative in EVERY frame -- that is
+# the whole meaning of the state in the app. A single cheerful, neutral or
+# celebratory frame in the row breaks the read, so the ban is total rather than
+# a matter of degree.
+FAILED_MOOD = (
+    "Mood: this is the `failed` action, so every frame shows a sad, disappointed, "
+    "deflated or discouraged Pet and nothing else. Drooping arm nubs, downturned or "
+    "flat mouth, sad or downcast eyes, a slightly sagged or deflated body. Draw no "
+    "smile, grin, smirk, cheerful eyes, thumbs-up, wave, bounce, sparkle, celebration "
+    "or any other happy, neutral or positive read in any frame."
+)
+
 # The states whose NAME pulls hardest towards legs. The word in the prompt is
 # what does the damage, so these are the ones that carry LEGLESS_MOTION.
 MOTION_STATES = frozenset({"running-right", "running-left", "running", "jumping"})
@@ -136,6 +171,56 @@ def motion_budget(state: str) -> tuple[int, int]:
     like art.
     """
     return MOTION_BUDGET.get(state, STILL)
+
+
+# How much a state's body may change SIZE across its own frames, as the ratio
+# between its largest and smallest alpha area. `MOTION_BUDGET` says where a body
+# may go; this says how big it may get once it is there. The two are the same
+# argument made about different pixels, and until this table existed only half
+# of it was declared.
+#
+# The gap was expensive. `generate_candidates.py` draws one frame per call with
+# the previous frame attached as a reference, so size ratchets along the chain
+# and frames 00-01 come back smallest every time. Measured 2026-08-13 on
+# FuseSprout, as drawn:
+#
+#     review   1.46x    idle   1.41x    waiting 1.37x    running 1.32x
+#     failed   1.50x    jumping 1.21x
+#
+# The first four are defects and the last two are the artwork -- a `failed` Pet
+# deflates and a `jumping` one squashes and stretches. Both sets come out of the
+# same pixels, exactly as with travel, so only a declaration separates them.
+# Three paid redraws went into telling the model to hold its size and bought
+# nothing: a SIZE LOCK in `--extra-prompt` took `idle` from 1.41x to 1.14x once,
+# then the next state came back at 0.54x. It is noise, not control. Scaling each
+# frame to the state's median area is deterministic, free, and landed all five
+# pinned states at 1.01-1.03x in one pass.
+#
+# PINNED normalises every frame of the state onto the state's median. A budgeted
+# state keeps its drawn sizes and is only pulled back when it overruns, which is
+# how `register` already treats a budgeted axis of travel.
+PINNED = 1.0
+SIZE_BUDGET: dict[str, float] = {
+    "idle": PINNED,
+    "waving": PINNED,
+    "waiting": PINNED,
+    "review": PINNED,
+    "running-right": PINNED,
+    "running-left": PINNED,
+    "running": PINNED,
+    "failed": 1.6,  # deflation is the pose; measured 1.50x
+    "jumping": 1.35,  # squash and stretch is the pose; measured 1.21x
+}
+
+
+def size_budget(state: str) -> float:
+    """The size allowance for a state, defaulting to pinned.
+
+    Same default and same reasoning as `motion_budget`: a new state nobody has
+    thought about should hold its size and be visibly wrong, rather than breathe
+    and look like art.
+    """
+    return SIZE_BUDGET.get(state, PINNED)
 
 # Cell count -> (columns, rows, aspect ratio).
 #

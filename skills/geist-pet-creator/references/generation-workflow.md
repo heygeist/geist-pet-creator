@@ -24,7 +24,7 @@ Write `character-bible.md` before generating frames. Include:
 - Palette: named colors and materials
 - Face landmarks: eye shape, eye spacing, mouth placement, face area
 - Props and accessories: side, shape, colors, attachment points
-- Motion personality: how this Pet idles, asks, works, fails, and reviews
+- Motion personality: how this Pet idles, asks, works, fails, and reviews — per state, which face landmarks and which other body parts (arm nubs, crown cue, prop, palette accents) move, and how. This is the signature the frame prompts animate; a state with no entry here gets generic motion
 - Avoidances: marks, effects, styles, objects, or expressions that would break identity
 - **Identity Blend** (derived Pets only): the source, its ranked cues, how each was translated, and which were dropped
 - **Part Manifest**: every part, how many times it may appear, its side, and its attachment point
@@ -171,7 +171,7 @@ For each sprite action:
 
 ### What varies between variants
 
-Variants vary **motion read and expression**: how far the body travels, how much it bobs, and the posture and expression language that carry the state. Expression is how `waiting` reads differently from `idle`, and it stays inside the Part Manifest, so the anatomy audit still counts it.
+Variants vary **motion read and expression**: how far the body travels, how much it bobs, and the posture and expression language that carry the state. Expression is how `waiting` reads differently from `idle`, and it stays inside the Part Manifest, so the anatomy audit still counts it. For `failed`, variants vary only within the sad family — sobbing versus drooping versus turned-away — never toward neutral or happy.
 
 Identity, palette, props, and style never vary here. Identity variance belongs to the concept sheet, before `canonical-base` is approved. A "variant" that changes the crown cue is not a variant, it is a different Pet.
 
@@ -385,15 +385,17 @@ Variant C: expressive anticipation, gentle upward bounce, no extra symbols.
 
 ## State Semantics
 
-- `idle`: subtle breathing, blink, or tiny body bob. Not static, not busy.
-- `running-right`: moving/gliding to the right. It is not literal running; do not use legs, feet, foot-step poses, walking, jogging, sprinting, shoes, knees, or running mechanics.
+Every state animates this Pet's signature, not just its position. Across each state's frames the face (eyes, mouth) and at least one other body part (arm nubs, crown cue, prop, palette accents) must visibly move in a way that fits both the state and the Pet's personality — a state carried by body translation alone is unfinished art, and a state whose expression never changes is a pre-screen reject. Every state also loops in the app, so motion must be smooth and continuous with the last frame flowing back into the first.
+
+- `idle`: subtle breathing, blink, or tiny body bob, with the face alive — slow blinks, a soft mouth, a gentle sway of the crown cue or prop. Not static, not busy.
+- `running-right`: moving/gliding to the right, leaning into the glide with eager eyes and trailing body shapes. It is not literal running; do not use legs, feet, foot-step poses, walking, jogging, sprinting, shoes, knees, or running mechanics.
 - `running-left`: horizontal mirror of the approved `running-right` frames by default, so the left and right directional rows are the same sprite cycle flipped. It is not literal running; do not use legs, feet, foot-step poses, walking, jogging, sprinting, shoes, knees, or running mechanics. Generate independent `running-left` art only if the human explicitly requests asymmetric directional art.
-- `waving`: greeting gesture using the body or limb, no wave marks.
-- `jumping`: vertical motion through body position, no floor marks or shadows.
-- `failed`: error or deflated reaction, readable but not noisy.
-- `waiting`: asks for approval, help, or user input.
-- `running`: active task work, processing, thinking, scanning, typing, or focused effort. Not foot-running.
-- `review`: focused inspection, reading, leaning, or thinking.
+- `waving`: greeting gesture using the body and a raised arm nub, with a bright happy face. No wave marks.
+- `jumping`: vertical motion through body position with squash on the way down and stretch on the way up, eyes and mouth reacting to the arc. No floor marks or shadows.
+- `failed`: sad, disappointed, deflated or discouraged in **every** frame and nothing else — drooping arm nubs, downturned or flat mouth, sad or downcast eyes, a slightly sagged body. No smile, grin, cheerful eyes, wave, bounce, sparkle, celebration, or any happy or neutral read in any frame. One cheerful frame breaks the whole row.
+- `waiting`: asks for approval, help, or user input — expectant lean, questioning eyes, mouth open as if asking.
+- `running`: active task work, processing, thinking, scanning, typing, or focused effort, with a concentrated face and busy arm nubs. Not foot-running.
+- `review`: focused inspection, reading, leaning, or thinking — narrowed studying eyes, a tilted or leaning body, the prop or crown cue caught up in the scrutiny.
 
 ## Repair Loop
 
